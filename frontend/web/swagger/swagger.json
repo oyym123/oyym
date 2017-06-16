@@ -1,0 +1,44 @@
+{
+    "swagger": "2.0",
+    "paths": {
+        "/demo/t?debug=1": {
+            "get": {
+                "tags": [
+                    "demo"
+                ],
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/demo/test": {
+            "post": {
+                "tags": [
+                    "demo"
+                ],
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "formData",
+                        "description": "",
+                        "required": true,
+                        "type": "integer",
+                        "default": 1
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {}
+}
