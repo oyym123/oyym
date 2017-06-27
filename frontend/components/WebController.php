@@ -140,6 +140,7 @@ class WebController extends Controller
         return $output;
     }
 
+
     //接口-当前应用类型
     public static function getAppType()
     {

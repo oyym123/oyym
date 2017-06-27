@@ -15,7 +15,7 @@ return [
         'fixture' => [
             'class' => 'yii\console\controllers\FixtureController',
             'namespace' => 'common\fixtures',
-          ],
+        ],
     ],
     'components' => [
         'log' => [
@@ -25,6 +25,13 @@ return [
                     'levels' => ['error', 'warning'],
                 ],
             ],
+        ],
+        'db' => [
+            'class' => 'yii\db\Connection',
+            'dsn' => 'mysql:host=localhost;dbname=zcdb',
+            'username' => 'root',
+            'password' => 'leaves_9876',
+            'charset' => 'utf8',
         ],
     ],
     'params' => $params,
