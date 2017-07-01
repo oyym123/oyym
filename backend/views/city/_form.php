@@ -4,15 +4,19 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\User */
+/* @var $model app\models\City */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="user-form">
+<div class="city-form">
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model,'status')->dropDownList(\common\models\User::status())?>
+    <?= $form->field($model, 'upid')->textInput() ?>
+
+    <?= $form->field($model, 'name')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model, 'level')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

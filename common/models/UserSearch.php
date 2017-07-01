@@ -10,7 +10,7 @@ use common\models\User;
 /**
  * IUserSearch represents the model behind the search form about `common\models\User`.
  */
-class IUserSearch extends User
+class UserSearch extends User
 {
     /**
      * @inheritdoc

@@ -2,40 +2,50 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use dosamigos\datepicker\DatePicker;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\IUserSearch */
+/* @var $model app\models\UserYearSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="user-search">
+<div class="user-search  form-inline">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
         'method' => 'get',
     ]); ?>
 
-    <?= $form->field($model, 'id') ?>
+    <div class="form-group form-inline left">
+        <?= DatePicker::widget([
+            'id' => 'start_date',
+            'name' => 'start_date',//当没有设置model时和attribute时必须设置name
+            'language' => 'zh-CN',
+            'size' => 'ms',
+            'value' => Yii::$app->request->get('start_date'),
+            'clientOptions' => [
+                'autoclose' => true,
+                'format' => 'yyyy-mm-dd',
+                'todayBtn' => true,
+            ],
+        ]); ?>
+        至
+        <?= DatePicker::widget([
+            'id' => 'end_date',
+            'name' => 'end_date',
+            'value' => Yii::$app->request->get('end_date'),
+            'language' => 'zh-CN',
+            'size' => 'ms',
+            'clientOptions' => [
+                'autoclose' => true,
+                'format' => 'yyyy-mm-dd',
+                'todayBtn' => true
+            ]
+        ]); ?>
 
-    <?= $form->field($model, 'username') ?>
 
-    <?= $form->field($model, 'auth_key') ?>
-
-    <?= $form->field($model, 'password_hash') ?>
-
-    <?= $form->field($model, 'password_reset_token') ?>
-
-    <?php // echo $form->field($model, 'email') ?>
-
-    <?php // echo $form->field($model, 'status') ?>
-
-    <?php // echo $form->field($model, 'created_at') ?>
-
-    <?php // echo $form->field($model, 'updated_at') ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton('Reset', ['class' => 'btn btn-default']) ?>
+        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Reset', ['/users'], ['class' => 'btn btn-default']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

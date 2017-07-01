@@ -2,7 +2,10 @@
 
 namespace common\models;
 
+use common\helpers\QiniuHelper;
 use Yii;
+use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "video".
@@ -21,6 +24,8 @@ use Yii;
  */
 class Video extends Base
 {
+    const TYPE_PRODUCT = 1; //产品视频
+
     /**
      * @inheritdoc
      */
@@ -59,5 +64,72 @@ class Video extends Base
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
         ];
+    }
+
+    /** 获取所有视频类型 */
+    public static function videoType()
+    {
+        return [
+            self::TYPE_PRODUCT => '产品视频',
+        ];
+    }
+
+    /** 获取视频类型 */
+    public function getType()
+    {
+        return ArrayHelper::getValue(self::videoType(), $this->type);
+    }
+
+    /** 获取所有视频 */
+    public function getVideos($params)
+    {
+        $videos = self::find()
+            ->where(['type_id' => ArrayHelper::getValue($params, 'type_id'),
+                'type' => ArrayHelper::getValue($params, 'type'),
+                'status' => self::STATUS_ENABLE])->orderBy('sort desc')->all();
+
+        $data = [];
+        foreach ($videos as $key => $video) {
+            if ($key < $params['limit']) {  //设置视频下放最大数量
+                if ($video->url) {
+                    $data[] = [
+                        'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_videos'], $video->url),
+                        'name' => $video->name ?: ''
+                    ];
+                }
+            }
+        }
+        return $data;
+    }
+
+    /** 获取单张视频 */
+    public function getOneVideo($params)
+    {
+        $video = self::find()
+            ->where(['type_id' => ArrayHelper::getValue($params, 'type_id'),
+                'type' => ArrayHelper::getValue($params, 'type'),
+                'status' => self::STATUS_ENABLE])->orderBy('sort desc')->one();
+
+        return [
+            'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_videos'], $video->url),
+            'name' => $video->name ?: ''
+        ];
+    }
+
+    /** 设置视频 */
+    public function setVideo($params)
+    {
+        $video = new video();
+        $video->name = ArrayHelper::getValue($params, 'name');
+        $video->type = ArrayHelper::getValue($params, 'type');
+        $video->type_id = ArrayHelper::getValue($params, 'type_id');
+        $video->url = ArrayHelper::getValue($params, 'url');
+        $video->size_type = ArrayHelper::getValue($params, 'size_type');
+        $video->status = ArrayHelper::getValue($params, 'status');
+        $video->created_at = time();
+        $video->updated_at = time();
+        if (!$video->save()) {
+            throw new Exception('视频保存失败!');
+        }
     }
 }

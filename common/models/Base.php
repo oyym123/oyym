@@ -23,12 +23,6 @@ class Base extends \yii\db\ActiveRecord
 
     Use BaseData;
 
-    // 文科 理科
-    const SUBJECT_WEN = 1;
-    const SUBJECT_LI = 2;
-    const SUBJECT_REGARDLESS = 3;
-
-
     const STATUS_DISABLE = 0;   // 无效
     const STATUS_ENABLE = 1;    // 有效
 

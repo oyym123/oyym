@@ -10,11 +10,9 @@ namespace frontend\controllers;
 
 class ApiController extends \yii\base\Controller
 {
-
     function actionList2()
     {
-        $this->layout='blank';
+        $this->layout = 'blank';
         return $this->render('index');
     }
-
 }

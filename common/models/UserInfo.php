@@ -32,7 +32,7 @@ class UserInfo extends Base
     {
         return [
             [['user_id', 'name', 'created_at', 'updated_at'], 'required'],
-            [['user_id', 'like_count', 'created_at', 'updated_at'], 'integer'],
+            [['user_id', 'like_count', 'created_at', 'updated_at', 'province', 'city', 'area'], 'integer'],
             [['profit'], 'number'],
             [['name'], 'string', 'max' => 255],
         ];
@@ -48,6 +48,9 @@ class UserInfo extends Base
             'user_id' => '用户ID',
             'name' => '名称',
             'profit' => '收益',
+            'province' => '省',
+            'city' => '市',
+            'area' => '地区',
             'like_count' => '点赞数',
             'created_at' => '创建时间',
             'updated_at' => '修改时间',

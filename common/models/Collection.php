@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
+use yii\base\Exception;
 
 /**
  * This is the model class for table "collection".
@@ -31,7 +33,7 @@ class Collection extends Base
     {
         return [
             [['user_id', 'type_id', 'type', 'created_at', 'updated_at'], 'required'],
-            [['user_id', 'type_id', 'type', 'created_at', 'updated_at'], 'integer'],
+            [['user_id', 'type_id', 'type', 'created_at', 'updated_at', 'status'], 'integer'],
         ];
     }
 
@@ -48,5 +50,37 @@ class Collection extends Base
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
         ];
+    }
+
+    /** 判断该用户是否已经收藏 */
+    public function collectionFlag($params)
+    {
+        $query = Collection::find()
+            ->where(["type_id" => ArrayHelper::getValue($params, 'type_id')])
+            ->andWhere(["type" => ArrayHelper::getValue($params, 'type')])
+            ->andWhere(["user_id" => Yii::$app->user->id])
+            ->andFilterWhere(["status" => ArrayHelper::getValue($params, 'status')]);
+        return $query->one();
+    }
+
+    /** 收藏  */
+    public function create($params)
+    {
+        $collection = new Collection();
+        $collection->user_id = Yii::$app->user->id;
+        $collection->type = ArrayHelper::getValue($params, 'type');
+        $collection->type_id = ArrayHelper::getValue($params, 'type_id');
+        $collection->status = self::STATUS_ENABLE;
+        $collection->created_at = time();
+        $collection->updated_at = time();
+        if ($collection->save()) {
+            return true;
+        }
+    }
+
+    /** 获取收藏数量 */
+    public static function collectionCount($type, $type_id)
+    {
+        return self::find()->where(['type' => $type])->andWhere(['type_id' => $type_id])->count();
     }
 }

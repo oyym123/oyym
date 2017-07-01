@@ -45,6 +45,11 @@ if (!empty(Yii::$app->user->identity->username) && in_array(Yii::$app->user->ide
         ],
     ]);
 
+    $menuItems[] = ['label' => '用户地址', 'items' => [
+        ['label' => '收货地址', 'url' => ['/user-address']],
+        ['label' => '全国所有城市', 'url' => ['/city']],
+    ]];
+
     $menuItems[] = ['label' => '评论管理', 'items' => [
         ['label' => '产品评论', 'url' => ['/comments']],
     ]];

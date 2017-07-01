@@ -1,6 +1,62 @@
 {
     "swagger": "2.0",
     "paths": {
+        "/collection/create?debug=1": {
+            "get": {
+                "tags": [
+                    "\u6536\u85cf"
+                ],
+                "summary": "\u6536\u85cf",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "\u6536\u85cf\u7684\u7c7b\u578b\uff0c1=\u4ea7\u54c1",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u8be5\u7c7b\u578b\u5bf9\u5e94\u7684id",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/collection/cancel?debug=1": {
+            "get": {
+                "tags": [
+                    "\u6536\u85cf"
+                ],
+                "summary": "\u53d6\u6d88\u6536\u85cf",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "\u6536\u85cf\u7684\u7c7b\u578b\uff0c1=\u4ea7\u54c1",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u8be5\u7c7b\u578b\u5bf9\u5e94\u7684id",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/demo/t?debug=1": {
             "get": {
                 "tags": [
@@ -34,6 +90,134 @@
                         "required": true,
                         "type": "integer",
                         "default": 1
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/like/create?debug=1": {
+            "get": {
+                "tags": [
+                    "\u70b9\u8d5e"
+                ],
+                "summary": "\u70b9\u8d5e",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "\u70b9\u8d5e\u7684\u7c7b\u578b\uff0c1=\u4ea7\u54c1",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u8be5\u7c7b\u578b\u5bf9\u5e94\u7684id",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/like/cancel?debug=1": {
+            "get": {
+                "tags": [
+                    "\u70b9\u8d5e"
+                ],
+                "summary": "\u53d6\u6d88\u70b9\u8d5e",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "\u70b9\u8d5e\u7684\u7c7b\u578b\uff0c1=\u4ea7\u54c1",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u8be5\u7c7b\u578b\u5bf9\u5e94\u7684id",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user-address/area-info?debug=1": {
+            "post": {
+                "tags": [
+                    "\u7528\u6237\u5730\u5740"
+                ],
+                "summary": "\u7701\u5e02\u53bf\u6570\u636e",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "formData",
+                        "description": "0 = \u4e0b\u653e\u7701\u7ea7\u6570\u636e\uff0c\u540e\u6839\u636e\u4f20\u6765\u7684id\u4e0b\u653e\u5bf9\u5e94\u7ea7\u522b\u4e0b\u7684\u6570\u636e",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user-address/create?debug=1": {
+            "post": {
+                "tags": [
+                    "\u7528\u6237\u5730\u5740"
+                ],
+                "summary": "\u65b0\u589e\u7528\u6237\u5730\u5740",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "formData",
+                        "description": "\u5730\u5740\u8be6\u7ec6\u4f4d\u7f6e",
+                        "required": true,
+                        "type": "string",
+                        "default": "\u5929\u5b50\u5e84\u56ed12\u53f7\u4e00\u5355\u5143"
+                    },
+                    {
+                        "name": "province_id",
+                        "in": "formData",
+                        "description": "\u7701ID",
+                        "required": true,
+                        "type": "string",
+                        "default": "1"
+                    },
+                    {
+                        "name": "city_id",
+                        "in": "formData",
+                        "description": "\u5e02ID",
+                        "required": true,
+                        "type": "string",
+                        "default": "1"
+                    },
+                    {
+                        "name": "area_id",
+                        "in": "formData",
+                        "description": "\u533a\u3001\u53bfID",
+                        "required": true,
+                        "type": "string",
+                        "default": "1"
+                    },
+                    {
+                        "name": "default_address",
+                        "in": "formData",
+                        "description": "ID",
+                        "required": false,
+                        "type": "integer",
+                        "default": "1"
                     }
                 ],
                 "responses": {}

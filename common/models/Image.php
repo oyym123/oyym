@@ -2,7 +2,10 @@
 
 namespace common\models;
 
+use common\helpers\QiniuHelper;
 use Yii;
+use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "image".
@@ -21,6 +24,10 @@ use Yii;
  */
 class Image extends Base
 {
+    const TYPE_USER_PHOTO = 1; //用户头像
+    const TYPE_PRODUCT = 2; //产品图片
+    const TYPE_COMMENTS = 3; //评论图片
+
     /**
      * @inheritdoc
      */
@@ -59,5 +66,74 @@ class Image extends Base
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
         ];
+    }
+
+    /** 获取所有图片类型 */
+    public static function imageType()
+    {
+        return [
+            self::TYPE_USER_PHOTO => '用户头像',
+            self::TYPE_PRODUCT => '产品图片',
+            self::TYPE_COMMENTS => '评论图片',
+        ];
+    }
+
+    /** 获取图片类型 */
+    public function getType()
+    {
+        return ArrayHelper::getValue(self::imageType(), $this->type);
+    }
+
+    /** 获取所有图片 */
+    public function getImages($params)
+    {
+        $images = self::find()
+            ->where(['type_id' => ArrayHelper::getValue($params, 'type_id'),
+                'type' => ArrayHelper::getValue($params, 'type'),
+                'status' => self::STATUS_ENABLE])->orderBy('sort desc')->all();
+
+        $data = [];
+        foreach ($images as $key => $image) {
+            if ($key < $params['limit']) {  //设置图片下放最大数量
+                if ($image->url) {
+                    $data[] = [
+                        'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_images'], $image->url),
+                        'name' => $image->name ?: ''
+                    ];
+                }
+            }
+        }
+        return $data;
+    }
+
+    /** 获取单张图片 */
+    public function getOneImage($params)
+    {
+        $image = self::find()
+            ->where(['type_id' => ArrayHelper::getValue($params, 'type_id'),
+                'type' => ArrayHelper::getValue($params, 'type'),
+                'status' => self::STATUS_ENABLE])->orderBy('sort desc')->one();
+
+        return [
+            'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_images'], $image->url),
+            'name' => $image->name ?: ''
+        ];
+    }
+
+    /** 设置图片 */
+    public function setImage($params)
+    {
+        $image = new Image();
+        $image->name = ArrayHelper::getValue($params, 'name');
+        $image->type = ArrayHelper::getValue($params, 'type');
+        $image->type_id = ArrayHelper::getValue($params, 'type_id');
+        $image->url = ArrayHelper::getValue($params, 'url');
+        $image->size_type = ArrayHelper::getValue($params, 'size_type');
+        $image->status = ArrayHelper::getValue($params, 'status');
+        $image->created_at = time();
+        $image->updated_at = time();
+        if (!$image->save()) {
+            throw new Exception('图片保存失败!');
+        }
     }
 }

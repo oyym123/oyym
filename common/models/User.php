@@ -1,10 +1,12 @@
 <?php
 namespace common\models;
 
+use common\helpers\Helper;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
 
 /**
@@ -26,6 +28,13 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
+    public static function status()
+    {
+        return [
+            self::STATUS_DELETED => '无效',
+            self::STATUS_ACTIVE => '有效',
+        ];
+    }
 
     /**
      * @inheritdoc
@@ -105,7 +114,7 @@ class User extends ActiveRecord implements IdentityInterface
      * Finds out if password reset token is valid
      *
      * @param string $token password reset token
-     * @return bool
+     * @return boolean
      */
     public static function isPasswordResetTokenValid($token)
     {
@@ -113,7 +122,7 @@ class User extends ActiveRecord implements IdentityInterface
             return false;
         }
 
-        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
+        $timestamp = (int)substr($token, strrpos($token, '_') + 1);
         $expire = Yii::$app->params['user.passwordResetTokenExpire'];
         return $timestamp + $expire >= time();
     }
@@ -146,7 +155,7 @@ class User extends ActiveRecord implements IdentityInterface
      * Validates password
      *
      * @param string $password password to validate
-     * @return bool if password provided is valid for current user
+     * @return boolean if password provided is valid for current user
      */
     public function validatePassword($password)
     {
@@ -185,5 +194,49 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    /**
+     * 取用户信息
+     */
+    public function getInfo()
+    {
+        return $this->hasOne(UserInfo::className(), ['user_id' => 'id']);
+    }
+
+    /** 获取用户昵称 */
+    public function getName()
+    {
+        if (Helper::isMobile($this->username)) {
+            $userName = Helper::formatMobile($this->username);
+        } else {
+            $userName = $userName = Helper::formatStr($this->username);
+        }
+        return ($this->info ? mb_substr($this->info->name,0,11,'utf-8') : '') ?: $userName;
+    }
+
+
+    /** 获取用户昵称 */
+    public function getMobile()
+    {
+        if (Helper::isMobile($this->username)) {
+            $userName = Helper::formatMobile($this->username);
+            return $userName;
+        }
+    }
+
+    public function getStatus()
+    {
+        return ArrayHelper::getValue(static::status(), $this->status);
+    }
+
+    public function setToken()
+    {
+        $this->token = md5($this->id . $this->username . $this->password_hash . time());
+    }
+
+    public function getToken()
+    {
+        return $this->token;
     }
 }
