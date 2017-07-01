@@ -85,7 +85,8 @@ class WebController extends Controller
         // 构造数据
         $item = array('errcode' => 0, 'errmsg' => $msg, 'version' => 1, 'state' => (int)$state, 'res' => ['list' => null]);
         if (is_array($res) && !empty($res)) {
-            $item['res'] = $res;
+
+            $item['res'] = $this->int2String($res); // 强制转换为string类型下放
         } elseif (is_string($res)) {
             $item['errmsg'] = $res;
         }
@@ -115,6 +116,26 @@ class WebController extends Controller
         // file_put_contents(Yii::$app->basePath . '/runtime/log.html', date('Y-m-d H:i:s ') . var_export($res, 1) . "\t{$state}\t{$msg}\n\n", FILE_APPEND);
 
         exit;
+    }
+
+    /**
+     * Name: changes
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-00-00
+     * @param $arr
+     * @return mixed
+     */
+    function int2String($arr)
+    {
+        foreach ($arr as $k => $v) {
+            if (is_int($v)) {
+                $arr[$k] = (string)$v;
+            } else if (is_array($v)) { //若为数组，则再转义.
+                $arr[$k] = $this->int2String($v);
+            }
+        }
+        return $arr;
     }
 
     public static function post($url, $post_data)
