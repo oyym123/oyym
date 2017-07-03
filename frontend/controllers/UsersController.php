@@ -24,18 +24,11 @@ class UsersController extends WebController
      * Desc: 关注的分类
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/demo/demo?debug=1",
-     *   tags={"demo"},
+     * @SWG\Get(path="/users/follow-category?debug=1",
+     *   tags={"用户"},
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(
-     *     name="id",
-     *     in="query",
-     *     default="1",
-     *     description="",
-     *     required=true,
-     *     type="integer",
-     *   ),
      *   @SWG\Response(
+     *      response=200, description="successful operation"
      *   )
      * )
      */
@@ -60,24 +53,17 @@ class UsersController extends WebController
      * Desc: 关注或取消关注
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/demo/demo?debug=1",
-     *   tags={"demo"},
+     * @SWG\Get(path="/users/follow-category-or-cancel?debug=1",
+     *   tags={"用户"},
+     *   summary= "关注或取消关注",
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(
-     *     name="id",
-     *     in="query",
-     *     default="1",
-     *     description="",
-     *     required=true,
-     *     type="integer",
-     *   ),
      *   @SWG\Response(
+     *       response=200, description="successful operation"
      *   )
      * )
      */
     public function actionFollowCategoryOrCancel()
     {
-
         self::showMsg('已关注');
         self::showMsg('已取消关注');
     }
@@ -87,18 +73,12 @@ class UsersController extends WebController
      * Desc: 首页排序类型列表
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/demo/demo?debug=1",
-     *   tags={"demo"},
+     * @SWG\Get(path="/users/sort-type?debug=1",
+     *   tags={"用户"},
+     *   summary= "首页排序类型列表",
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(
-     *     name="id",
-     *     in="query",
-     *     default="1",
-     *     description="",
-     *     required=true,
-     *     type="integer",
-     *   ),
      *   @SWG\Response(
+     *     response=200, description="successful operation"
      *   )
      * )
      */
@@ -143,18 +123,12 @@ class UsersController extends WebController
      * Desc: 获取宝贝分类
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/demo/demo?debug=1",
-     *   tags={"demo"},
+     * @SWG\Get(path="/users/category?debug=1",
+     *   tags={"用户"},
+     *   summary= "获取宝贝分类",
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(
-     *     name="id",
-     *     in="query",
-     *     default="1",
-     *     description="",
-     *     required=true,
-     *     type="integer",
-     *   ),
      *   @SWG\Response(
+     *      response=200, description="successful operation"
      *   )
      * )
      */
@@ -171,7 +145,6 @@ class UsersController extends WebController
             ]
         ]);
     }
-
 
 
 }

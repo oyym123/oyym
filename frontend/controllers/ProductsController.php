@@ -24,18 +24,12 @@ class ProductsController extends WebController
      * Desc: 宝贝列表页接口
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/demo/demo?debug=1",
-     *   tags={"demo"},
+     * @SWG\Get(path="/products?debug=1",
+     *   tags={"产品"},
+     *   summary="产品列表",
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(
-     *     name="id",
-     *     in="query",
-     *     default="1",
-     *     description="",
-     *     required=true,
-     *     type="integer",
-     *   ),
      *   @SWG\Response(
+     *      response=200, description="successful operation"
      *   )
      * )
      */
@@ -58,7 +52,7 @@ class ProductsController extends WebController
                     ],
                     'title' => '保时捷跑车便宜卖了',
                     'contents' => "保时捷跑车便宜卖了,保时捷跑车便宜卖了,保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了",
-                    'progress' => '80%', //
+                    'progress' => '80', //
                     'progress_type' => "time || number",
                     'like' => 123,
                     'comment' => '12',
@@ -67,8 +61,8 @@ class ProductsController extends WebController
                     'yikoujia' => '12', // 一口价
                     'end_time' => '12', // 时间
                     'share_params' => [
-                        'share_title' => '高招App',
-                        'share_contents' => '下载高招App圆您一个名校的梦想!',
+                        'share_title' => '众筹夺宝',
+                        'share_contents' => '夺宝达人!',
                         'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
                         'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
                     ]
@@ -90,12 +84,12 @@ class ProductsController extends WebController
         ]);
     }
 
-    public function actionView($id) {
+    public function actionView($id)
+    {
         $this->showMsg([
 
         ]);
     }
-
 
 
 }

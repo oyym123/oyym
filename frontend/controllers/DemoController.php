@@ -29,6 +29,7 @@ class DemoController extends WebController
      *     type="integer",
      *   ),
      *   @SWG\Response(
+     *      response=200, description="successful operation"
      *   )
      * )
      */
@@ -53,6 +54,7 @@ class DemoController extends WebController
      *     type="integer",
      *   ),
      *   @SWG\Response(
+     *      response=200, description="successful operation"
      *   )
      * )
      */

@@ -2,17 +2,6 @@
 namespace frontend\controllers;
 
 use frontend\components\WebController;
-use Yii;
-use yii\base\InvalidParamException;
-use yii\web\BadRequestHttpException;
-use yii\web\Controller;
-use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
-use common\models\LoginForm;
-use frontend\models\PasswordResetRequestForm;
-use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
-use frontend\models\ContactForm;
 
 /**
  * Home controller
@@ -25,18 +14,11 @@ class HomeController extends WebController
      * Desc: 首页排序类型列表
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/demo/demo?debug=1",
-     *   tags={"demo"},
+     * @SWG\Get(path="/home/sort-type?debug=1",
+     *   tags={"首页"},
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(
-     *     name="id",
-     *     in="query",
-     *     default="1",
-     *     description="",
-     *     required=true,
-     *     type="integer",
-     *   ),
      *   @SWG\Response(
+     *      response=200, description="successful operation"
      *   )
      * )
      */
@@ -81,18 +63,11 @@ class HomeController extends WebController
      * Desc: 获取宝贝分类
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/demo/demo?debug=1",
-     *   tags={"demo"},
+     * @SWG\Get(path="/home/actionCategory?debug=1",
+     *   tags={"首页"},
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(
-     *     name="id",
-     *     in="query",
-     *     default="1",
-     *     description="",
-     *     required=true,
-     *     type="integer",
-     *   ),
      *   @SWG\Response(
+     *      response=200, description="successful operation"
      *   )
      * )
      */
@@ -109,7 +84,6 @@ class HomeController extends WebController
             ]
         ]);
     }
-
 
 
 }
