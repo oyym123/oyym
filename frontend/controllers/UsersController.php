@@ -26,6 +26,7 @@ class UsersController extends WebController
      * Date: 2017-07-01
      * @SWG\Get(path="/users/follow-category?debug=1",
      *   tags={"用户"},
+     *   summary= "关注的分类",
      *   description="Author: lixinxin",
      *   @SWG\Response(
      *      response=200, description="successful operation"
