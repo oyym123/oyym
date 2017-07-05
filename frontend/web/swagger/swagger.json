@@ -246,11 +246,59 @@
                 "tags": [
                     "\u7528\u6237\u5730\u5740"
                 ],
-                "summary": "\u65b0\u589e\u7528\u6237\u5730\u5740",
+                "summary": "\u65b0\u589e/\u4fee\u6539\u7528\u6237\u5730\u5740",
                 "description": "Author: OYYM",
                 "parameters": [
                     {
-                        "name": "name",
+                        "name": "user_name",
+                        "in": "formData",
+                        "description": "\u9700\u8981\u4fee\u6539\u7684\u5730\u5740id",
+                        "required": false,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "user_name",
+                        "in": "formData",
+                        "description": "\u6536\u8d27\u4eba\u59d3\u540d",
+                        "required": true,
+                        "type": "string",
+                        "default": "\u6b27\u9633\u5148\u751f"
+                    },
+                    {
+                        "name": "province_id",
+                        "in": "formData",
+                        "description": "\u7701ID(\u6c5f\u897f\u7701)",
+                        "required": true,
+                        "type": "integer",
+                        "default": "14"
+                    },
+                    {
+                        "name": "city_id",
+                        "in": "formData",
+                        "description": "\u5e02ID(\u666f\u5fb7\u9547)",
+                        "required": true,
+                        "type": "integer",
+                        "default": "213"
+                    },
+                    {
+                        "name": "area_id",
+                        "in": "formData",
+                        "description": "\u533a\u3001\u53bfID(\u73e0\u5c71\u533a)",
+                        "required": true,
+                        "type": "integer",
+                        "default": "2426"
+                    },
+                    {
+                        "name": "street_id",
+                        "in": "formData",
+                        "description": "\u8857\u9053ID(\u65b0\u5382\u8857\u9053)",
+                        "required": true,
+                        "type": "integer",
+                        "default": "19639"
+                    },
+                    {
+                        "name": "detail_address",
                         "in": "formData",
                         "description": "\u5730\u5740\u8be6\u7ec6\u4f4d\u7f6e",
                         "required": true,
@@ -258,28 +306,20 @@
                         "default": "\u5929\u5b50\u5e84\u56ed12\u53f7\u4e00\u5355\u5143"
                     },
                     {
-                        "name": "province_id",
+                        "name": "telephone",
                         "in": "formData",
-                        "description": "\u7701ID",
+                        "description": "\u624b\u673a\u53f7",
                         "required": true,
                         "type": "string",
-                        "default": "1"
+                        "default": "13161057804"
                     },
                     {
-                        "name": "city_id",
+                        "name": "postal",
                         "in": "formData",
-                        "description": "\u5e02ID",
+                        "description": "\u90ae\u653f\u7f16\u7801",
                         "required": true,
                         "type": "string",
-                        "default": "1"
-                    },
-                    {
-                        "name": "area_id",
-                        "in": "formData",
-                        "description": "\u533a\u3001\u53bfID",
-                        "required": true,
-                        "type": "string",
-                        "default": "1"
+                        "default": "333000"
                     },
                     {
                         "name": "default_address",
