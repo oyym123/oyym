@@ -66,7 +66,7 @@ class UserAddressController extends WebController
      *   summary="新增/修改用户地址",
      *   description="Author: OYYM",
      * @SWG\Parameter(
-     *     name="user_name",
+     *     name="id",
      *     in="formData",
      *     default="1",
      *     description="需要修改的地址id",
