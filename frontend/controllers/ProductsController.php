@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\Base;
 use frontend\components\WebController;
 use Yii;
 use yii\base\InvalidParamException;
@@ -83,6 +84,51 @@ class ProductsController extends WebController
             ]
         ]);
     }
+
+
+    public function actionCreate()
+    {
+        $data = [
+            'images' => [
+                [
+                    'name' => '测试图片',
+                    'url' => 'demo321',
+                ],
+                [
+                    'name' => '测试图片2',
+                    'url' => 'demo456',
+                ]
+            ],
+
+            'videos' => [
+                [
+                    'name' => '测试视频1',
+                    'url' => 'demo321',
+                ],
+                [
+                    'name' => '测试视频2',
+                    'url' => 'demo321',
+                ]
+            ],
+            'quantity' => 8,
+            ''
+
+        ];
+
+        $params = [
+            'name' => Yii::$app->request->post('name'),
+            'type' => Yii::$app->request->post('type'),
+            'type_id' => Yii::$app->request->post('id'),
+            'url' => Yii::$app->request->post('url'),
+            'size_type' => Yii::$app->request->post('size', Image::SIZE_BIG),
+            'status' => Base::STATUS_ENABLE,
+            'sort' => Yii::$app->request->post('sort', 8),
+            'limit' => Yii::$app->request->post('limit', 1)
+        ];
+
+
+    }
+
 
     public function actionView($id)
     {

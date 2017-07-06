@@ -173,7 +173,7 @@ class Helper extends BaseArrayHelper
     }
 
     /** 个性化时间 */
-    public static function  tranTime($time)
+    public static function tranTime($time)
     {
         $rtime = date("m-d H:i", $time);
         $htime = date("H:i", $time);
@@ -239,5 +239,5 @@ class Helper extends BaseArrayHelper
         } else {
             return $contents;
         }
-}
+    }
 }

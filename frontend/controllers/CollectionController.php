@@ -38,6 +38,14 @@ class CollectionController extends WebController
      *     required=true,
      *     type="integer",
      *   ),
+     *  @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
      *   )
@@ -80,6 +88,14 @@ class CollectionController extends WebController
      *     in="query",
      *     default="1",
      *     description="该类型对应的id",
+     *     required=true,
+     *     type="integer",
+     *   ),
+     *  @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
      *     required=true,
      *     type="integer",
      *   ),

@@ -72,6 +72,8 @@
         const ui = SwaggerUIBundle({
             url: "<?= \yii\helpers\Url::to(['swagger/swagger.json']) ?>",
             dom_id: '#swagger-ui',
+            headers: { "ky-token" : 1 },
+            supportHeaderParams: true,
             presets: [
                 SwaggerUIBundle.presets.apis,
                 SwaggerUIStandalonePreset
@@ -83,6 +85,31 @@
         })
         window.ui = ui
     }
+
+    window.swaggerUi = new SwaggerUi({
+        discoveryUrl: "http://pathtomyservice.com/resources",
+        headers: { "testheader" : "123" },
+        apiKey: "123",
+        apiKeyName: "Api-Key",
+        dom_id:"swagger-ui-container",
+        supportHeaderParams: true,
+        supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
+        onComplete: function(swaggerApi, swaggerUi){
+            if(console) {
+                console.log("Loaded SwaggerUI");
+                console.log(swaggerApi);
+                console.log(swaggerUi);
+            }
+            $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
+        },
+        onFailure: function(data) {
+            if(console) {
+                console.log("Unable to Load SwaggerUI");
+                console.log(data);
+            }
+        },
+        docExpansion: "none"
+    });
 </script>
 </body>
 

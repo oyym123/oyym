@@ -29,6 +29,9 @@ AppAsset::register($this);
 $role = 0;
 if (!empty(Yii::$app->user->identity->username) && in_array(Yii::$app->user->identity->username, [
         13161057904,
+        17610068627,//梦洁
+        15210771883,//姗鸿
+        18606615070
     ])
 ) {
     $role = 1;
@@ -67,6 +70,7 @@ if (!empty(Yii::$app->user->identity->username) && in_array(Yii::$app->user->ide
     ]];
     $menuItems[] = ['label' => '产品管理', 'items' => [
         ['label' => '产品', 'url' => ['/product']],
+        ['label' => '产品类型', 'url' => ['/product-type']],
     ]];
 
     if (Yii::$app->user->isGuest) {

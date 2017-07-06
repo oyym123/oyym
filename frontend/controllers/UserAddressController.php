@@ -37,6 +37,14 @@ class UserAddressController extends WebController
      *     required=true,
      *     type="integer",
      *   ),
+     *   @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
      *   )
@@ -145,6 +153,22 @@ class UserAddressController extends WebController
      *     required=false,
      *     type="integer",
      *   ),
+     *   @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
      *   )
@@ -185,6 +209,14 @@ class UserAddressController extends WebController
      *     required=true,
      *     type="integer",
      *   ),
+     *   @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -202,6 +234,14 @@ class UserAddressController extends WebController
      *   tags={"用户地址"},
      *   summary="获取用户默认地址",
      *   description="Author: OYYM",
+     * @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -225,6 +265,14 @@ class UserAddressController extends WebController
      *   tags={"用户地址"},
      *   summary="获取用户所有地址",
      *   description="Author: OYYM",
+     *  @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
