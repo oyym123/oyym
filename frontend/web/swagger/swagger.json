@@ -139,6 +139,126 @@
                 }
             }
         },
+        "/images/create?debug=1": {
+            "post": {
+                "tags": [
+                    "\u56fe\u7247"
+                ],
+                "summary": "\u4e0a\u4f20\u56fe\u7247",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "test.mp4",
+                        "in": "formData",
+                        "description": "\u56fe\u7247\u540d\u79f0",
+                        "required": true,
+                        "type": "string",
+                        "default": "1"
+                    },
+                    {
+                        "name": "type",
+                        "in": "formData",
+                        "description": "\u56fe\u7247\u7c7b\u578b",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "id",
+                        "in": "formData",
+                        "description": "\u5bf9\u5e94\u7c7b\u578b\u7684ID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "url",
+                        "in": "formData",
+                        "description": "\u4e03\u725b\u4e91\u8fd4\u56de\u5b58\u50a8\u6587\u4ef6\u8def\u5f84",
+                        "required": true,
+                        "type": "string",
+                        "default": "demo321"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "formData",
+                        "description": "\u9ed8\u8ba4\u964d\u5e8f\u6392\u5217\uff0c\u9ed8\u8ba4\u4e3a0",
+                        "required": false,
+                        "type": "integer",
+                        "default": "0"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "formData",
+                        "description": "\u56fe\u7247\u9650\u5236\u4e0a\u4f20\u6570\u91cf\uff0c\u9ed8\u8ba4\u4e3a1",
+                        "required": false,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/images/delete?debug=1": {
+            "get": {
+                "tags": [
+                    "\u56fe\u7247"
+                ],
+                "summary": "\u5220\u9664\u56fe\u7247",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u56fe\u7247ID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/images/get-all?debug=1": {
+            "get": {
+                "tags": [
+                    "\u56fe\u7247"
+                ],
+                "summary": "\u83b7\u53d6\u56fe\u7247",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u56fe\u7247\u7c7b\u578b\u5bf9\u5e94\u7684ID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "\u56fe\u7247\u7c7b\u578b",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
         "/like/create?debug=1": {
             "get": {
                 "tags": [
@@ -250,7 +370,7 @@
                 "description": "Author: OYYM",
                 "parameters": [
                     {
-                        "name": "user_name",
+                        "name": "id",
                         "in": "formData",
                         "description": "\u9700\u8981\u4fee\u6539\u7684\u5730\u5740id",
                         "required": false,
@@ -438,6 +558,126 @@
                 ],
                 "summary": "\u83b7\u53d6\u5b9d\u8d1d\u5206\u7c7b",
                 "description": "Author: lixinxin",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/videos/create?debug=1": {
+            "post": {
+                "tags": [
+                    "\u89c6\u9891"
+                ],
+                "summary": "\u4e0a\u4f20\u89c6\u9891",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "test.mp4",
+                        "in": "formData",
+                        "description": "\u89c6\u9891\u540d\u79f0",
+                        "required": true,
+                        "type": "string",
+                        "default": "1"
+                    },
+                    {
+                        "name": "type",
+                        "in": "formData",
+                        "description": "\u89c6\u9891\u7c7b\u578b",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "id",
+                        "in": "formData",
+                        "description": "\u5bf9\u5e94\u7c7b\u578b\u7684ID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "url",
+                        "in": "formData",
+                        "description": "\u4e03\u725b\u4e91\u8fd4\u56de\u5b58\u50a8\u6587\u4ef6\u8def\u5f84",
+                        "required": true,
+                        "type": "string",
+                        "default": "demo321"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "formData",
+                        "description": "\u9ed8\u8ba4\u964d\u5e8f\u6392\u5217\uff0c\u9ed8\u8ba4\u4e3a0",
+                        "required": false,
+                        "type": "integer",
+                        "default": "0"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "formData",
+                        "description": "\u89c6\u9891\u9650\u5236\u4e0a\u4f20\u6570\u91cf\uff0c\u9ed8\u8ba4\u4e3a1",
+                        "required": false,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/videos/delete?debug=1": {
+            "get": {
+                "tags": [
+                    "\u89c6\u9891"
+                ],
+                "summary": "\u5220\u9664\u89c6\u9891",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u89c6\u9891ID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/videos/get-all?debug=1": {
+            "get": {
+                "tags": [
+                    "\u89c6\u9891"
+                ],
+                "summary": "\u83b7\u53d6\u89c6\u9891",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u89c6\u9891\u7c7b\u578b\u5bf9\u5e94\u7684ID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "\u89c6\u9891\u7c7b\u578b",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "successful operation"

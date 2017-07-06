@@ -13,7 +13,7 @@ class CollectionController extends WebController
     {
         parent::init();
         if (empty($this->userId)) {
-          //  self::needLogin();
+            self::needLogin();
         }
     }
 

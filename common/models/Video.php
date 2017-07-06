@@ -24,7 +24,11 @@ use yii\helpers\ArrayHelper;
  */
 class Video extends Base
 {
-    const TYPE_PRODUCT = 1; //产品视频
+    const TYPE_PRODUCT = 1;     //产品视频
+
+    const SIZE_SMOOTH = 1;      //流畅(480P)
+    const SIZE_HD = 2;          //高清(720P)
+    const SIZE_ULTRA_CLEAR = 3; //超清(1080P)
 
     /**
      * @inheritdoc
@@ -40,7 +44,7 @@ class Video extends Base
     public function rules()
     {
         return [
-            [['type', 'type_id', 'created_at', 'updated_at'], 'required'],
+            [['type', 'type_id', 'created_at', 'updated_at', 'user_id', 'url'], 'required'],
             [['type', 'type_id', 'size_type', 'user_id', 'sort', 'status', 'created_at', 'updated_at'], 'integer'],
             [['name', 'url'], 'string', 'max' => 255],
         ];
@@ -81,43 +85,29 @@ class Video extends Base
     }
 
     /** 获取所有视频 */
-    public function getVideos($params)
+    public static function getVideos($params)
     {
         $videos = self::find()
             ->where(['type_id' => ArrayHelper::getValue($params, 'type_id'),
                 'type' => ArrayHelper::getValue($params, 'type'),
-                'status' => self::STATUS_ENABLE])->orderBy('sort desc')->all();
-
+                'status' => self::STATUS_ENABLE])->orderBy('sort desc')
+            ->offset(ArrayHelper::getValue($params, 'skip'))
+            ->limit(ArrayHelper::getValue($params, 'psize'))->all();
         $data = [];
-        foreach ($videos as $key => $video) {
-            if ($key < $params['limit']) {  //设置视频下放最大数量
-                if ($video->url) {
-                    $data[] = [
-                        'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_videos'], $video->url),
-                        'name' => $video->name ?: ''
-                    ];
-                }
+        foreach ($videos as $video) {
+            if ($video->url) {
+                $data['list'][] = [
+                    'id' => $video->id,
+                    'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_videos'], $video->url),
+                    'name' => $video->name ?: ''
+                ];
             }
         }
         return $data;
     }
 
-    /** 获取单张视频 */
-    public function getOneVideo($params)
-    {
-        $video = self::find()
-            ->where(['type_id' => ArrayHelper::getValue($params, 'type_id'),
-                'type' => ArrayHelper::getValue($params, 'type'),
-                'status' => self::STATUS_ENABLE])->orderBy('sort desc')->one();
-
-        return [
-            'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_videos'], $video->url),
-            'name' => $video->name ?: ''
-        ];
-    }
-
     /** 设置视频 */
-    public function setVideo($params)
+    public static function setVideo($params)
     {
         $video = new video();
         $video->name = ArrayHelper::getValue($params, 'name');
@@ -126,10 +116,29 @@ class Video extends Base
         $video->url = ArrayHelper::getValue($params, 'url');
         $video->size_type = ArrayHelper::getValue($params, 'size_type');
         $video->status = ArrayHelper::getValue($params, 'status');
+        $image->sort = ArrayHelper::getValue($params, 'sort');
+        $video->user_id = Yii::$app->user->id;
         $video->created_at = time();
         $video->updated_at = time();
         if (!$video->save()) {
             throw new Exception('视频保存失败!');
+        }
+    }
+
+    /** 用于限制视频上传数量 */
+    public static function videoLimit($params)
+    {
+        return self::find()->where(['type_id' => $params['type_id'],
+            'user_id' => Yii::$app->user->id, 'type' => $params['type']])->count();
+    }
+
+    /** 删除视频 */
+    public static function deleteVideo($params)
+    {
+        $model = self::find()->where(['user_id' => Yii::$app->user->id, 'id' => $params['id']])->one();
+        $model->status = self::STATUS_DISABLE;
+        if (!$model->save()) {
+            throw new Exception('删除视频失败!');
         }
     }
 }

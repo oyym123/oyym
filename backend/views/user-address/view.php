@@ -6,7 +6,6 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\UserAddress */
 
-$this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'User Addresses', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -29,13 +28,18 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'name',
+            'user_name',
             'user_id',
             'lng',
             'lat',
             'province_id',
             'city_id',
             'area_id',
+            'street_id',
+            'str_address',
+            'detail_address',
+            'postail',
+            'telephone',
             'default_address',
             'status',
             'created_at',

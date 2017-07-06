@@ -61,7 +61,7 @@ class UserAddress extends Base
     {
         return [
             'id' => 'ID',
-            'name' => '地址名称',
+            'user_name' => '收货人名称',
             'user_id' => '用户ID',
             'lng' => '经度',
             'lat' => '纬度',
@@ -70,6 +70,9 @@ class UserAddress extends Base
             'area_id' => '地区',
             'street_id' => '街道',
             'default_address' => '默认地址',
+            'detail_address' => '详细地址',
+            'telephone' => '电话号码',
+            'postal' => '邮政编码',
             'status' => '状态',
             'str_address' => '完整地址',
             'created_at' => '创建时间',

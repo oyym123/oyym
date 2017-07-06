@@ -18,8 +18,8 @@ class UserAddressSearch extends UserAddress
     public function rules()
     {
         return [
-            [['id', 'user_id', 'province_id', 'city_id', 'area_id', 'default_address', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['name', 'lng', 'lat'], 'safe'],
+            [['id', 'user_id', 'province_id', 'city_id', 'street_id', 'area_id', 'default_address', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['user_name', 'lng', 'lat', 'postal', 'telephone', 'detail_address', 'str_address'], 'safe'],
         ];
     }
 
@@ -70,9 +70,13 @@ class UserAddressSearch extends UserAddress
             'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name])
+        $query->andFilterWhere(['like', 'user_name', $this->user_name])
             ->andFilterWhere(['like', 'lng', $this->lng])
-            ->andFilterWhere(['like', 'lat', $this->lat]);
+            ->andFilterWhere(['like', 'lat', $this->lat])
+            ->andFilterWhere(['like', 'postal', $this->postal])
+            ->andFilterWhere(['like', 'telephone', $this->telephone])
+            ->andFilterWhere(['like', 'detail_address', $this->detail_address])
+            ->andFilterWhere(['like', 'str_address', $this->str_address]);
 
         return $dataProvider;
     }

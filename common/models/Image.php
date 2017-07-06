@@ -24,9 +24,13 @@ use yii\helpers\ArrayHelper;
  */
 class Image extends Base
 {
-    const TYPE_USER_PHOTO = 1; //用户头像
-    const TYPE_PRODUCT = 2; //产品图片
-    const TYPE_COMMENTS = 3; //评论图片
+    const TYPE_USER_PHOTO = 1;  //用户头像
+    const TYPE_PRODUCT = 2;     //产品图片
+    const TYPE_COMMENTS = 3;    //评论图片
+
+    const SIZE_SMALL = 1;       //小图(缩率图)
+    const SIZE_MEDIUM = 2;      //中等图
+    const SIZE_BIG = 3;         //大图(原图)
 
     /**
      * @inheritdoc
@@ -85,43 +89,35 @@ class Image extends Base
     }
 
     /** 获取所有图片 */
-    public function getImages($params)
+    public static function getImages($params)
     {
         $images = self::find()
             ->where(['type_id' => ArrayHelper::getValue($params, 'type_id'),
                 'type' => ArrayHelper::getValue($params, 'type'),
-                'status' => self::STATUS_ENABLE])->orderBy('sort desc')->all();
-
+                'status' => self::STATUS_ENABLE])->orderBy('sort desc')
+            ->offset(ArrayHelper::getValue($params, 'skip'))
+            ->limit(ArrayHelper::getValue($params, 'psize'))->all();
         $data = [];
-        foreach ($images as $key => $image) {
-            if ($key < $params['limit']) {  //设置图片下放最大数量
-                if ($image->url) {
-                    $data[] = [
-                        'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_images'], $image->url),
-                        'name' => $image->name ?: ''
-                    ];
-                }
+        foreach ($images as $image) {
+            if ($image->url) {
+                $data['list'][] = [
+                    'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_images'], $image->url),
+                    'name' => $image->name ?: ''
+                ];
             }
         }
         return $data;
     }
 
-    /** 获取单张图片 */
-    public function getOneImage($params)
+    /** 用于限制图片上传数量 */
+    public static function imageLimit($params)
     {
-        $image = self::find()
-            ->where(['type_id' => ArrayHelper::getValue($params, 'type_id'),
-                'type' => ArrayHelper::getValue($params, 'type'),
-                'status' => self::STATUS_ENABLE])->orderBy('sort desc')->one();
-
-        return [
-            'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_images'], $image->url),
-            'name' => $image->name ?: ''
-        ];
+        return self::find()->where(['type_id' => $params['type_id'],
+            'user_id' => Yii::$app->user->id, 'type' => $params['type']])->count();
     }
 
     /** 设置图片 */
-    public function setImage($params)
+    public static function setImage($params)
     {
         $image = new Image();
         $image->name = ArrayHelper::getValue($params, 'name');
@@ -130,10 +126,22 @@ class Image extends Base
         $image->url = ArrayHelper::getValue($params, 'url');
         $image->size_type = ArrayHelper::getValue($params, 'size_type');
         $image->status = ArrayHelper::getValue($params, 'status');
+        $image->sort = ArrayHelper::getValue($params, 'sort');
+        $image->user_id = Yii::$app->user->id;
         $image->created_at = time();
         $image->updated_at = time();
         if (!$image->save()) {
             throw new Exception('图片保存失败!');
+        }
+    }
+
+    /** 删除图片 */
+    public static function deleteImage($params)
+    {
+        $model = self::find()->where(['user_id' => Yii::$app->user->id, 'id' => $params['id']])->one();
+        $model->status = self::STATUS_DISABLE;
+        if (!$model->save()) {
+            throw new Exception('删除图片失败!');
         }
     }
 }

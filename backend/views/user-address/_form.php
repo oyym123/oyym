@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'user_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'user_id')->textInput() ?>
 
@@ -25,6 +25,16 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'city_id')->textInput() ?>
 
     <?= $form->field($model, 'area_id')->textInput() ?>
+
+    <?= $form->field($model, 'street_id')->textInput() ?>
+
+    <?= $form->field($model, 'str_address')->textInput() ?>
+
+    <?= $form->field($model, 'detail_address')->textInput() ?>
+
+    <?= $form->field($model, 'telephone')->textInput() ?>
+
+    <?= $form->field($model, 'postal')->textInput() ?>
 
     <?= $form->field($model, 'default_address')->textInput() ?>
 
