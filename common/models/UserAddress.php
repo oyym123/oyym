@@ -170,7 +170,7 @@ class UserAddress extends Base
         }
 
         $defaultAddress = self::findOne(['id' => ArrayHelper::getValue($params, 'id'),
-            'user_id' => ArrayHelper::getValue($params, 'user_id')]);
+            'user_id' => Yii::$app->user->id]);
         $defaultAddress->default_address = self::DEFAULT_ADDRESS;
         if (!$defaultAddress->save()) {
             throw new Exception('默认地址设置失败!');

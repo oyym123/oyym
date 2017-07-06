@@ -64,7 +64,7 @@ class HomeController extends WebController
      * Desc: 获取宝贝分类
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/home/actionCategory?debug=1",
+     * @SWG\Get(path="/home/category?debug=1",
      *   tags={"首页"},
      *   summary="获取宝贝分类",
      *   description="Author: lixinxin",
