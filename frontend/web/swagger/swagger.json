@@ -411,10 +411,10 @@
                 }
             }
         },
-        "/products?debug=1": {
+        "/products": {
             "get": {
                 "tags": [
-                    "\u4ea7\u54c1"
+                    "\u9996\u9875"
                 ],
                 "summary": "\u4ea7\u54c1\u5217\u8868",
                 "description": "Author: lixinxin",
