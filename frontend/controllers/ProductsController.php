@@ -5,6 +5,7 @@ use common\models\Base;
 use frontend\components\WebController;
 use Yii;
 use yii\base\InvalidParamException;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -26,7 +27,7 @@ class ProductsController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
      * @SWG\Get(path="/products?debug=1",
-     *   tags={"产品"},
+     *   tags={"首页"},
      *   summary="产品列表",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(
@@ -89,11 +90,11 @@ class ProductsController extends WebController
                     'zongjia' => '12', // 总价
                     'a_price' => '12', // 一口价
                     'end_time' => '12', // 时间
-                    'layout_type' => $this->layoutType([]), // 布局类型
+                    'layout_type' => $this->listlayoutType([]), // 布局类型
                     'share_params' => [
                         'share_title' => '众筹夺宝',
                         'share_contents' => '夺宝达人!',
-                        'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
+                        'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . Url::to(['invite/signup', 'invite_id' => $this->userId]),
                         'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
                     ]
                 ],
@@ -282,7 +283,7 @@ class ProductsController extends WebController
             'need_total' => 1000, // 需要参与人次
             'remaining' => 11, // 剩余人次
             'all_total' => 3245, // 总参与人次
-            'layout_type' => $this->layoutType([]), // 布局类型
+            'layout_type' => $this->listLayoutType([]), // 布局类型
             'share_params' => [
                 'share_title' => '众筹夺宝',
                 'share_contents' => '夺宝达人!',
