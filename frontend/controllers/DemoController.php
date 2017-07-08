@@ -17,7 +17,7 @@ class DemoController extends WebController
 {
 
     /**
-     * @SWG\Get(path="/demo/t?debug=1",
+     * @SWG\Get(path="/demo/t",
      *   tags={"demo"},
      *   description="Author: OYYM",
      *   @SWG\Parameter(

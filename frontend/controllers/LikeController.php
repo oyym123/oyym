@@ -18,7 +18,7 @@ class LikeController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/like/create?debug=1",
+     * @SWG\Get(path="/like/create",
      *   tags={"点赞"},
      *   summary="点赞",
      *   description="Author: OYYM",
@@ -71,7 +71,7 @@ class LikeController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/like/cancel?debug=1",
+     * @SWG\Get(path="/like/cancel",
      *   tags={"点赞"},
      *   summary="取消点赞",
      *   description="Author: OYYM",

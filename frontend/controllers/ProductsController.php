@@ -30,6 +30,8 @@ class ProductsController extends WebController
      *   tags={"首页"},
      *   summary="产品列表",
      *   description="Author: lixinxin",
+     *   consumes={"application/json", "application/xml"},
+     *   produces={"application/json", "application/xml"},
      *   @SWG\Parameter(
      *     name="sort_type",
      *     in="query",
@@ -176,7 +178,7 @@ class ProductsController extends WebController
      * Desc: 添加宝贝, 由客户端发起宝贝的添加
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-05
-     * @SWG\Get(path="/demo/demo?debug=1",
+     * @SWG\Get(path="/demo/demo",
      *   tags={"demo"},
      *   summary="添加宝贝",
      *   description="Author: OYYM",

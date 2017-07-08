@@ -26,7 +26,7 @@ class ImagesController extends WebController
     }
 
     /**
-     * @SWG\Post(path="/images/create?debug=1",
+     * @SWG\Post(path="/images/create",
      *   tags={"图片"},
      *   summary="上传图片",
      *   description="Author: OYYM",
@@ -104,7 +104,7 @@ class ImagesController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/images/delete?debug=1",
+     * @SWG\Get(path="/images/delete",
      *   tags={"图片"},
      *   summary="删除图片",
      *   description="Author: OYYM",
@@ -131,7 +131,7 @@ class ImagesController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/images/get-all?debug=1",
+     * @SWG\Get(path="/images/get-all",
      *   tags={"图片"},
      *   summary="获取图片",
      *   description="Author: OYYM",

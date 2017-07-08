@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "paths": {
-        "/collection/create?debug=1": {
+        "/collection/create": {
             "get": {
                 "tags": [
                     "\u6536\u85cf"
@@ -41,7 +41,7 @@
                 }
             }
         },
-        "/collection/cancel?debug=1": {
+        "/collection/cancel": {
             "get": {
                 "tags": [
                     "\u6536\u85cf"
@@ -81,7 +81,7 @@
                 }
             }
         },
-        "/demo/t?debug=1": {
+        "/demo/t": {
             "get": {
                 "tags": [
                     "demo"
@@ -127,7 +127,7 @@
                 }
             }
         },
-        "/home/sort-type?debug=1": {
+        "/home/sort-type": {
             "get": {
                 "tags": [
                     "\u9996\u9875"
@@ -141,7 +141,7 @@
                 }
             }
         },
-        "/home/category?debug=1": {
+        "/home/category": {
             "get": {
                 "tags": [
                     "\u5206\u7c7b"
@@ -155,7 +155,7 @@
                 }
             }
         },
-        "/images/create?debug=1": {
+        "/images/create": {
             "post": {
                 "tags": [
                     "\u56fe\u7247"
@@ -219,7 +219,7 @@
                 }
             }
         },
-        "/images/delete?debug=1": {
+        "/images/delete": {
             "get": {
                 "tags": [
                     "\u56fe\u7247"
@@ -243,7 +243,7 @@
                 }
             }
         },
-        "/images/get-all?debug=1": {
+        "/images/get-all": {
             "get": {
                 "tags": [
                     "\u56fe\u7247"
@@ -275,7 +275,7 @@
                 }
             }
         },
-        "/like/create?debug=1": {
+        "/like/create": {
             "get": {
                 "tags": [
                     "\u70b9\u8d5e"
@@ -315,7 +315,7 @@
                 }
             }
         },
-        "/like/cancel?debug=1": {
+        "/like/cancel": {
             "get": {
                 "tags": [
                     "\u70b9\u8d5e"
@@ -418,6 +418,14 @@
                 ],
                 "summary": "\u4ea7\u54c1\u5217\u8868",
                 "description": "Author: lixinxin",
+                "consumes": [
+                    "application/json",
+                    "application/xml"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/xml"
+                ],
                 "parameters": [
                     {
                         "name": "sort_type",
@@ -451,7 +459,7 @@
                 }
             }
         },
-        "/demo/demo?debug=1": {
+        "/demo/demo": {
             "get": {
                 "tags": [
                     "demo"
@@ -475,7 +483,7 @@
                 }
             }
         },
-        "/user-address/area-info?debug=1": {
+        "/user-address/area-info": {
             "post": {
                 "tags": [
                     "\u7528\u6237\u5730\u5740"
@@ -507,7 +515,7 @@
                 }
             }
         },
-        "/user-address/create?debug=1": {
+        "/user-address/create": {
             "post": {
                 "tags": [
                     "\u7528\u6237\u5730\u5740"
@@ -611,7 +619,7 @@
                 }
             }
         },
-        "/user-address/set-default-address?debug=1": {
+        "/user-address/set-default-address": {
             "get": {
                 "tags": [
                     "\u7528\u6237\u5730\u5740"
@@ -643,7 +651,7 @@
                 }
             }
         },
-        "/user-address/get-default-address?debug=1": {
+        "/user-address/get-default-address": {
             "get": {
                 "tags": [
                     "\u7528\u6237\u5730\u5740"
@@ -667,7 +675,7 @@
                 }
             }
         },
-        "/user-address/get-address?debug=1": {
+        "/user-address/get-address": {
             "get": {
                 "tags": [
                     "\u7528\u6237\u5730\u5740"
@@ -691,7 +699,7 @@
                 }
             }
         },
-        "/users/follow-category?debug=1": {
+        "/users/follow-category": {
             "get": {
                 "tags": [
                     "\u7528\u6237"
@@ -705,7 +713,7 @@
                 }
             }
         },
-        "/users/follow-category-or-cancel?debug=1": {
+        "/users/follow-category-or-cancel": {
             "get": {
                 "tags": [
                     "\u7528\u6237"
@@ -719,7 +727,7 @@
                 }
             }
         },
-        "/users/sort-type?debug=1": {
+        "/users/sort-type": {
             "get": {
                 "tags": [
                     "\u7528\u6237"
@@ -733,7 +741,7 @@
                 }
             }
         },
-        "/users/category?debug=1": {
+        "/users/category": {
             "get": {
                 "tags": [
                     "\u7528\u6237"
@@ -747,7 +755,7 @@
                 }
             }
         },
-        "/videos/create?debug=1": {
+        "/videos/create": {
             "post": {
                 "tags": [
                     "\u89c6\u9891"
@@ -811,7 +819,7 @@
                 }
             }
         },
-        "/videos/delete?debug=1": {
+        "/videos/delete": {
             "get": {
                 "tags": [
                     "\u89c6\u9891"
@@ -835,7 +843,7 @@
                 }
             }
         },
-        "/videos/get-all?debug=1": {
+        "/videos/get-all": {
             "get": {
                 "tags": [
                     "\u89c6\u9891"
