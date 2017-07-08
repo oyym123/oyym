@@ -62,9 +62,8 @@ class HomeController extends WebController
      * Name: actionCategory
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-
-     * @SWG\Get(path="/demo/demo?debug=1",
-     *   tags={"demo"},
+     * @SWG\Get(path="/home/category?debug=1",
+     *   tags={"分类"},
      *   summary="获取宝贝分类",
      *   description="Author: OYYM",
      *   @SWG\Parameter(

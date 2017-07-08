@@ -16,6 +16,8 @@ class WebController extends Controller
         $userRule = [
             '13161057904' => '*', // 欧阳裕民
             '18606615070' => '*', // 新哥
+            '17610068627' => '*', //梦洁
+            '15210771883' => '*', //姗鸿
         ];
 //        echo Yii::$app->user->identity->username;exit;
         if (empty($userRule[Yii::$app->user->identity->username])) {

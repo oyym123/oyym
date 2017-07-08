@@ -72,6 +72,8 @@
         const ui = SwaggerUIBundle({
             url: "<?= \yii\helpers\Url::to(['swagger/swagger.json']) ?>",
             dom_id: '#swagger-ui',
+            headers: { "ky-token" : 1 },
+            supportHeaderParams: true,
             presets: [
                 SwaggerUIBundle.presets.apis,
                 SwaggerUIStandalonePreset
@@ -83,6 +85,7 @@
         })
         window.ui = ui
     }
+
 </script>
 </body>
 

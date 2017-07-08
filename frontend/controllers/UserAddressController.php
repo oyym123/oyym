@@ -37,6 +37,14 @@ class UserAddressController extends WebController
      *     required=true,
      *     type="integer",
      *   ),
+     *   @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
      *   )
@@ -145,6 +153,14 @@ class UserAddressController extends WebController
      *     required=false,
      *     type="integer",
      *   ),
+     *   @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
      *   )
@@ -185,6 +201,14 @@ class UserAddressController extends WebController
      *     required=true,
      *     type="integer",
      *   ),
+     *   @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -192,8 +216,7 @@ class UserAddressController extends WebController
      */
     public function actionSetDefaultAddress()
     {
-        $model = new UserAddress();
-        $model->setDefaultAddress(['id' => Yii::$app->request->get('id')]);
+        UserAddress::setDefaultAddress(['id' => Yii::$app->request->get('id')]);
         self::showMsg('默认地址设置成功', 1);
     }
 
@@ -202,6 +225,14 @@ class UserAddressController extends WebController
      *   tags={"用户地址"},
      *   summary="获取用户默认地址",
      *   description="Author: OYYM",
+     * @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -213,9 +244,10 @@ class UserAddressController extends WebController
         $data = [
             'id' => $address->id,
             'user_name' => $address->user_name,
-            'province_id' => $address->province_id,
-            'city_id' => $address->city_id,
-            'area_id' => $address->area_id,
+            'postal' => $address->postal,
+            'str_address' => $address->str_address,
+            'detail_address' => $address->detail_address,
+            'telephone' => $address->telephone
         ];
         self::showMsg($data);
     }
@@ -225,6 +257,14 @@ class UserAddressController extends WebController
      *   tags={"用户地址"},
      *   summary="获取用户所有地址",
      *   description="Author: OYYM",
+     *  @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -237,9 +277,10 @@ class UserAddressController extends WebController
             $data[] = [
                 'id' => $address->id,
                 'user_name' => $address->user_name,
-                'province_id' => $address->province_id,
-                'city_id' => $address->city_id,
-                'area_id' => $address->area_id,
+                'postal' => $address->postal,
+                'str_address' => $address->str_address,
+                'detail_address' => $address->detail_address,
+                'telephone' => $address->telephone,
                 'default_address' => $address->default_address
             ];
         }
