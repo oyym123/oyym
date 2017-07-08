@@ -46,7 +46,8 @@ class Image extends Base
     public function rules()
     {
         return [
-            [['type', 'type_id', 'created_at', 'updated_at'], 'required'],
+            [['type', 'type_id', 'created_at', 'updated_at', 'user_id'], 'required'],
+            [['sort'], 'default', 'value' => 0],
             [['type', 'type_id', 'size_type', 'user_id', 'sort', 'status', 'created_at', 'updated_at'], 'integer'],
             [['name', 'url'], 'string', 'max' => 255],
         ];

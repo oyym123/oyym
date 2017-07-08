@@ -86,6 +86,7 @@
                 "tags": [
                     "demo"
                 ],
+                "summary": "http://www.bejson.com/jsonviewernew/",
                 "description": "Author: OYYM",
                 "parameters": [
                     {
@@ -118,6 +119,30 @@
                         "required": true,
                         "type": "integer",
                         "default": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/demo/trim-double-quotes": {
+            "post": {
+                "tags": [
+                    "demo"
+                ],
+                "summary": "json\u5355\u5f15\u53f7\u53d8\u53cc\u5f15\u53f7",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "json",
+                        "in": "formData",
+                        "description": "\u5355\u5f15\u53f7\u53d8\u53cc\u5f15\u53f7",
+                        "required": true,
+                        "type": "string",
+                        "default": ""
                     }
                 ],
                 "responses": {
@@ -362,6 +387,38 @@
                 ],
                 "summary": "\u4ea7\u54c1\u5217\u8868",
                 "description": "Author: lixinxin",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/products/create?debug=1": {
+            "post": {
+                "tags": [
+                    "\u4ea7\u54c1"
+                ],
+                "summary": "",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "formData",
+                        "description": "\u53d1\u5e03\u4ea7\u54c1\u9700\u8981\u7684\u6570\u636e\uff0c\u53ef\u5728http://www.bejson.com/jsonviewernew/\u4e0a\u89e3\u6790",
+                        "required": true,
+                        "type": "string",
+                        "default": "{'model':1,'title':'Iphone9','contents':'\\u4e70\\u5b8c\\u5c31\\u5403\\u571f:)','images':[{'name':'\\u6d4b\\u8bd5\\u56fe\\u7247','url':'demo321'},{'name':'\\u6d4b\\u8bd5\\u56fe\\u72472','url':'demo456'}],'videos':[{'name':'\\u6d4b\\u8bd5\\u89c6\\u98911','url':'demo321'}],'address':{'lat':'0.232512','lng':'1.2335432','detail_address':'\\u6cb3\\u5317\\u7701\\u5eca\\u574a\\u5e02\\u71d5\\u90ca\\u9547'},'quantity':{'total':10000,'unit_price':1,'a_price':8000,'type_id':2},'time':{'start_time':1499392688,'end_time':1499692688,'unit_price':1,'type_id':2}}"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "successful operation"

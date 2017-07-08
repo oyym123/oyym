@@ -45,6 +45,7 @@ class Video extends Base
     {
         return [
             [['type', 'type_id', 'created_at', 'updated_at', 'user_id', 'url'], 'required'],
+            [['sort'], 'default', 'value' => 0],
             [['type', 'type_id', 'size_type', 'user_id', 'sort', 'status', 'created_at', 'updated_at'], 'integer'],
             [['name', 'url'], 'string', 'max' => 255],
         ];
@@ -116,7 +117,7 @@ class Video extends Base
         $video->url = ArrayHelper::getValue($params, 'url');
         $video->size_type = ArrayHelper::getValue($params, 'size_type');
         $video->status = ArrayHelper::getValue($params, 'status');
-        $image->sort = ArrayHelper::getValue($params, 'sort');
+        $video->sort = ArrayHelper::getValue($params, 'sort');
         $video->user_id = Yii::$app->user->id;
         $video->created_at = time();
         $video->updated_at = time();
