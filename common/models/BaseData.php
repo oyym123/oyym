@@ -46,7 +46,5 @@ trait BaseData
     public static $payType = [
         1 => '支付宝支付',
         2 => '微信支付',
-        3 => '银行转账', // 这个不能修改
-        4 => '银联支付',
     ];
 }

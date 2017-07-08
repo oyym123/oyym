@@ -4,7 +4,14 @@ namespace frontend\controllers;
 use frontend\components\WebController;
 
 /**
- * Home controller
+ * @SWG\Get(path="/home/sort-type",
+ *   tags={"首页"},
+ *   summary="首页排序类型列表",
+ *   description="Author: lixinxin",
+ *   @SWG\Response(
+ *      response=200, description="successful operation"
+ *   )
+ * )
  */
 class HomeController extends WebController
 {
@@ -27,31 +34,31 @@ class HomeController extends WebController
     {
         self::showMsg([
             [
-                'id' => 1,
+                'id' => 'tuijian',
                 'title' => '推荐'
             ],
             [
-                'id' => 1,
+                'id' => 'jindu',
                 'title' => '进度'
             ],
             [
-                'id' => 1,
+                'id' => 'danjia',
                 'title' => '单价'
             ],
             [
-                'id' => 1,
+                'id' => 'zongjia',
                 'title' => '总价'
             ],
             [
-                'id' => 1,
+                'id' => 'yikoujia',
                 'title' => '一口价'
             ],
             [
-                'id' => 1,
+                'id' => 'shijian',
                 'title' => '时间'
             ],
             [
-                'id' => 1,
+                'id' => 'zuixin',
                 'title' => '最新'
             ],
 
@@ -75,7 +82,7 @@ class HomeController extends WebController
     {
         self::showMsg([
             [
-                'id' => 1,
+                'id' => __LINE__,
                 'title' => '电子产品'
             ],
             [

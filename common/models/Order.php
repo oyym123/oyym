@@ -185,4 +185,13 @@ class Order extends Base
 
         }
     }
+
+    /** 设置支付方式 */
+    public function setPayType($pay_type)
+    {
+        $type = array_search($pay_type, BaseData::$payType);
+        $this->pay_type = $type ?: '';
+
+        return $this;
+    }
 }
