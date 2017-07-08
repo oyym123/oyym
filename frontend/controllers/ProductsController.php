@@ -26,7 +26,7 @@ class ProductsController extends WebController
      * Desc: 宝贝列表页接口
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/products?debug=1",
+     * @SWG\Get(path="/products",
      *   tags={"首页"},
      *   summary="产品列表",
      *   description="Author: lixinxin",
