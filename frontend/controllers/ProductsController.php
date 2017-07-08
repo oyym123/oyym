@@ -29,17 +29,32 @@ class ProductsController extends WebController
      *   tags={"产品"},
      *   summary="产品列表",
      *   description="Author: lixinxin",
+     *   @SWG\Parameter(
+     *     name="sort_type",
+     *     in="query",
+     *     default="tuijian",
+     *     description="排序类型",
+     *     required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="keywords",
+     *     in="query",
+     *     default="电脑",
+     *     description="搜索关键词",
+     *     required=false,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="category",
+     *     in="query",
+     *     default="1",
+     *     description="宝贝分类",
+     *     required=false,
+     *     type="string",
+     *   ),
      *   @SWG\Response(
-     *      response=200, description="successful operation",
-     *      schema:
-     *          type: object
-     *              properties:
-     *                  id:
-     *                      type: integer
-     *                      description: The user ID.
-     *                  username:
-     *                      type: string
-     *                      description: The user name.
+     *      response=200, description="successful operation"
      *
      *
      *   )
@@ -149,8 +164,8 @@ class ProductsController extends WebController
     }
 
 
-    /** 布局类型,根据宝贝属性判定客户端需要调用哪种的布局类型 */
-    public function layoutType($product)
+    /** 首页布局类型,根据宝贝属性判定客户端需要调用哪种的布局类型 */
+    public function listLayoutType($product)
     {
         return 1;
     }
@@ -218,6 +233,12 @@ class ProductsController extends WebController
             'limit' => Yii::$app->request->post('limit', 1)
         ];
 
+
+    }
+
+    /** 宝贝详情接口下放布局样式id, 用于控制客户端展示不同的布局  */
+    public function viewLayoutType($product)
+    {
 
     }
 

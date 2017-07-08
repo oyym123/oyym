@@ -225,12 +225,17 @@ class OrdersController extends WebController
      * Desc: 提交订单前的确认
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-07
-     * @SWG\Get(path="/orders/submit",
-     *   tags={"demo"},
+     * @SWG\Get(path="/orders/confirm",
+     *   tags={"订单"},
      *   summary="提交订单前的确认",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(
-     *     products="[{'id':'1234','count':'1','buy_type':'a_price || unit_price'}, {'id':'231','count':'1','buy_type':'a_price || unit_price'}]",
+     *     name="products",
+     *     in="query",
+     *     default="[{'id':'1234','count':'1','buy_type':'a_price || unit_price'}, {'id':'231','count':'1','buy_type':'a_price || unit_price'}]",
+     *     description="提交订单前的确认",
+     *     required=false,
+     *     type="string",
      *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation",
@@ -313,12 +318,24 @@ class OrdersController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-07
      * @SWG\Get(path="/orders/submit",
-     *   tags={"demo"},
+     *   tags={"订单"},
      *   summary="提交订单",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(
-     *     products="[{'id':'1234','count':'1','buy_type':'a_price || unit_price'}, {'id':'231','count':'1','buy_type':'a_price || unit_price'}]",
-     *     pay_type="alipay",
+     *     name="products",
+     *     in="query",
+     *     default="[{'id':'1234','count':'1','buy_type':'a_price || unit_price'}, {'id':'231','count':'1','buy_type':'a_price || unit_price'}]",
+     *     description="购买的宝贝明细",
+     *     required=false,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="pay_type",
+     *     in="query",
+     *     default="alipay",
+     *     description="使用的支付方式",
+     *     required=false,
+     *     type="string",
      *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation",

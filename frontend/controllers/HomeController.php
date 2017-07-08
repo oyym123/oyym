@@ -66,9 +66,6 @@ class HomeController extends WebController
      *   tags={"分类"},
      *   summary="获取宝贝分类",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(
-     *
-     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
