@@ -18,7 +18,7 @@ class CollectionController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/collection/create?debug=1",
+     * @SWG\Get(path="/collection/create",
      *   tags={"收藏"},
      *   summary="收藏",
      *   description="Author: OYYM",
@@ -71,7 +71,7 @@ class CollectionController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/collection/cancel?debug=1",
+     * @SWG\Get(path="/collection/cancel",
      *   tags={"收藏"},
      *   summary="取消收藏",
      *   description="Author: OYYM",

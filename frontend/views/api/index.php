@@ -70,7 +70,7 @@
     window.onload = function () {
         // Build a system
         const ui = SwaggerUIBundle({
-            url: "<?= \yii\helpers\Url::to(['swagger/swagger.json']) ?>",
+            url: "<?= \yii\helpers\Url::to(['swagger/swagger.json', 't' => time()]) ?>",
             dom_id: '#swagger-ui',
             headers: { "ky-token" : 1 },
             supportHeaderParams: true,

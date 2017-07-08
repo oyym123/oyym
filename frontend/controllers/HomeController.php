@@ -14,7 +14,7 @@ class HomeController extends WebController
      * Desc: 首页排序类型列表
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/home/sort-type?debug=1",
+     * @SWG\Get(path="/home/sort-type",
      *   tags={"首页"},
      *   summary="首页排序类型列表",
      *   description="Author: lixinxin",
@@ -58,18 +58,16 @@ class HomeController extends WebController
         ]);
     }
 
-
     /**
      * Name: actionCategory
-     * Desc: 获取宝贝分类
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/home/category?debug=1",
-     *   tags={"首页"},
+     * @SWG\Get(path="/home/category",
+     *   tags={"分类"},
      *   summary="获取宝贝分类",
-     *   description="Author: lixinxin",
+     *   description="Author: OYYM",
      *   @SWG\Response(
-     *      response=200, description="successful operation"
+     *       response=200,description="successful operation"
      *   )
      * )
      */

@@ -26,7 +26,7 @@ class VideosController extends WebController
     }
 
     /**
-     * @SWG\Post(path="/videos/create?debug=1",
+     * @SWG\Post(path="/videos/create",
      *   tags={"视频"},
      *   summary="上传视频",
      *   description="Author: OYYM",
@@ -104,7 +104,7 @@ class VideosController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/videos/delete?debug=1",
+     * @SWG\Get(path="/videos/delete",
      *   tags={"视频"},
      *   summary="删除视频",
      *   description="Author: OYYM",
@@ -131,7 +131,7 @@ class VideosController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/videos/get-all?debug=1",
+     * @SWG\Get(path="/videos/get-all",
      *   tags={"视频"},
      *   summary="获取视频",
      *   description="Author: OYYM",

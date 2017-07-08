@@ -25,7 +25,7 @@ class UserAddressController extends WebController
     }
 
     /**
-     * @SWG\Post(path="/user-address/area-info?debug=1",
+     * @SWG\Post(path="/user-address/area-info",
      *   tags={"用户地址"},
      *   summary="省市县数据",
      *   description="Author: OYYM",
@@ -69,7 +69,7 @@ class UserAddressController extends WebController
     }
 
     /**
-     * @SWG\Post(path="/user-address/create?debug=1",
+     * @SWG\Post(path="/user-address/create",
      *   tags={"用户地址"},
      *   summary="新增/修改用户地址",
      *   description="Author: OYYM",
@@ -189,7 +189,7 @@ class UserAddressController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/user-address/set-default-address?debug=1",
+     * @SWG\Get(path="/user-address/set-default-address",
      *   tags={"用户地址"},
      *   summary="设置默认收货地址",
      *   description="Author: OYYM",
@@ -221,7 +221,7 @@ class UserAddressController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/user-address/get-default-address?debug=1",
+     * @SWG\Get(path="/user-address/get-default-address",
      *   tags={"用户地址"},
      *   summary="获取用户默认地址",
      *   description="Author: OYYM",
@@ -253,7 +253,7 @@ class UserAddressController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/user-address/get-address?debug=1",
+     * @SWG\Get(path="/user-address/get-address",
      *   tags={"用户地址"},
      *   summary="获取用户所有地址",
      *   description="Author: OYYM",

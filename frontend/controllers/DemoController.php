@@ -18,7 +18,7 @@ use Yii;
 class DemoController extends WebController
 {
     /**
-     * @SWG\Get(path="/demo/t?debug=1",
+     * @SWG\Get(path="/demo/t",
      *   tags={"demo"},
      *     summary="http://www.bejson.com/jsonviewernew/",
      *   description="Author: OYYM",
