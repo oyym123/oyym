@@ -104,29 +104,52 @@ class Product extends Base
     /**
      * 判断商品是否可以购买
      */
-    public function isCanBuy($userId = 0)
+    public function canBuy($userId = 0)
     {
-        if ($this->status != self::STATUS_IN_PROGRESS || ($userId && $userId == $this->created_by)) {
-            return 0;
+        if ($this->status != self::STATUS_IN_PROGRESS) {
+            return [1, '宝贝状态不允许购买'];
         }
-        return 1;
+
+        if ($userId && $userId == $this->created_by) {
+            return [1, '不允许购买自己的宝贝哦'];
+        }
+        return [0, ''];
     }
 
     /**
      * 是否可以修改, 如果有交易产生,则不允许修改
      */
-    public function isCanUpdate()
+    public function canUpdate($userId = 0)
     {
-        return true;
+        if ($this->status != self::STATUS_IN_PROGRESS) {
+            return [1, '宝贝状态不允许修改哦'];
+        }
+
+        if ($userId && $userId != $this->created_by) {
+            return [1, '不允许修改别人的宝贝哦'];
+        }
+        return [0, ''];
     }
 
     /**
      * 是否可以修改, 如果有交易产生,则不允许修改
      */
-    public function isCanDelete()
+    public function canDelete($userId)
     {
-        return false;
+        if ($this->status == self::STATUS_IN_PROGRESS) {
+            return [1, '宝贝状态不允许删除哦'];
+        }
+
+        if ($userId && $userId != $this->created_by) {
+            return [1, '不允许删除别人的宝贝哦'];
+        }
+        return [0, ''];
     }
 
 
+    /** 商品头图 */
+    public function headImg()
+    {
+
+    }
 }

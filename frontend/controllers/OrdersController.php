@@ -255,8 +255,9 @@ class OrdersController extends WebController
 
         $dataProducts = [];
         foreach ($products as $key => $item) {
-            if ($item['product']->isCanbuy() == false) {
-                self::showMsg('活动已结束, 不允许购买', -1);
+            list($err, $msg) = $item['product']->canbuy();
+            if ($err) {
+                self::showMsg($msg, -1);
             }
 
             $dataProducts[] = [
@@ -277,10 +278,6 @@ class OrdersController extends WebController
             'user_name' => substr_replace(ArrayHelper::getValue($order->userEntity, 'username'), '****', 3, 4),
             'pay_amount' => '￥' . floatval($order->payAmount),
             'product_amount' => '￥' . floatval($order->productsAmount),
-            'default_pay_type' => '支付宝支付',
-            'pay_types' => $order->getPayTypes(Yii::$app->request->post('pay_ids', '["支付宝支付","微信支付"]')),
-            'pay_terms_word' => '', // 付款说明
-            'pay_terms' => '', // 是否展示 付款说明
             'amount' => $order->amountDesc ?: ($this->isAndroid() ? [
                 [
                     'name' => '',
@@ -303,10 +300,6 @@ class OrdersController extends WebController
                 'mobile' => $userAddress->telephone,
                 'detail' => UserAddress::mergeAddress($userAddress)
             ];
-        }
-
-        if (strpos(Yii::$app->request->post('pay_ids'), '微信支付') !== false) {
-            $data['default_pay_type'] = '微信支付';
         }
 
         self::showMsg($data);
@@ -394,6 +387,11 @@ class OrdersController extends WebController
             self::showMsg($e->getMessage(), -1);
         }
 
+        $pay += [
+            'default_pay_type' => '支付宝支付',
+            'pay_types' => $order->getPayTypes(Yii::$app->request->post('pay_ids', '["支付宝支付","微信支付"]')),
+        ];
+
         self::showMsg($pay);
     }
 
@@ -403,14 +401,7 @@ class OrdersController extends WebController
         $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'user_id' => $this->userId]);
 
         $params = [];
-//      if ($this->isIos() && in_array($this->getAppVersion(), Yii::$app->params['unDisplayVideosInIos'])) {
-        if ($this->isWaitCheckInIos()) {
-            // 苹果审核专用, 不取收费的视频
-            $params['freeProduct'] = '0.00';
-        }
-        foreach ($order->product as $item) {
-            $params['xingshi'] = $item ? (Product::getGuessLikeProductType($item->product->type ?: 12)) : [];
-        }
+
         $data = [
             'id' => $order->id,
             'pay_type' => $order->getPayType(),
