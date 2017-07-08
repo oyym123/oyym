@@ -25,6 +25,36 @@ use Yii;
  */
 class Product extends Base
 {
+    const STATUS_NOT_SALE = 1; // 未上架
+    const STATUS_IN_PROGRESS = 10; // 进行中
+    const STATUS_WAIT_LOTTERY = 20; // 待揭晓
+    const STATUS_PUBLISHED = 30; // 已揭晓
+    const STATUS_CANCELED = 40; // 已取消
+    const STATUS_COMPLETED = 50; // 已完成
+
+
+    /** 宝贝状态 */
+    public static $status = [
+        self::STATUS_NOT_SALE => '未上架',
+        self::STATUS_IN_PROGRESS => '进行中',
+        self::STATUS_WAIT_LOTTERY => '待揭晓',
+        self::STATUS_PUBLISHED => '已揭晓',
+        self::STATUS_CANCELED => '已取消',
+        self::STATUS_COMPLETED => '已完成',
+    ];
+
+    const TYPE_NOT_EXAMINE = 0; //未审核
+    const TYPE_ALREADY_EXAMINE = 1; //已审核
+
+    /** 审核状态(后台使用) */
+    public static $examineStatus = [
+        self::TYPE_NOT_EXAMINE => '未审核',
+        self::TYPE_ALREADY_EXAMINE => '已审核',
+    ];
+
+    const MODEL_NUMBER = 1; // 数量模式
+    const MODEL_TIME = 2; // 时间模式
+
     /**
      * @inheritdoc
      */
@@ -70,4 +100,33 @@ class Product extends Base
             'updated_at' => '修改时间',
         ];
     }
+
+    /**
+     * 判断商品是否可以购买
+     */
+    public function isCanBuy($userId = 0)
+    {
+        if ($this->status != self::STATUS_IN_PROGRESS || ($userId && $userId == $this->created_by)) {
+            return 0;
+        }
+        return 1;
+    }
+
+    /**
+     * 是否可以修改, 如果有交易产生,则不允许修改
+     */
+    public function isCanUpdate()
+    {
+        return true;
+    }
+
+    /**
+     * 是否可以修改, 如果有交易产生,则不允许修改
+     */
+    public function isCanDelete()
+    {
+        return false;
+    }
+
+
 }

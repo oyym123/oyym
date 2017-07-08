@@ -58,18 +58,20 @@ class HomeController extends WebController
         ]);
     }
 
-
     /**
      * Name: actionCategory
-     * Desc: 获取宝贝分类
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/home/actionCategory?debug=1",
-     *   tags={"首页"},
+
+     * @SWG\Get(path="/demo/demo?debug=1",
+     *   tags={"demo"},
      *   summary="获取宝贝分类",
-     *   description="Author: lixinxin",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(
+     *
+     *   ),
      *   @SWG\Response(
-     *      response=200, description="successful operation"
+     *       response=200,description="successful operation"
      *   )
      * )
      */
