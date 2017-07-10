@@ -619,7 +619,6 @@ class Product extends Base
                 'product_id' => $item->id,
                 'title' => $item->title,
                 'img' => $item->headImg(), // 宝贝头图
-                'img' => $item->headImg(),
                 'layout' => $item->sellerProductLayout(),
                 'status' => $item->getStatusText(),
                 'total' => $item->total, // 总需要多少人次
