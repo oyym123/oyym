@@ -38,6 +38,10 @@ class UsersController extends WebController
      *   tags={"我的"},
      *   summary= "关注的分类",
      *   description="Author: lixinxin",
+     *  @SWG\Parameter(
+     *     name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
      *   )
