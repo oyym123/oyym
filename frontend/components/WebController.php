@@ -96,7 +96,7 @@ class WebController extends Controller
             $item['pars'] = !empty($_GET) ? $_GET : null;
         }
 
-        if (isset($_GET['debug']) && $_GET['debug'] == '1') {
+        if ((isset($_GET['debug']) && $_GET['debug'] == '1') || strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
             echo "<pre>";
             print_r($_REQUEST);
             print_r($item);

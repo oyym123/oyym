@@ -10,7 +10,7 @@ namespace frontend\controllers;
 use app\helpers\Helper;
 use app\helpers\Weixin;
 use common\models\Order;
-use common\models\OrderPay;
+use common\models\Pay;
 use common\models\UserBought;
 use frontend\components\WebController;
 use Yii;
@@ -86,7 +86,8 @@ class PayController extends WebController
             }
 
             if (empty($order->pay)) {
-                $pay = new OrderPay();
+                $order->pay_type = 1;
+                $pay = new Pay();
                 $pay->sn = $order->sn;
                 $pay->order_id = $order->id;
                 $pay->pay_type = $order->pay_type;
@@ -190,12 +191,14 @@ class PayController extends WebController
             $this->_checkWeixinOrder($order, $data);
 
             $order->status = Order::STATUS_PAYED;
+            $order->pay_type = 2;
 
             if (!$order->save()) {
                 throw new Exception(current($order->getFirstErrors()));
             }
 
             $order->pay->weixin_pay_xml = $xml;
+            $order->pay->pay_type = $order->pay_type;
             $order->pay->out_trade_status = '已付款';
             $order->pay->paid_at = time();
 
@@ -302,7 +305,7 @@ class PayController extends WebController
         }
 
         if ($order->pay) {
-            $pay = OrderPay::findOne(['order_id' => $order->id]);
+            $pay = Pay::findOne(['order_id' => $order->id]);
             $pay->sn = $order->sn;
             $pay->order_id = $order->id;
             $pay->pay_type = $order->pay_type;
@@ -349,6 +352,53 @@ class PayController extends WebController
             //验证失败
             echo "fail";
             //logResult("这里写入想要调试的代码变量值，或其他运行的结果记录");
+        }
+    }
+
+    /**
+     * Name: actionPaySuccess
+     * Desc: 支付成功
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-00-00
+     * @SWG\Get(path="/pay/success",
+     *   tags={"demo"},
+     *   summary="",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(
+     *     name="sn", in="query", required=true, type="integer", default="1",
+     *     description="订单号"
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="[{'msg':'你成功参与了1件宝贝共计2人次,活动编号如下', 'award_code':{'123','234'}}]"
+     *   )
+     * )
+     */
+    public function actionPaySuccess($sn)
+    {
+        $order = $this->findOrderModel(['sn' => $sn, 'user_id' => $this->userId]);
+        $codes = $order->getAwardCodes();
+
+        $data = [
+            'msg' => '你成功参与了1件宝贝共计2人次,活动编号如下',
+            'codes' => ''
+        ];
+        foreach ($codes as $code) {
+            $data['codes'][] = $code;
+        }
+
+        self::showMsg($data);
+    }
+
+    /** 取订单实体 */
+    protected function findOrderModel($params)
+    {
+        /**
+         * 如果加这个条件, 客户端在删除订单操作完成后重新刷新了详情页面
+         */
+        if (($model = Order::findOne($params)) !== null) {
+            return $model;
+        } else {
+            self::showMsg('订单不存在', -1);
         }
     }
 }

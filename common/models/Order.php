@@ -21,6 +21,34 @@ use Yii;
  */
 class Order extends Base
 {
+    public $productTags = []; // 订单商品的所有标签
+    public $buyCount = []; // 购买总数
+    public $productAttribute = []; // 产品sku
+    public $productsAmount = 0.00; // 订单商品总金额
+    public $discountAmount = 0.00; // 折扣总金额
+    public $amountDesc = []; // 折扣明细,包括运费等
+    public $payAmount = 0.00; // 折扣总金额
+    public $coupons = []; // 优惠券
+
+    const STATUS_WAIT_PAY = 10; // 待付款
+    const STATUS_WAIT_PAY_CONFIRM = 20; // 付款待审核
+    const STATUS_PAYED = 30; // 交易成功
+    const STATUS_COMPLETED = 40; // 已完成
+    const STATUS_CANCEL = 50; // 交易关闭
+    const STATUS_DELETED = 90; // 已删除
+
+    public static function orderStatus()
+    {
+        return [
+            self::STATUS_WAIT_PAY => '待付款',
+            self::STATUS_WAIT_PAY_CONFIRM => '转账待审核',
+            self::STATUS_PAYED => '交易成功',
+            self::STATUS_COMPLETED => '完成',
+            self::STATUS_CANCEL => '交易关闭',
+            self::STATUS_DELETED => '已删除',
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -154,19 +182,27 @@ class Order extends Base
                 if (!$orderProduct->save()) {
                     throw new Exception('创建订单商品失败');
                 } else {
-                    $orderProduct->createAwardNumber();
+                    $orderProduct->createAwardCode();
                 }
             }
         }
     }
 
     /** 生成摇奖号码 */
-    public function createAwardNumber()
+    public function createAwardCode()
     {
         if ($this->buy_type == 'unit_price') {
             // 购买方式是参与众筹,需要生成摇奖编码
 
         }
+    }
+
+    /** 获取摇奖号码 */
+    public function getAwardCodes()
+    {
+        return [
+            '1234567890', '1234567891', '1234567892', '1234567893', '1234567894', '1234567895'
+        ];
     }
 
     /** 修改优惠券已被使用 */
@@ -193,5 +229,211 @@ class Order extends Base
         $this->pay_type = $type ?: '';
 
         return $this;
+    }
+
+    /** 获取支付方式 */
+    public function getPayTypes($payIds)
+    {
+        $payIds = @json_decode($payIds, true);
+
+        $return = [];
+
+        if (is_array($payIds)) {
+
+            if (in_array('微信支付', $payIds)) {
+                $return[] = [
+                    'show' => 1,
+                    'detail' => '推荐开通微信支付的用户',
+                    'type' => BaseData::$payType[2],
+                    'img' => Url::to('/images/pay_weixin.png', 1)
+                ];
+            }
+
+            if (in_array('支付宝支付', $payIds)) {
+                $return[] = [
+                    'show' => 1,
+                    'detail' => '推荐有支付宝的用户使用',
+                    'type' => BaseData::$payType[1],
+                    'img' => Yii::$app->params['qiniu_url_images'] . 'pay_alipay1.png'
+                ];
+            }
+        }
+
+        return $return;
+    }
+
+    /** 获取支付参数 */
+    public function getPayParams($payType = '')
+    {
+        $payType = $payType ?: $this->pay_type;
+        switch ($payType) {
+            case 1 :  // 支付宝
+                return $this->_alipay();
+                break;
+
+            case 2: // 微信
+                return $this->_weixinPay();
+                break;
+        }
+    }
+
+    /** 获取支付宝支付参数 */
+    public function _alipay()
+    {
+        require_once(Yii::getAlias('@app') . "/sdk/alipay/alipay.config.php");
+        require_once(Yii::getAlias('@app') . "/sdk/alipay/lib/alipay_core.function.php");
+        require_once(Yii::getAlias('@app') . "/sdk/alipay/lib/alipay_rsa.function.php");
+
+        $productTitle = $this->product ? ArrayHelper::getValue($this->product, "0.title") : '';
+
+        $apiParams = [
+            'service' => 'mobile.securitypay.pay',
+            'out_trade_no' => $this->sn,
+            '_input_charset' => 'utf-8',
+            'total_fee' => $this->pay_amount,
+            'subject' => $productTitle,
+            'body' => $productTitle,
+            'partner' => '2088801047131045',
+            'notify_url' => Url::to('/alipayCallback.php', true),
+            'payment_type' => 1,
+            'goods_type' => 0, // 0 虚拟 1 实物
+            'seller_id' => '1@diyixue.com',
+        ];
+//        Helper::writeLog($apiParams);
+        $apiParams = $apiParams2 = argSort($apiParams);
+
+        foreach ($apiParams as $key => $val) {
+            $apiParams[$key] = '"' . $val . '"';
+        }
+
+        $apiParams = createLinkstring($apiParams);
+
+        $signData = rsaSign($apiParams, Yii::getAlias('@app') . "/sdk/alipay/key/rsa_private_key.pem");
+
+        return ['alipay' => $apiParams . '&sign_type="RSA"&sign="' . urlencode($signData) . '"'];
+    }
+
+    /** 获取微信支付参数 */
+    public function _weixinPay()
+    {
+        $productTitle = $this->product ? ArrayHelper::getValue($this->product, "0.title") : '';
+
+        if ($this->pay) {
+            $signParams = [
+                'appid' => Yii::$app->params['wx_app_id'],
+                'partnerid' => Yii::$app->params['wx_mch_id'],
+                'prepayid' => $this->pay->out_trade_no,
+                'noncestr' => md5($this->sn . time() . mt_rand(1, 9999999)),
+                'timestamp' => (string)time(),
+                'package' => "Sign=WXPay",
+            ];
+
+            // 如果已经有微信支付日志, 直接返回
+            return [
+                "wx_appid" => (string)Yii::$app->params['wx_app_id'],
+                "wx_sign" => Weixin::getSign($signParams),
+                "wx_timestamp" => (string)time(),
+                "wx_partner_id" => Yii::$app->params['wx_mch_id'],
+                "wx_package" => "Sign=WXPay",
+                "wx_nonce_str" => $signParams['noncestr'],
+                "wx_prepay_id" => $signParams['prepayid'],
+            ];
+        }
+
+        $apiParams = [
+            'appid' => Yii::$app->params['wx_app_id'],
+            'mch_id' => Yii::$app->params['wx_mch_id'],
+            'nonce_str' => md5(mt_rand(1, 999999999) . $this->sn),
+            'body' => $productTitle,
+            'out_trade_no' => $this->sn,
+            'total_fee' => $this->pay_amount * 100,
+            'spbill_create_ip' => Helper::getIP(),
+            'notify_url' => Url::to('/weixinpayCallback.php', true),
+            'trade_type' => 'APP',
+        ];
+
+        $apiParams['sign'] = Weixin::getSign($apiParams);
+
+        $xml = '<xml>';
+        foreach ($apiParams as $key => $val) {
+            $xml .= "<$key>$val</$key>";
+        }
+        $xml .= '</xml>';
+
+        $url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
+
+        $response = Helper::post($url, $xml);
+
+        list($data, $ok) = Weixin::checkSign($response);
+
+        if ($ok == false) {
+            throw new Exception('签名验证失败', -1);
+        }
+
+        $xml = simplexml_load_string($response);
+
+        if (empty($data['return_code'])) {
+            throw new Exception('创建微信预支付订单失败');
+        }
+
+        if ($data['return_code'] == 'FAIL') {
+            throw new Exception(empty($data['return_msg']) ? '创建微信预支付订单失败' : $data['return_msg']);
+        }
+
+        if ($data['result_code'] == 'FAIL') {
+            throw new Exception(empty($data['err_code_des']) ? '创建微信预支付订单失败' : $data['err_code_des']);
+        }
+
+        if ($data['return_code'] == 'SUCCESS') {
+            if (empty($data['prepay_id'])) {
+                throw new Exception((empty($data['return_msg']) ? '创建微信预支付订单失败' : $data['return_msg']));
+            }
+
+            /** 保存微信支付日志 */
+            $pay = new OrderPay();
+            $pay->sn = $this->sn;
+            $pay->order_id = $this->id;
+            $pay->pay_type = $this->pay_type;
+            $pay->out_trade_no = $data['prepay_id'];
+            $pay->out_trade_status = '等待付款';
+            $pay->log = $response;
+            $pay->status = '1';
+
+            if (!$pay->save()) {
+                print_r($pay->getErrors());
+                throw new Exception('创建订单支付日志失败');
+            }
+
+            $sign = Weixin::getSign([
+                'appid' => Yii::$app->params['wx_app_id'],
+                'partnerid' => Yii::$app->params['wx_mch_id'],
+                'partnerid' => $data['mch_id'],
+                'prepayid' => $data['prepay_id'],
+                'noncestr' => $data['nonce_str'],
+                'timestamp' => (string)time(),
+                'package' => "Sign=WXPay",
+            ]);
+
+            return [
+                "wx_appid" => (string)Yii::$app->params['wx_app_id'],
+                "wx_sign" => $sign,
+                "wx_timestamp" => (string)time(),
+                "wx_partner_id" => $data['mch_id'],
+                "wx_package" => "Sign=WXPay",
+                "wx_nonce_str" => $data['nonce_str'],
+                "wx_prepay_id" => $data['prepay_id'],
+            ];
+        }
+
+        throw new Exception('微信支付暂时不可用');
+
+//        return [
+//            "wx_sign" => "d7fe3d29cda19ddf9924e005ee37278a6f3af085",
+//            "wx_timestamp" => "1462421594",
+//            "wx_partner_id" => "1219130301",
+//            "wx_package" => "Sign=WXPay",
+//            "wx_nonce_str" => "f4beeba0dd6c190c6ac02f85e7b3691c",
+//            "wx_prepay_id" => "820103800016050513bed566589137c9",
+//        ];
     }
 }
