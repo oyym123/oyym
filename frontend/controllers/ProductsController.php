@@ -182,7 +182,7 @@ class ProductsController extends WebController
      *   @SWG\Parameter(
      *     name="data",
      *     in="formData",
-     *     default="{'model':1,'title':'Iphone9','contents':'\u4e70\u5b8c\u5c31\u5403\u571f:)','images':[{'name':'\u6d4b\u8bd5\u56fe\u7247','url':'demo321'},{'name':'\u6d4b\u8bd5\u56fe\u72472','url':'demo456'}],'videos':[{'name':'\u6d4b\u8bd5\u89c6\u98911','url':'demo321'}],'address':{'lat':'0.232512','lng':'1.2335432','detail_address':'\u6cb3\u5317\u7701\u5eca\u574a\u5e02\u71d5\u90ca\u9547'},'quantity':{'total':10000,'unit_price':1,'a_price':8000,'type_id':2},'time':{'start_time':1499392688,'end_time':1499692688,'unit_price':1,'type_id':2}}",
+     *     default="{'model':1,'title':'Iphone9','contents':'\u4e70\u5b8c\u5c31\u5403\u571f:)','images':[{'name':'\u6d4b\u8bd5\u56fe\u7247','url':'demo321'},{'name':'\u6d4b\u8bd5\u56fe\u72472','url':'demo456'}],'videos':[{'name':'\u6d4b\u8bd5\u89c6\u98911','url':'demo321'}],'address':{'lat':'0.232512','lng':'1.2335432','detail_address':'\u6cb3\u5317\u7701\u5eca\u574a\u5e02\u71d5\u90ca\u9547'},'total':10000,'a_price':8000,'type_id':2,'start_time':1499392688,'end_time':1499692688,'unit_price':1}",
      *     description= "发布产品需要的数据，可在http://www.bejson.com/jsonviewernew/上解析",
      *     required=true,
      *     type="string",
@@ -228,20 +228,15 @@ class ProductsController extends WebController
                 'lng' => '1.2335432',
                 'detail_address' => '河北省廊坊市燕郊镇',
             ],
-            'quantity' => [
-                'total' => 10000,
-                'unit_price' => 1,
-                'a_price' => 8000,
-                'type_id' => 2,
-            ],
-            'time' => [
-                'start_time' => 1499392688,
-                'end_time' => 1499692688,
-                'unit_price' => 1,
-                'type_id' => 2,
-            ],
+            'total' => 10000,
+            'a_price' => 8000,
+            'type_id' => 2,
+            'start_time' => 1499392688,
+            'end_time' => 1499692688,
+            'unit_price' => 1,
         ];
-        // echo json_encode($data);exit;
+        // echo json_encode($data);
+        //  exit;
         //  $data = json_encode($data);
         $data = Yii::$app->request->post('data');
         $data = json_decode($data, true);
@@ -265,17 +260,13 @@ class ProductsController extends WebController
             $product->status = Product::STATUS_IN_PROGRESS;
             $product->created_at = time();
             $product->updated_at = time();
-            if ($data['model'] == Product::MODEL_NUMBER) {
-                $product->total = $data['quantity']['total'];
-                $product->unit_price = $data['quantity']['unit_price'];
-                $product->type_id = $data['quantity']['type_id'];
-                $product->a_price = $data['quantity']['a_price'];
-            } else {
-                $product->start_time = $data['time']['start_time'];
-                $product->end_time = $data['time']['end_time'];
-                $product->unit_price = $data['time']['unit_price'];
-                $product->type_id = $data['time']['type_id'];
-            }
+            $product->total = $data['total'];
+            $product->unit_price = $data['unit_price'];
+            $product->type_id = $data['type_id'];
+            $product->a_price = $data['a_price'];
+            $product->start_time = $data['start_time'];
+            $product->end_time = $data['end_time'];
+
             if (!$product->save()) {
                 throw new Exception('宝贝发布失败');
             }
