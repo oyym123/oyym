@@ -198,7 +198,7 @@ class Order extends Base
     }
 
     /** 获取摇奖号码 */
-    public function getAwardCode()
+    public function getAwardCodes()
     {
         return [
             '1234567890', '1234567891', '1234567892', '1234567893', '1234567894', '1234567895'

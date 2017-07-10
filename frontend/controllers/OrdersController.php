@@ -68,7 +68,6 @@ class OrdersController extends WebController
         $comment = new Comments();
         $params = Yii::$app->request->get();
         $params['skip'] = intval(Yii::$app->request->get('skip', 0));
-        $params['psize'] = intval(Yii::$app->request->get('psize', 10));
         $params['user_id'] = $this->userId;
 
         list($items, $count) = $order->apiSearch($params);
@@ -718,37 +717,6 @@ class OrdersController extends WebController
         }
     }
 
-    /**
-     * Name: actionPaySuccess
-     * Desc: 支付成功
-     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
-     * Date: 2017-00-00
-     * @SWG\Get(path="/demo/demo",
-     *   tags={"demo"},
-     *   summary="",
-     *   description="Author: lixinxin",
-     *   @SWG\Parameter(
-     *     name="sn", in="query", required=true, type="integer", default="1",
-     *     description="订单号"
-     *   ),
-     *   @SWG\Response(
-     *       response=200,description="[{'msg':'你成功参与了1件宝贝共计2人次,活动编号如下', 'award_code':{'123','234'}}]"
-     *   )
-     * )
-     */
-    public function actionPaySuccess($sn)
-    {
-        $order = $this->findOrderModel(['sn' => $sn, 'user_id' => $this->userId]);
-        $codes = $order->getAwardCodes();
 
-        $data = [
-            'msg' => '你成功参与了1件宝贝共计2人次,活动编号如下',
-            'codes' => ''
-        ];
-        foreach ($codes as $code) {
-            $data['codes'][] = $code;
-        }
 
-        self::showMsg($data);
-    }
 }
