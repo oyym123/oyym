@@ -87,6 +87,35 @@ class Product extends Base
         ];
     }
 
+    /** 宝贝详情接口下放布局样式id, 用于控制客户端展示不同的布局  */
+    public function viewLayoutType()
+    {
+        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER) {
+            return 1; //正在进行的页面，数量模式 区别有一口价或者没有一口价
+        } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
+            return 2; //正在进行的页面，时间模式
+        } elseif ($this->status == Product::STATUS_WAIT_LOTTERY) {
+            return 3; //卖家用户的待揭晓页面，显示“我来揭晓” ，买家用户的待揭晓页面，显示“请等待系统揭晓”
+        } elseif ($this->status == Product::STATUS_COMPLETED) {
+            return 4; //已揭晓 , 一口价
+        } elseif ($this->status == Product::STATUS_PUBLISHED) {
+            return 5; //已揭晓 ，获奖
+        } else {
+            return 6; //显示空页面
+        }
+    }
+
+    /** 揭晓模式判断 */
+    public function viewAnnouncedType()
+    {
+        if ($this->created_by != Yii::$app->user->id && $this->status == Product::STATUS_WAIT_LOTTERY) {
+            return '请等待系统揭晓'; //买家用户的待揭晓页面，显示“请等待系统揭晓”
+        } elseif ($this->created_by == Yii::$app->user->id && $this->status == Product::STATUS_WAIT_LOTTERY) {
+            return '我来揭晓'; //卖家用户的待揭晓页面，显示“我来揭晓”
+        }
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -112,8 +141,6 @@ class Product extends Base
             'updated_at' => '修改时间',
         ];
     }
-
-
 
     /**
      * 判断商品是否可以购买
@@ -159,7 +186,6 @@ class Product extends Base
         }
         return [0, ''];
     }
-
 
 
     /** 商品头图 */

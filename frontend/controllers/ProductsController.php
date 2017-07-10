@@ -2,12 +2,15 @@
 namespace frontend\controllers;
 
 use common\models\Base;
+use common\models\Collection;
 use common\models\Image;
 use common\models\Product;
 use common\models\Video;
 use frontend\components\WebController;
 use Yii;
 use yii\base\Exception;
+use common\helpers\Helper;
+use common\models\Comments;
 use yii\base\InvalidParamException;
 use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
@@ -251,6 +254,7 @@ class ProductsController extends WebController
             $product->lng = $data['address']['lng'];
             $product->user_id = $this->userId;
             $product->created_by = $this->userId;
+            $product->status = Product::STATUS_IN_PROGRESS;
             $product->created_at = time();
             $product->updated_at = time();
             if ($data['model'] == Product::MODEL_NUMBER) {
@@ -298,89 +302,79 @@ class ProductsController extends WebController
         }
     }
 
-    /** 首页布局类型,根据宝贝属性判定客户端需要调用哪种的布局类型 */
-    public function listLayoutType($product)
+    /**
+     * @param $id
+     * @SWG\Get(path="/products/view",
+     *   tags={"产品"},
+     *   summary="宝贝详情页",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(
+     *     name="id",
+     *     in="query",
+     *     default="1",
+     *     description="产品ID",
+     *     required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionView()
     {
-        return 1;
-    }
-
-    /** 宝贝详情接口下放布局样式id, 用于控制客户端展示不同的布局  */
-    public function viewLayoutType($product)
-    {
-
-    }
-
-    public function actionView($id)
-    {
-        $item = $this->findModel(['id' => $id]);
-        $params['user_id'] = $this->userId;
-        $params['type'] = Collection::TYPE_VIDEO;
-        $params['type_id'] = $id;
-
-        $collectionFlag = Collection::collectionFlag($params) ? Collection::COLLECTED : Collection::NOT_COLLECT;
+        $item = $this->findModel(['id' => Yii::$app->request->get('id')]);
+        $params['type'] = Collection::TYPE_PRODUCT;
+        $params['type_id'] = $item->id;
+        $collectionFlag = Collection::collectionFlag($params) ? Collection::COLLECT : Collection::NOT_COLLECT;
 
         $data = [
-            'id' => __LINE__,
-            'status' => '',
-            'layout_type' => '布局类型',
-            'images' => [
-                [
-                    'id' => __LINE__,
-                    'url' => 'https://www.baidu.com/img/bd_logo1.png',
-                ],
-                [
-                    'id' => __LINE__,
-                    'url' => 'https://www.baidu.com/img/bd_logo1.png',
-                ],
-                [
-                    'id' => __LINE__,
-                    'url' => 'https://www.baidu.com/img/bd_logo1.png',
-                ]
-            ],
+            'id' => $item->id,
+            'images' => Image::getImages(['type' => Image::TYPE_PRODUCT, 'type_id' => $item->id]),
+            'videos' => Video::getVideos(['type' => Video::TYPE_PRODUCT, 'type_id' => $item->id]),
             'title' => $item->title,
-            'contents' => "保时捷跑车便宜卖了,保时捷跑车便宜卖了,保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了",
+            'contents' => $item->contents,
             'progress' => '80', // 众筹进度
             'model_type' => $item->model,
-            'layout_type' => "1", // 布局类型
             'like' => 123, // 喜欢
-            'comment' => '12', // 评论
-            'unit_price' => '12', // 单价
-            'a_price' => '12', // 一口价
-            'end_time' => '12', // 结束时间
-            'need_total' => 1000, // 需要参与人次
-            'remaining' => 11, // 剩余人次
-            'all_total' => 3245, // 总参与人次
-            'layout_type' => $this->listLayoutType([]), // 布局类型
-            'share_params' => [
-                'share_title' => '众筹夺宝',
-                'share_contents' => '夺宝达人!',
-                'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
-                'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
+            'comments' => '12', // 评论
+            'layout_type' => $item->viewLayoutType(), // 布局类型
+            'layout1' => [
+                'unit_price' => $item->unit_price,
+                'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
+                'need_total' => 1000, // 需要参与人次
+                'remaining' => 11, // 剩余人次
             ],
-
-            'address' => "北京 朝阳区",
-            'intro' => $this->getIntro(2000),
-            'peiyou_apply_personal_data' => [
-                'tips_title' => '请补充资料',
-                'tips_contents' => '培优计划是为学生量身定制的名师服务计划,需要学生尽可能详细的补充个人学习成绩信息等,点击"下一步"开始完善资料吧~',
+            'layout2' => [
+                'unit_price' => $item->unit_price,
+                'all_total' => 3245, // 总参与人次
+                'start_time' => $item->start_time, // 开始时间
+                'end_time' => $item->end_time, // 结束时间
             ],
-            'collection_flag' => $collectionFlag,
-            'can_buy' => $item->isCanBuy(),
-            'comment_count' => $item->user_count,
-            'comment_list' => $item->getComments([
-                'skip' => 0,
-                'psize' => 5,
-            ]),
-            'video_url' => '',
-            'video_img' => '',
-            'sale_user' => [
-                'img' => '',
-                'name' => '',
-                'zhima' => '芝麻信用:700',
-                'intro' => '来到众筹夺宝20天了,成功卖出30件商品',
+            'layout3' => [
+                'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式
+                'all_total' => 3245, // 总参与人次
+                'end_time' => 3445122333, //时间戳，客户端进行倒计时
             ],
-            'publish_countdown' => '7200', // 揭晓倒计时以秒为单位
-            'luck_user' => [
+            'layout4' => [
+                'user_img' => '',
+                'luck_number' => '',
+                'list' => [
+                    [
+                        'title' => '获得者:',
+                        'value' => '李新新'
+                    ],
+                    [
+                        'title' => '参与方式:',
+                        'value' => "一口价{$item->a_price}元购买"
+                    ],
+                    [
+                        'title' => '购买时间:',
+                        'value' => '2017-07-08 08:12:22'
+                    ],
+                ]
+            ],
+            'layout5' => [
                 'user_img' => '',
                 'luck_number' => '3707863272837',
                 'list' => [
@@ -397,30 +391,34 @@ class ProductsController extends WebController
                         'value' => '2017-07-08 08:12:22'
                     ],
                 ]
-            ], // 中奖人信息
-            'luck_user2' => [
-                'user_img' => '',
-                'luck_number' => '',
-                'list' => [
-                    [
-                        'title' => '获得者:',
-                        'value' => '李新新'
-                    ],
-                    [
-                        'title' => '参与方式:',
-                        'value' => '一口价500元购买'
-                    ],
-                    [
-                        'title' => '购买时间:',
-                        'value' => '2017-07-08 08:12:22'
-                    ],
-                ]
-            ], // 中奖人信息
-
+            ],
+            'layout6' => [
+                'data' => ''
+            ],
+            'share_params' => [
+                'share_title' => '众筹夺宝',
+                'share_contents' => '夺宝达人!',
+                'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
+                'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
+            ],
+            'address' => $item->detail_address,
+            'intro' => '',
+            'collection_flag' => $collectionFlag,
+            //    'can_buy' => $item->isCanBuy(),
+            'comment_count' => $item->comments,
+            'comment_list' => Comments::getProduct($item->id, 0, 5),
+            'sale_user' => [
+                'img' => '',
+                'name' => '',
+                'zhima' => '芝麻信用:700',
+                'intro' => '来到众筹夺宝20天了,成功卖出30件商品',
+            ],
+            'publish_countdown' => '7200', // 揭晓倒计时以秒为单位
         ];
 
         $this->showMsg($data);
     }
+
 
     /** 取产品实体 */
     protected function findModel($params)

@@ -18,6 +18,12 @@ use yii\base\Exception;
  */
 class Collection extends Base
 {
+    const TYPE_PRODUCT = 1; //商品
+
+
+    const COLLECT = 1;
+    const NOT_COLLECT = 0;
+
     /**
      * @inheritdoc
      */
@@ -53,7 +59,7 @@ class Collection extends Base
     }
 
     /** 判断该用户是否已经收藏 */
-    public function collectionFlag($params)
+    public static function collectionFlag($params)
     {
         $query = Collection::find()
             ->where(["type_id" => ArrayHelper::getValue($params, 'type_id')])

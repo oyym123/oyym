@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "user_info".
@@ -36,6 +37,17 @@ class UserInfo extends Base
             [['profit'], 'number'],
             [['name'], 'string', 'max' => 255],
         ];
+    }
+
+    public function phoneSystem()
+    {
+        return ArrayHelper::getValue(Base::$phoneSystem, $this->phone_system, '未知');
+    }
+
+    /** 用户头像地址 */
+    public function photoUrl()
+    {
+        return empty($this->photo) ? Yii::$app->params['defaultPhoto'] : Yii::$app->params['qiniu_url_images'] . $this->photo;
     }
 
     /**
