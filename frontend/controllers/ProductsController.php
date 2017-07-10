@@ -347,26 +347,17 @@ class ProductsController extends WebController
             'like' => 123, // 喜欢
             'comments' => '12', // 评论
             'layout_type' => $item->viewLayoutType(), // 布局类型
-            'layout1' => [
-                'unit_price' => $item->unit_price,
-                'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
-                'need_total' => 1000, // 需要参与人次
-                'remaining' => 11, // 剩余人次
-            ],
-            'layout2' => [
-                'unit_price' => $item->unit_price,
-                'all_total' => 3245, // 总参与人次
-                'start_time' => $item->start_time, // 开始时间
-                'end_time' => $item->end_time, // 结束时间
-            ],
-            'layout3' => [
-                'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式
-                'all_total' => 3245, // 总参与人次
-                'end_time' => 3445122333, //时间戳，客户端进行倒计时
-            ],
-            'layout4' => [
+            'unit_price' => $item->unit_price,
+            'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
+            'need_total' => 1000, // 需要参与人次
+            'remaining' => 11, // 剩余人次
+            'start_time' => $item->start_time, // 开始时间
+            'end_time' => $item->end_time, // 结束时间
+            'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式
+            'all_total' => 3245, // 总参与人次
+            'luck_user' => [
                 'user_img' => '',
-                'luck_number' => '',
+                'luck_number' => '3707863272837',
                 'list' => [
                     [
                         'title' => '获得者:',
@@ -381,27 +372,6 @@ class ProductsController extends WebController
                         'value' => '2017-07-08 08:12:22'
                     ],
                 ]
-            ],
-            'layout5' => [
-                'user_img' => '',
-                'luck_number' => '3707863272837',
-                'list' => [
-                    [
-                        'title' => '获得者:',
-                        'value' => '李新新'
-                    ],
-                    [
-                        'title' => '参与人次:',
-                        'value' => '50'
-                    ],
-                    [
-                        'title' => '揭晓时间:',
-                        'value' => '2017-07-08 08:12:22'
-                    ],
-                ]
-            ],
-            'layout6' => [
-                'data' => ''
             ],
             'share_params' => [
                 'share_title' => '众筹夺宝',

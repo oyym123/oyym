@@ -81,6 +81,86 @@
                 }
             }
         },
+        "/comments/create-product": {
+            "post": {
+                "tags": [
+                    "\u8bc4\u8bba"
+                ],
+                "summary": "\u6dfb\u52a0\u4ea7\u54c1\u8bc4\u8bba",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "contents",
+                        "in": "formData",
+                        "description": "\u8bc4\u8bba\u5185\u5bb9",
+                        "required": true,
+                        "type": "string",
+                        "default": "\u8fd9\u624b\u673a\u771f\u597d\u770b\uff0cI want buy !"
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "formData",
+                        "description": "\u4ea7\u54c1ID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/comments/get-product": {
+            "get": {
+                "tags": [
+                    "\u8bc4\u8bba"
+                ],
+                "summary": "\u83b7\u53d6\u4ea7\u54c1\u8bc4\u8bba",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "comment_id",
+                        "in": "query",
+                        "description": "\u8bc4\u8bbaID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "comment_line_id",
+                        "in": "query",
+                        "description": "\u8bc4\u8bba\u6807\u8bb0ID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "query",
+                        "description": "\u4ea7\u54c1ID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
         "/demo/t": {
             "get": {
                 "tags": [

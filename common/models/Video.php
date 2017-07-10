@@ -97,7 +97,7 @@ class Video extends Base
         $data = [];
         foreach ($videos as $video) {
             if ($video->url) {
-                $data['list'][] = [
+                $data[] = [
                     'id' => $video->id,
                     'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_videos'], $video->url),
                     'name' => $video->name ?: ''

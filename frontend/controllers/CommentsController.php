@@ -27,7 +27,7 @@ class CommentsController extends WebController
     {
         parent::init();
         if (empty($this->userId) && in_array(Yii::$app->requestedRoute, [
-                'comments/create-video', 'comments/create-product', 'comments/reply-product', 'comments/product-page',
+                'comments/create-product', 'comments/reply-product', 'comments/product-page',
                 'comments/create-product'
             ])
         ) {
@@ -50,7 +50,40 @@ class CommentsController extends WebController
         ];
     }
 
-    /** 提交话题评论 */
+    /**
+     * @SWG\Post(path="/comments/create-product",
+     *   tags={"评论"},
+     *   summary="添加产品评论",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(
+     *     name="contents",
+     *     in="formData",
+     *     default="这手机真好看，I want buy !",
+     *     description="评论内容",
+     *     required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="product_id",
+     *     in="formData",
+     *     default="1",
+     *     description="产品ID",
+     *     required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=true,
+     *     type="integer",
+     *    ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
     public function actionCreateProduct()
     {
         $contents = Helper::wordScreen(Yii::$app->request->post('contents')) ?: self::showMsg('提交的信息有敏感词', -200);
@@ -106,7 +139,40 @@ class CommentsController extends WebController
     }
 
 
-    /** 获取评论详情 */
+    /**
+     * @SWG\Get(path="/comments/get-product",
+     *   tags={"评论"},
+     *   summary="获取产品评论",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(
+     *     name="comment_id",
+     *     in="query",
+     *     default="1",
+     *     description="评论ID",
+     *     required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="comment_line_id",
+     *     in="query",
+     *     default="1",
+     *     description="评论标记ID",
+     *     required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="product_id",
+     *     in="query",
+     *     default="1",
+     *     description="产品ID",
+     *     required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
     public function actionGetProduct()
     {
         $comment_id = Yii::$app->request->get('comment_id');
