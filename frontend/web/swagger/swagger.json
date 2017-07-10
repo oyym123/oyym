@@ -232,6 +232,30 @@
                 }
             }
         },
+        "/file-token/index?debug=1": {
+            "get": {
+                "tags": [
+                    "\u83b7\u53d6\u4e03\u725b\u4e91token"
+                ],
+                "summary": "\u83b7\u53d6\u4e03\u725b\u4e91token",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "token_type",
+                        "in": "query",
+                        "description": "\u4e0d\u4f20\u53c2\u6570\u9ed8\u8ba4\u7ed9image\u7684token, 1 = video\u516c\u6709\uff0c2 = video\u79c1\u6709\u6876 , 3 = image\u79c1\u6709",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
         "/home/sort-type": {
             "get": {
                 "tags": [
