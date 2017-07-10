@@ -10,7 +10,7 @@ namespace frontend\controllers;
 use app\helpers\Helper;
 use app\helpers\Weixin;
 use common\models\Order;
-use common\models\OrderPay;
+use common\models\Pay;
 use common\models\UserBought;
 use frontend\components\WebController;
 use Yii;
@@ -86,7 +86,8 @@ class PayController extends WebController
             }
 
             if (empty($order->pay)) {
-                $pay = new OrderPay();
+                $order->pay_type = 1;
+                $pay = new Pay();
                 $pay->sn = $order->sn;
                 $pay->order_id = $order->id;
                 $pay->pay_type = $order->pay_type;
@@ -190,12 +191,14 @@ class PayController extends WebController
             $this->_checkWeixinOrder($order, $data);
 
             $order->status = Order::STATUS_PAYED;
+            $order->pay_type = 2;
 
             if (!$order->save()) {
                 throw new Exception(current($order->getFirstErrors()));
             }
 
             $order->pay->weixin_pay_xml = $xml;
+            $order->pay->pay_type = $order->pay_type;
             $order->pay->out_trade_status = '已付款';
             $order->pay->paid_at = time();
 
@@ -302,7 +305,7 @@ class PayController extends WebController
         }
 
         if ($order->pay) {
-            $pay = OrderPay::findOne(['order_id' => $order->id]);
+            $pay = Pay::findOne(['order_id' => $order->id]);
             $pay->sn = $order->sn;
             $pay->order_id = $order->id;
             $pay->pay_type = $order->pay_type;

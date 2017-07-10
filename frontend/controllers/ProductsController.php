@@ -53,6 +53,14 @@ class ProductsController extends WebController
      *     required=false,
      *     type="string",
      *   ),
+     *   @SWG\Parameter(
+     *     name="skip",
+     *     in="query",
+     *     default="0",
+     *     description="分页用的数据游标",
+     *     required=false,
+     *     type="string",
+     *   ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
      *
