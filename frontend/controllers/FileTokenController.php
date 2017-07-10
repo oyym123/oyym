@@ -18,7 +18,7 @@ class FileTokenController extends WebController
      *     name="token_type",
      *     in="query",
      *     default="1",
-     *     description="不传参数默认给image的token, 1 = video公有，2 = video私有桶 , 3 = image私有",
+     *     description="0=image, 1 = video公有，2 = video私有桶 , 3 = image私有",
      *     required=true,
      *     type="integer",
      *   ),
