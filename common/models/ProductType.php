@@ -36,6 +36,20 @@ class ProductType extends Base
         ];
     }
 
+    /** 获取产品类型 */
+    public static function getType()
+    {
+        $model = ProductType::findAll(['level' => 1]);
+        $data = [];
+        foreach ($model as $item) {
+            $data[] = [
+                'id' => $item->id,
+                'title' => $item->name
+            ];
+        }
+        return $data;
+    }
+
     /**
      * @inheritdoc
      */

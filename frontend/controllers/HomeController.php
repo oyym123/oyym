@@ -65,32 +65,6 @@ class HomeController extends WebController
         ]);
     }
 
-    /**
-     * Name: actionCategory
-     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
-     * Date: 2017-07-01
-     * @SWG\Get(path="/home/category",
-     *   tags={"分类"},
-     *   summary="获取宝贝分类",
-     *   description="Author: OYYM",
-     *   @SWG\Response(
-     *       response=200,description="successful operation"
-     *   )
-     * )
-     */
-    public function actionCategory()
-    {
-        self::showMsg([
-            [
-                'id' => __LINE__,
-                'title' => '电子产品'
-            ],
-            [
-                'id' => 2,
-                'title' => '服装'
-            ]
-        ]);
-    }
 
 
 }

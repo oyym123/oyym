@@ -270,20 +270,6 @@
                 }
             }
         },
-        "/home/category": {
-            "get": {
-                "tags": [
-                    "\u5206\u7c7b"
-                ],
-                "summary": "\u83b7\u53d6\u5b9d\u8d1d\u5206\u7c7b",
-                "description": "Author: OYYM",
-                "responses": {
-                    "200": {
-                        "description": "successful operation"
-                    }
-                }
-            }
-        },
         "/images/create": {
             "post": {
                 "tags": [
@@ -495,10 +481,10 @@
                     {
                         "name": "products",
                         "in": "query",
-                        "description": "\u63d0\u4ea4\u8ba2\u5355\u524d\u7684\u786e\u8ba4",
+                        "description": "\u63d0\u4ea4\u8ba2\u5355\u524d\u7684\u786e\u8ba4 buy_type:1=\u4e00\u53e3\u4ef72=\u5355\u4ef7",
                         "required": false,
                         "type": "string",
-                        "default": "[{'id':'1234','count':'1','buy_type':'a_price || unit_price'}, {'id':'231','count':'1','buy_type':'a_price || unit_price'}]"
+                        "default": "[{'id':'1','count':'1','buy_type':'1'}]"
                     }
                 ],
                 "responses": {
@@ -519,10 +505,10 @@
                     {
                         "name": "products",
                         "in": "query",
-                        "description": "\u8d2d\u4e70\u7684\u5b9d\u8d1d\u660e\u7ec6",
+                        "description": "\u8d2d\u4e70\u7684\u5b9d\u8d1d\u660e\u7ec6 buy_type:1=\u4e00\u53e3\u4ef72=\u5355\u4ef7",
                         "required": false,
                         "type": "string",
-                        "default": "[{'id':'1234','count':'1','buy_type':'a_price || unit_price'}, {'id':'231','count':'1','buy_type':'a_price || unit_price'}]"
+                        "default": "[{'id':'1','count':'1','buy_type':'1'}]"
                     },
                     {
                         "name": "pay_type",
@@ -616,6 +602,20 @@
                 "responses": {
                     "200": {
                         "description": "[{'msg':'\u4f60\u6210\u529f\u53c2\u4e0e\u4e861\u4ef6\u5b9d\u8d1d\u5171\u8ba12\u4eba\u6b21,\u6d3b\u52a8\u7f16\u53f7\u5982\u4e0b', 'award_code':{'123','234'}}]"
+                    }
+                }
+            }
+        },
+        "/products/category": {
+            "get": {
+                "tags": [
+                    "\u4ea7\u54c1"
+                ],
+                "summary": "\u83b7\u53d6\u5b9d\u8d1d\u5206\u7c7b",
+                "description": "Author: OYYM",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
                     }
                 }
             }

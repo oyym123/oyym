@@ -5,6 +5,7 @@ use common\models\Base;
 use common\models\Collection;
 use common\models\Image;
 use common\models\Product;
+use common\models\ProductType;
 use common\models\Video;
 use frontend\components\WebController;
 use Yii;
@@ -21,6 +22,27 @@ use yii\web\Controller;
  */
 class ProductsController extends WebController
 {
+    
+    /**
+     * Name: actionCategory
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-01
+     * @SWG\Get(path="/products/category",
+     *   tags={"产品"},
+     *   summary="获取宝贝分类",
+     *   description="Author: OYYM",
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionCategory()
+    {
+        self::showMsg(
+            ProductType::getType()
+        );
+    }
+
     /**
      * Name: actionIndex
      * Desc: 宝贝列表页接口
