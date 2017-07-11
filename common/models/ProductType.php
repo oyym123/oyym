@@ -14,7 +14,7 @@ use Yii;
  * @property integer $created_at
  * @property integer $updated_at
  */
-class ProductType extends \yii\db\ActiveRecord
+class ProductType extends Base
 {
     /**
      * @inheritdoc

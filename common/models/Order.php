@@ -3,18 +3,19 @@
 namespace common\models;
 
 use Yii;
+use yii\web\User;
 
 /**
  * This is the model class for table "order".
  *
  * @property integer $id
- * @property integer $user_id
+ * @property integer $buyer_id
+ * @property integer $seller_id
  * @property string $sn
  * @property integer $pay_type
  * @property string $pay_amount
  * @property string $product_amount
  * @property string $discount_amount
- * @property string $user_name
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
@@ -31,11 +32,11 @@ class Order extends Base
     public $coupons = []; // 优惠券
 
     const STATUS_WAIT_PAY = 10; // 待付款
-    const STATUS_WAIT_PAY_CONFIRM = 20; // 付款待审核
-    const STATUS_PAYED = 30; // 交易成功
-    const STATUS_COMPLETED = 40; // 已完成
-    const STATUS_CANCEL = 50; // 交易关闭
-    const STATUS_DELETED = 90; // 已删除
+    const STATUS_WAIT_PAY_SUCCESS = 20; // 已付款
+    const STATUS_PAYED = 30; // 待发货
+    const STATUS_COMPLETED = 40; // 待签收
+    const STATUS_CANCEL = 50; // 待评价
+    const STATUS_DELETED = 90; // 已完成
 
     public static function orderStatus()
     {
@@ -63,11 +64,10 @@ class Order extends Base
     public function rules()
     {
         return [
-            [['user_id', 'sn', 'pay_type', 'user_name', 'status', 'created_at', 'updated_at'], 'required'],
-            [['user_id', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['buyer_id', 'seller_id', 'sn', 'pay_type', 'status', 'created_at', 'updated_at'], 'required'],
+            [['buyer_id', 'seller_id', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
             [['sn'], 'string', 'max' => 100],
-            [['user_name'], 'string', 'max' => 255],
         ];
     }
 
@@ -78,13 +78,13 @@ class Order extends Base
     {
         return [
             'id' => 'ID',
-            'user_id' => '用户ID',
+            'buyer_id' => '买家',
+            'seller_id' => '卖家',
             'sn' => '订单号',
             'pay_type' => '支付类型',
             'pay_amount' => '支付金额',
             'product_amount' => '产品金额',
             'discount_amount' => '优惠后的金额',
-            'user_name' => '用户名称',
             'status' => '状态',
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
@@ -101,7 +101,7 @@ class Order extends Base
     public function confirmPrice($products)
     {
         foreach ($products as $key => $product) {
-            if (in_array($product['buy_type'], ['a_price', 'unit_price'])) { // 一口价 和 单价
+            if (in_array($product['buy_type'], [OrderProduct::A_PRICE, OrderProduct::UNIT_PRICE])) { // 一口价 和 单价
                 $this->productsAmount += $product['product']->$product['buy_type'] * $product['count'];
             }
         }
@@ -191,9 +191,9 @@ class Order extends Base
     /** 生成摇奖号码 */
     public function createAwardCode()
     {
-        if ($this->buy_type == 'unit_price') {
+        if ($this->buy_type == OrderProduct::UNIT_PRICE) {
             // 购买方式是参与众筹,需要生成摇奖编码
-
+            $maxAwardNum = OrderAwardCode::find()->where(['product_id' => '']);
         }
     }
 
@@ -209,7 +209,7 @@ class Order extends Base
     public function saveCoupon($newOrder)
     {
         foreach ($this->coupons as $coupon) {
-            $userCoupon = UserCoupon::findOne(['user_id' => $newOrder->user_id, 'coupon_id' => $coupon->id]);
+            $userCoupon = UserCoupon::findOne(['user_id' => $newOrder->buyer_id, 'coupon_id' => $coupon->id]);
             if ($userCoupon) {
                 $userCoupon->order_id = $newOrder->id;
                 $userCoupon->status = UserCoupon::STATUS_USED;
@@ -293,7 +293,7 @@ class Order extends Base
             'total_fee' => $this->pay_amount,
             'subject' => $productTitle,
             'body' => $productTitle,
-            'partner' => '2088801047131045',
+            'partner' => Yii::$app->params['alipay_partner'],
             'notify_url' => Url::to('/alipayCallback.php', true),
             'payment_type' => 1,
             'goods_type' => 0, // 0 虚拟 1 实物
@@ -426,14 +426,24 @@ class Order extends Base
         }
 
         throw new Exception('微信支付暂时不可用');
-
-//        return [
-//            "wx_sign" => "d7fe3d29cda19ddf9924e005ee37278a6f3af085",
-//            "wx_timestamp" => "1462421594",
-//            "wx_partner_id" => "1219130301",
-//            "wx_package" => "Sign=WXPay",
-//            "wx_nonce_str" => "f4beeba0dd6c190c6ac02f85e7b3691c",
-//            "wx_prepay_id" => "820103800016050513bed566589137c9",
-//        ];
     }
+
+    /** 取买家信息 */
+    public function getSeller()
+    {
+        return $this->hasOne(User::className(), ['id' => 'seller_id']);
+    }
+
+    /** 取卖家信息 */
+    public function getBuyer()
+    {
+        return $this->hasOne(User::className(), ['id' => 'buyer_id']);
+    }
+
+    /** 取订单商品一条 */
+    public function getProduct()
+    {
+        return $this->hasOne(OrderProduct::className(), ['order_id' => 'id']);
+    }
+
 }

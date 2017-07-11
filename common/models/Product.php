@@ -34,12 +34,11 @@ use Yii;
  */
 class Product extends Base
 {
-    const STATUS_NOT_SALE = 1; // 未上架
-    const STATUS_IN_PROGRESS = 10; // 进行中
-    const STATUS_WAIT_LOTTERY = 20; // 待揭晓
-    const STATUS_PUBLISHED = 30; // 已揭晓
-    const STATUS_CANCELED = 40; // 已取消
-    const STATUS_COMPLETED = 50; // 已完成
+    const STATUS_NOT_SALE = 10; // 未上架
+    const STATUS_IN_PROGRESS = 20; // 进行中
+    const STATUS_WAIT_LOTTERY = 30; // 待揭晓
+    const STATUS_PUBLISHED = 40; // 已揭晓
+    const STATUS_CANCELED = 50; // 已取消
 
 
     /** 宝贝状态 */
@@ -49,7 +48,6 @@ class Product extends Base
         self::STATUS_WAIT_LOTTERY => '待揭晓',
         self::STATUS_PUBLISHED => '已揭晓',
         self::STATUS_CANCELED => '已取消',
-        self::STATUS_COMPLETED => '已完成',
     ];
 
     const TYPE_NOT_EXAMINE = 0; //未审核
@@ -80,7 +78,7 @@ class Product extends Base
         return [
             [['user_id', 'type_id', 'title', 'created_at', 'updated_at', 'unit_price', 'created_by'], 'required'],
             [['sort'], 'default', 'value' => 0],
-            [['user_id', 'type_id', 'unit', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total'], 'integer'],
+            [['user_id', 'type_id', 'unit', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total', 'random_code'], 'integer'],
             [['price', 'original_price', 'freight', 'unit_price', 'a_price'], 'number'],
             [['contents'], 'string'],
             [['title', 'lat', 'lng'], 'string', 'max' => 255],
@@ -166,6 +164,9 @@ class Product extends Base
             'status' => '状态',
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
+            'random_code' => '随机码B, 例如时时彩的5位中奖码',
+            'order_award_id' => '中奖id',
+            'award_published_at' => '中奖揭晓时间',
         ];
     }
 
@@ -221,5 +222,9 @@ class Product extends Base
 
     }
 
+    public function getMaxAwardCode()
+    {
+
+    }
 }
 
