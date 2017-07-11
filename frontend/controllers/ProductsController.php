@@ -73,6 +73,7 @@ class ProductsController extends WebController
      */
     public function actionIndex()
     {
+        
         self::showMsg([
             'sort_type' => 'tuijian',
             'count' => 200,
@@ -100,7 +101,6 @@ class ProductsController extends WebController
                     'zongjia' => '12', // 总价
                     'a_price' => '12', // 一口价
                     'end_time' => '12', // 时间
-                    'layout_type' => $this->listlayoutType([]), // 布局类型
                     'share_params' => [
                         'share_title' => '众筹夺宝',
                         'share_contents' => '夺宝达人!',
@@ -131,7 +131,6 @@ class ProductsController extends WebController
                     'zongjia' => '12', // 总价
                     'a_price' => '12', // 一口价
                     'end_time' => '12', // 时间
-
                     'share_params' => [
                         'share_title' => '众筹夺宝',
                         'share_contents' => '夺宝达人!',
@@ -162,7 +161,6 @@ class ProductsController extends WebController
                     'zongjia' => '12', // 总价
                     'a_price' => '12', // 一口价
                     'end_time' => '12', // 时间
-                    'layout_type' => "2", // 布局类型
                     'share_params' => [
                         'share_title' => '众筹夺宝',
                         'share_contents' => '夺宝达人!',

@@ -116,6 +116,13 @@ class Product extends Base
     }
 
 
+    /** 产品搜索 */
+    public function productSearch()
+    {
+        $
+
+    }
+
     /**
      * @inheritdoc
      */
