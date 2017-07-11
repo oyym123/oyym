@@ -95,7 +95,7 @@ class Product extends Base
             return 2; //正在进行的页面，时间模式
         } elseif ($this->status == Product::STATUS_WAIT_LOTTERY) {
             return 3; //卖家用户的待揭晓页面，显示“我来揭晓” ，买家用户的待揭晓页面，显示“请等待系统揭晓”
-        } elseif ($this->status == Product::STATUS_COMPLETED) {
+        } elseif ($this->status == Product::STATUS_WAIT_LOTTERY) {
             return 4; //已揭晓 , 一口价
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
             return 5; //已揭晓 ，获奖
