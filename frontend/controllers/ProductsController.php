@@ -212,11 +212,11 @@ class ProductsController extends WebController
             'contents' => '哈哈哈',
             'end_time' => '0',
             'images' => '[
-  {
-    "name" : "200562",
-    "url" : "200562"
-  }
-]',
+              {
+                "name" : "200562",
+                "url" : "200562"
+              }
+            ]',
             'model' => '1',
             'start_time' => '0',
             'title' => '齐全',
@@ -225,7 +225,7 @@ class ProductsController extends WebController
             'unit_price' => '4581',
             'videos' => '[
 
-]',
+            ]',
         );
         //  $data = json_encode($data);
         //$data = Yii::$app->request->post('data');
@@ -247,6 +247,7 @@ class ProductsController extends WebController
             $product->detail_address = $data['address']['detail_address'];
             $product->lat = $data['address']['lat'];
             $product->lng = $data['address']['lng'];
+            $product->model = $data['model'];
             $product->user_id = $this->userId;
             $product->created_by = $this->userId;
             $product->status = Product::STATUS_IN_PROGRESS;
@@ -260,8 +261,6 @@ class ProductsController extends WebController
             $product->end_time = $data['end_time'];
 
             if (!$product->save()) {
-                print_r($product->getErrors());
-                exit;
                 throw new Exception('宝贝发布失败');
             }
             foreach ($images as $image) {
@@ -288,7 +287,7 @@ class ProductsController extends WebController
                 Video::setVideo($params);
             }
             $transaction->commit();
-            self::showMsg('宝贝发布成功！', -1);
+            self::showMsg('宝贝发布成功！', 1);
         } catch (Exception $e) {
             $transaction->rollBack();
             self::showMsg($e->getMessage(), -1);

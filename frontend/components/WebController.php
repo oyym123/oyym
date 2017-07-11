@@ -29,11 +29,10 @@ class WebController extends Controller
             Yii::$app->user->identity = $this->getApiUser();
         }
 
-             if (isset($_REQUEST['env_dev'])) {
+        if (isset($_REQUEST['env_dev'])) {
             \common\helpers\Helper::writeLog($_GET);
             \common\helpers\Helper::writeLog($_POST);
         }
-
 
 //        $session = Yii::$app->session;
 
