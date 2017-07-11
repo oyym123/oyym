@@ -117,10 +117,30 @@ class Product extends Base
 
 
     /** 产品搜索 */
-    public function productSearch()
+    public function productSearch($key)
     {
-        $
 
+
+    }
+
+    public function searchType($key)
+    {
+        switch ($key) {
+            case 'tuijian':
+                return $sql = "andWhere(['type_id' => 'id'])";
+            case 'jindu':
+                return $sql = "andWhere(['type_id' => 'id'])";
+            case 'danjia':
+                return $sql = "andWhere(['type_id' => 'id'])";
+            case 'zongjia':
+                return $sql = "andWhere(['type_id' => 'id'])";
+            case 'yikoujia':
+                return $sql = "andWhere(['type_id' => 'id'])";
+            case 'shijian':
+                return $sql = "andWhere(['type_id' => 'id'])";
+            case 'zuixin':
+                return $sql = "andWhere(['and', 'type=1', ['or', 'id=1', 'id=2']])";
+        }
     }
 
     /**

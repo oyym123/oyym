@@ -73,7 +73,7 @@ class ProductsController extends WebController
      */
     public function actionIndex()
     {
-        
+
         self::showMsg([
             'sort_type' => 'tuijian',
             'count' => 200,
@@ -201,50 +201,44 @@ class ProductsController extends WebController
     public function actionCreate()
     {
 
-        $data = [
-            'model' => 1,
-            'title' => 'Iphone9',
-            'contents' => '买完就吃土:)',
-            'images' => [
-                [
-                    'name' => '测试图片',
-                    'url' => 'demo321',
-                ],
-                [
-                    'name' => '测试图片2',
-                    'url' => 'demo456',
-                ]
-            ],
-            'videos' => [
-                [
-                    'name' => '测试视频1',
-                    'url' => 'demo321',
-                ],
-            ],
-            'address' => [
-                'lat' => '0.232512',
-                'lng' => '1.2335432',
-                'detail_address' => '河北省廊坊市燕郊镇',
-            ],
-            'total' => 10000,
-            'a_price' => 8000,
-            'type_id' => 2,
-            'start_time' => 1499392688,
-            'end_time' => 1499692688,
-            'unit_price' => 1,
-        ];
-        // echo json_encode($data);
-        //  exit;
+        $data = array(
+            'a_price' => '0',
+            'address' =>
+                array(
+                    'detail_address' => '河北省廊坊市三河市',
+                    'lat' => '39.917108',
+                    'lng' => '116.819580',
+                ),
+            'contents' => '哈哈哈',
+            'end_time' => '0',
+            'images' => '[
+  {
+    "name" : "200562",
+    "url" : "200562"
+  }
+]',
+            'model' => '1',
+            'start_time' => '0',
+            'title' => '齐全',
+            'total' => '1215',
+            'type_id' => '0',
+            'unit_price' => '4581',
+            'videos' => '[
+
+]',
+        );
         //  $data = json_encode($data);
-        $data = Yii::$app->request->post('data');
-        $data = json_decode($data, true);
+        //$data = Yii::$app->request->post('data');
+        // $data = json_decode($data, true);
 
         $transaction = Yii::$app->db->beginTransaction();
+        $images = json_decode($data['images'], true);
+        $videos = json_decode($data['videos'], true);
         try {
-            if (count($data['images']) > 6) {
+            if (count($images) > 6) {
                 throw new Exception('最多上传6张图片');
             }
-            if (count($data['videos']) > 1) {
+            if (count($videos) > 1) {
                 throw new Exception('最多上传1个视频');
             }
             $product = new Product();
@@ -266,9 +260,11 @@ class ProductsController extends WebController
             $product->end_time = $data['end_time'];
 
             if (!$product->save()) {
+                print_r($product->getErrors());
+                exit;
                 throw new Exception('宝贝发布失败');
             }
-            foreach ($data['images'] as $image) {
+            foreach ($images as $image) {
                 $params = [
                     'name' => $image['name'],
                     'type' => Image::TYPE_PRODUCT,
@@ -280,7 +276,7 @@ class ProductsController extends WebController
                 Image::setImage($params);
             }
 
-            foreach ($data['videos'] as $video) {
+            foreach ($videos as $video) {
                 $params = [
                     'name' => $video['name'],
                     'type' => Video::TYPE_PRODUCT,
