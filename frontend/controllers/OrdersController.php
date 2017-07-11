@@ -231,8 +231,8 @@ class OrdersController extends WebController
      *   @SWG\Parameter(
      *     name="products",
      *     in="query",
-     *     default="[{'id':'1234','count':'1','buy_type':'a_price || unit_price'}, {'id':'231','count':'1','buy_type':'a_price || unit_price'}]",
-     *     description="提交订单前的确认",
+     *     default="[{'id':'1','count':'1','buy_type':'1'}]",
+     *     description="提交订单前的确认 buy_type:1=一口价2=单价",
      *     required=false,
      *     type="string",
      *   ),
@@ -316,8 +316,8 @@ class OrdersController extends WebController
      *   @SWG\Parameter(
      *     name="products",
      *     in="query",
-     *     default="[{'id':'1234','count':'1','buy_type':'a_price || unit_price'}, {'id':'231','count':'1','buy_type':'a_price || unit_price'}]",
-     *     description="购买的宝贝明细",
+     *     default="[{'id':'1','count':'1','buy_type':'1'}]",
+     *     description="购买的宝贝明细 buy_type:1=一口价2=单价",
      *     required=false,
      *     type="string",
      *   ),
