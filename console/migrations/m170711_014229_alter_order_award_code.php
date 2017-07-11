@@ -15,6 +15,7 @@ class m170711_014229_alter_order_award_code extends Migration
         $this->addColumn('product', 'random_code', Schema::TYPE_INTEGER . '(11) NOT NULL DEFAULT 0 COMMENT "随机码B, 例如时时彩的5位中奖码"');
         $this->addColumn('product', 'order_award_id', Schema::TYPE_INTEGER . '(11) NOT NULL DEFAULT 0 COMMENT "中奖id"');
         $this->dropColumn('order_award_code', 'is_win');
+        $this->dropColumn('order_award_code', 'user_id');
     }
 
     public function safeDown()
