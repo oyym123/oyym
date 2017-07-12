@@ -112,6 +112,21 @@ class Product extends Base
         }
     }
 
+    /** 宝贝列表接口下放布局样式id, 用于控制客户端展示不同的布局  */
+    public function listLayoutType()
+    {
+        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER) {
+            return 1; //正在进行的页面，数量模式 没有一口价
+        } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price > 0) {
+            return 2; //正在进行的页面，数量模式 有一口价
+        } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
+            return 3; //正在进行的页面，时间模式
+        } else {
+            return 4;//显示空页面
+        }
+    }
+
+
     /** 获取众筹进度 */
     public function getProgress($participants)
     {

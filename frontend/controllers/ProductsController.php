@@ -140,7 +140,7 @@ class ProductsController extends WebController
                 'comment' => $product->comments,
                 'like' => $product->likes,
                 'collection' => $product->collections,
-                'layout_type' => $product->viewLayoutType(), //
+                'layout_type' => $product->listLayoutType(), //
                 'a_price' => $product->a_price,
                 // 布局类型
                 'zongjia' => $product->total,
