@@ -130,7 +130,7 @@ class Product extends Base
     /** 获取众筹进度 */
     public function getProgress($participants)
     {
-        return round($participants / $this->total * 100, 2) . "%";
+        return round($participants / $this->total * 100, 0);
     }
 
     /** 产品收藏数量保存 */
