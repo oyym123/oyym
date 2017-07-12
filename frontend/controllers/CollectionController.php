@@ -4,6 +4,8 @@ namespace frontend\controllers;
 
 use common\models\Base;
 use common\models\Collection;
+use common\models\Product;
+use yii\base\Exception;
 use frontend\components\WebController;
 use Yii;
 
@@ -56,18 +58,28 @@ class CollectionController extends WebController
         $collection = new Collection();
         $params['type'] = Yii::$app->request->get('type');
         $params['type_id'] = Yii::$app->request->get('id');
-        if ($model = $collection->collectionFlag($params)) {
-            $model->status = Base::STATUS_ENABLE;
-            if ($model->save()) {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $collection->checkType($params['type']);
+            if ($model = $collection->collectionFlag($params)) {
+                $model->status = Base::STATUS_ENABLE;
+                if (!$model->save()) {
+                    throw new Exception('收藏失败');
+                }
+                $collection->saveTypeNumbers($params['type'], $params['type_id']);
+                $transaction->commit();
                 self::showMsg('收藏成功', 1);
             }
-            self::showMsg('收藏失败', -1);
-        }
-
-        if ($collection->create($params)) {
+            if (!$collection->create($params)) {
+                throw new Exception('收藏失败');
+            }
+            $collection->saveTypeNumbers($params['type'], $params['type_id']);
+            $transaction->commit();
             self::showMsg('收藏成功', 1);
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            self::showMsg($e->getMessage(), -1);
         }
-        self::showMsg('收藏失败', -1);
     }
 
     /**
@@ -109,14 +121,23 @@ class CollectionController extends WebController
         $collection = new Collection();
         $params['type'] = Yii::$app->request->get('type');
         $params['type_id'] = Yii::$app->request->get('id');
-        if ($model = $collection->collectionFlag($params)) {
-            $model->status = Base::STATUS_DISABLE;
-            if ($model->save()) {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $collection->checkType($params['type']);
+            if ($model = $collection->collectionFlag($params)) {
+                $model->status = Base::STATUS_DISABLE;
+                if (!$model->save()) {
+                    throw new Exception('收藏失败');
+                }
+                $collection->saveTypeNumbers($params['type'], $params['type_id']);
+                $transaction->commit();
                 self::showMsg('已取消收藏', 1);
             }
             self::showMsg('取消收藏失败', -1);
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            self::showMsg($e->getMessage(), -1);
         }
-        self::showMsg('取消收藏失败', -1);
     }
 
 }

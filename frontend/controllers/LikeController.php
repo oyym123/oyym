@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\Base;
 use common\models\Like;
+use yii\base\Exception;
 use frontend\components\WebController;
 use Yii;
 
@@ -56,19 +57,31 @@ class LikeController extends WebController
         $like = new Like();
         $params['type'] = Yii::$app->request->get('type');
         $params['type_id'] = Yii::$app->request->get('id');
-        if ($model = $like->LikeFlag($params)) {
-            $model->status = Base::STATUS_ENABLE;
-            if ($model->save()) {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $like->checkType($params['type']);
+            if ($model = $like->LikeFlag($params)) {
+                $model->status = Base::STATUS_ENABLE;
+                if (!$model->save()) {
+                    throw new Exception('点赞失败');
+                }
+                $like->saveTypeNumbers($params['type'], $params['type_id']);
+                $transaction->commit();
                 self::showMsg('点赞成功', 1);
             }
-            self::showMsg('点赞失败', -1);
-        }
 
-        if ($like->create($params)) {
+            if (!$like->create($params)) {
+                throw new Exception('点赞失败');
+            }
+            $like->saveTypeNumbers($params['type'], $params['type_id']);
+            $transaction->commit();
             self::showMsg('点赞成功', 1);
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            self::showMsg($e->getMessage(), -1);
         }
-        self::showMsg('点赞失败', -1);
     }
+
 
     /**
      * @SWG\Get(path="/like/cancel",
@@ -109,14 +122,22 @@ class LikeController extends WebController
         $like = new Like();
         $params['type'] = Yii::$app->request->get('type');
         $params['type_id'] = Yii::$app->request->get('id');
-        if ($model = $like->LikeFlag($params)) {
-            $model->status = Base::STATUS_DISABLE;
-            if ($model->save()) {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $like->checkType($params['type']);
+            if ($model = $like->LikeFlag($params)) {
+                $model->status = Base::STATUS_DISABLE;
+                if (!$model->save()) {
+                    throw new Exception('取消点赞失败');
+                }
+                $like->saveTypeNumbers($params['type'], $params['type_id']);
+                $transaction->commit();
                 self::showMsg('已取消点赞', 1);
             }
             self::showMsg('取消点赞失败', -1);
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            self::showMsg($e->getMessage(), -1);
         }
-        self::showMsg('取消点赞失败', -1);
     }
-
 }

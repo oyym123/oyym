@@ -2,9 +2,9 @@
 
 namespace common\models;
 
-use phpDocumentor\Reflection\Types\Self_;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\base\Exception;
 
 /**
  * This is the model class for table "like".
@@ -18,6 +18,8 @@ use yii\helpers\ArrayHelper;
  */
 class Like extends Base
 {
+    const TYPE_PRODUCT = 1; //产品类型
+
     /**
      * @inheritdoc
      */
@@ -52,8 +54,32 @@ class Like extends Base
         ];
     }
 
+    public static function getType()
+    {
+        return [
+            self::TYPE_PRODUCT => '宝贝商品',
+        ];
+    }
+
+    /** 判断所传类型是否存在 */
+    public function checkType($key)
+    {
+        if (!array_key_exists($key, self::getType())) {
+            throw new Exception('该点赞类型不存在!');
+        }
+    }
+
+    /** 保存对应表中点赞数量 */
+    public function saveTypeNumbers($type, $type_id)
+    {
+        switch ($type) {
+            case Collection::TYPE_PRODUCT:
+                return Product::like($type_id, self::likeCount($type, $type_id));
+        }
+    }
+
     /** 判断该用户是否已经点赞 */
-    public function likeFlag($params)
+    public static function likeFlag($params)
     {
         $query = self::find()
             ->where(["type_id" => ArrayHelper::getValue($params, 'type_id')])
@@ -81,6 +107,6 @@ class Like extends Base
     /** 获取点赞数量 */
     public static function likeCount($type, $type_id)
     {
-        return self::find()->where(['type' => $type])->andWhere(['type_id' => $type_id])->count();
+        return self::find()->where(['type' => $type])->andWhere(['type_id' => $type_id, 'status' => self::STATUS_ENABLE])->count();
     }
 }

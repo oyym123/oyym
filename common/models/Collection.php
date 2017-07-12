@@ -32,6 +32,13 @@ class Collection extends Base
         return 'collection';
     }
 
+    public static function getType()
+    {
+        return [
+            self::TYPE_PRODUCT => '宝贝商品',
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -42,6 +49,7 @@ class Collection extends Base
             [['user_id', 'type_id', 'type', 'created_at', 'updated_at', 'status'], 'integer'],
         ];
     }
+
 
     /**
      * @inheritdoc
@@ -56,6 +64,23 @@ class Collection extends Base
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
         ];
+    }
+
+    /** 判断所传类型是否存在 */
+    public function checkType($key)
+    {
+        if (!array_key_exists($key, self::getType())) {
+            throw new Exception('该收藏类型不存在!');
+        }
+    }
+
+    /** 保存对应表中收藏数量 */
+    public function saveTypeNumbers($type, $type_id)
+    {
+        switch ($type) {
+            case Collection::TYPE_PRODUCT:
+                return Product::collection($type_id, self::collectionCount($type, $type_id));
+        }
     }
 
     /** 判断该用户是否已经收藏 */
@@ -87,6 +112,6 @@ class Collection extends Base
     /** 获取收藏数量 */
     public static function collectionCount($type, $type_id)
     {
-        return self::find()->where(['type' => $type])->andWhere(['type_id' => $type_id])->count();
+        return self::find()->where(['type' => $type])->andWhere(['type_id' => $type_id, 'status' => self::STATUS_ENABLE])->count();
     }
 }
