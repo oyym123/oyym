@@ -25,6 +25,17 @@ use yii\web\Controller;
 class ProductsController extends WebController
 {
 
+    public function init()
+    {
+        parent::init();
+        if (empty($this->userId) && in_array(Yii::$app->requestedRoute, [
+                'products/create'
+            ])
+        ) {
+            self::needLogin();
+        }
+    }
+
     /**
      * Name: actionCategory
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
@@ -89,6 +100,14 @@ class ProductsController extends WebController
      *     required=false,
      *     type="string",
      *   ),
+     *  @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=false,
+     *     type="integer",
+     *    ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
      *
@@ -98,7 +117,6 @@ class ProductsController extends WebController
      */
     public function actionIndex()
     {
-
         $product = new Product();
         $skip = intval(Yii::$app->request->get('skip', 0));
         $psize = intval(Yii::$app->request->get('psize', 10));
@@ -111,7 +129,7 @@ class ProductsController extends WebController
             $params['type_id'] = $product->id;
             $collectionFlag = Collection::collectionFlag($params) ? Collection::COLLECT : Collection::NOT_COLLECT;
             $likeFlag = Like::likeFlag($params) ? Like::STATUS_ENABLE : Like::STATUS_DISABLE;
-            $data['product_list'][] = [
+            $data['products_list'][] = [
                 'id' => $product->id,
                 'images' => Image::getImages(['type' => Image::TYPE_PRODUCT, 'type_id' => $product->id]),
                 'model_type' => $product->model,
@@ -387,7 +405,7 @@ class ProductsController extends WebController
             'publish_countdown' => '7200', // 揭晓倒计时以秒为单位
         ];
 
-        $this->showMsg($data);
+        self::showMsg($data);
     }
 
     /** 取产品实体 */
