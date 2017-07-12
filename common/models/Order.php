@@ -188,12 +188,22 @@ class Order extends Base
         }
     }
 
-    /** 生成摇奖号码 */
+    /** 生成摇奖号码 次方法仅支持一个订单一个宝贝的情况*/
     public function createAwardCode()
     {
-        if ($this->buy_type == OrderProduct::UNIT_PRICE) {
-            // 购买方式是参与众筹,需要生成摇奖编码
-            $maxAwardNum = OrderAwardCode::find()->where(['product_id' => '']);
+        if ($this->orderProduct && $this->orderProduct->buy_type == OrderProduct::UNIT_PRICE) {
+            // 购买方式是参与众筹,在支付成功后,生成摇奖编码
+            $maxAwardCode = OrderAwardCode::find()->where(['product_id' => $this->orderProduct->product_id]);
+            for ($maxAwardCode; $maxAwardCode > 0; $maxAwardCode--) {
+                $awardCodeModel = new OrderAwardCode();
+                $awardCodeModel->setAttributes([
+                    'order_id' => $this->id,
+                    'order_product_id' => $this->orderProduct->id,
+                    'code' => $maxAwardCode,
+                    'seller_id' => $maxAwardCode,
+                ]);
+            }
+
         }
     }
 
@@ -441,7 +451,7 @@ class Order extends Base
     }
 
     /** 取订单商品一条 */
-    public function getProduct()
+    public function getOrderProduct()
     {
         return $this->hasOne(OrderProduct::className(), ['order_id' => 'id']);
     }
