@@ -22,7 +22,7 @@ use yii\web\Controller;
  */
 class ProductsController extends WebController
 {
-    
+
     /**
      * Name: actionCategory
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
@@ -55,41 +55,23 @@ class ProductsController extends WebController
      *   consumes={"application/json", "application/xml"},
      *   produces={"application/json", "application/xml"},
      *   @SWG\Parameter(
-     *     name="sort_type",
-     *     in="query",
-     *     default="tuijian",
-     *     description="排序类型",
-     *     required=true,
-     *     type="string",
+     *     name="sort_type", in="query", required=true, type="string", default="tuijian",
+     *     description="排序类型"
      *   ),
      *   @SWG\Parameter(
-     *     name="keywords",
-     *     in="query",
-     *     default="电脑",
-     *     description="搜索关键词",
-     *     required=false,
-     *     type="string",
+     *     name="keywords", in="query", required=false, type="string", default="电脑",
+     *     description="搜索关键词"
      *   ),
      *   @SWG\Parameter(
-     *     name="category",
-     *     in="query",
-     *     default="1",
-     *     description="宝贝分类",
-     *     required=false,
-     *     type="string",
+     *     name="category", in="query", required=false, type="string", default="1",
+     *     description="宝贝分类"
      *   ),
      *   @SWG\Parameter(
-     *     name="skip",
-     *     in="query",
-     *     default="0",
-     *     description="分页用的数据游标",
-     *     required=false,
-     *     type="string",
+     *     name="offset", in="query", required=false, default="0", type="string",
+     *     description="分页用的数据游标"
      *   ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
-     *
-     *
      *   )
      * )
      */
@@ -192,6 +174,68 @@ class ProductsController extends WebController
                 ]
             ]
         ]);
+    }
+
+    /**
+     * Name: actionMyProducts
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-12
+     * @SWG\Get(path="/products/my-sell",
+     *   tags={"我发布的"},
+     *   summary="宝贝列表",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
+     *     description="宝贝状态,传的值有: 全部=0 || 正在进行=20 || 待揭晓=30 , 这儿没有 待发货,代签收"
+     *   ),
+     *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
+     *     description="数据游标"
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionMySell($status)
+    {
+        $productModel = new Product();
+        list($sellerAllProducts, $count) = $productModel->sellerProducts([
+            'status' => $status,
+            'created_by' => $this->userId,
+            'offset' => Yii::$app->request->get('offset', 0)
+        ]);
+
+        $data = [
+            'product' => [
+                'count' => $count,
+                'list' => $sellerAllProducts
+            ]
+        ];
+
+        self::showMsg($data);
+    }
+
+    /**
+     * Name: actionMyBuy
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-12
+     * @param $status
+     * @SWG\Get(path="/products/my-buy",
+     *   tags={"我参与的"},
+     *   summary="",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="全部",
+     *     description="宝贝状态,传的值有: 全部 || 正在进行 || 待揭晓 , 这儿没有 待发货,代签收"
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionMyBuy($status)
+    {
+
     }
 
     /**

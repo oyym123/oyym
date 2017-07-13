@@ -20,6 +20,7 @@ class Base extends \yii\db\ActiveRecord
     public $offset = 0; // 分页
     public $limit = 10; // 分页
     public $userEntity = null; // 用户实体
+    public $psize = 20;
 
     Use BaseData;
 

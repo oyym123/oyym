@@ -12,6 +12,7 @@ class ApiController extends \yii\base\Controller
 {
     function actionList2()
     {
+        \Yii::error('Hello, I am a test log message223');
         $this->layout = 'blank';
         return $this->render('index');
     }

@@ -118,6 +118,12 @@ class PayController extends WebController
                             if (!$userBouht->save()) {
                                 throw new Exception('保存用户购买记录失败');
                             }
+
+                            list ($err, $code) = $order->createAwardCode();
+
+                            if ($err) {
+                                Yii::info($code, 'pay');
+                            }
                         }
                     }
 

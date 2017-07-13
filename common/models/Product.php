@@ -37,7 +37,7 @@ class Product extends Base
 {
     const STATUS_NOT_SALE = 10; // 未上架
     const STATUS_IN_PROGRESS = 20; // 进行中
-    const STATUS_WAIT_LOTTERY = 30; // 待揭晓
+    const STATUS_WAIT_PUBLISHED = 30; // 待揭晓
     const STATUS_PUBLISHED = 40; // 已揭晓
     const STATUS_CANCELED = 50; // 已取消
 
@@ -46,7 +46,7 @@ class Product extends Base
     public static $status = [
         self::STATUS_NOT_SALE => '未上架',
         self::STATUS_IN_PROGRESS => '进行中',
-        self::STATUS_WAIT_LOTTERY => '待揭晓',
+        self::STATUS_WAIT_PUBLISHED => '待揭晓',
         self::STATUS_PUBLISHED => '已揭晓',
         self::STATUS_CANCELED => '已取消',
     ];
@@ -78,7 +78,7 @@ class Product extends Base
     {
         return [
             [['user_id', 'type_id', 'title', 'created_at', 'updated_at', 'unit_price', 'created_by'], 'required'],
-            [['sort'], 'default', 'value' => 0],
+            [['sort', 'order_award_id', 'award_published_at', 'deleted_at'], 'default', 'value' => 0],
             [['user_id', 'type_id', 'unit', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total', 'random_code'], 'integer'],
             [['price', 'original_price', 'freight', 'unit_price', 'a_price'], 'number'],
             [['contents'], 'string'],
@@ -93,9 +93,9 @@ class Product extends Base
             return 1; //正在进行的页面，数量模式 区别有一口价或者没有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
             return 2; //正在进行的页面，时间模式
-        } elseif ($this->status == Product::STATUS_WAIT_LOTTERY) {
+        } elseif ($this->status == Product::STATUS_WAIT_PUBLISHED) {
             return 3; //卖家用户的待揭晓页面，显示“我来揭晓” ，买家用户的待揭晓页面，显示“请等待系统揭晓”
-        } elseif ($this->status == Product::STATUS_WAIT_LOTTERY) {
+        } elseif ($this->status == Product::STATUS_WAIT_PUBLISHED) {
             return 4; //已揭晓 , 一口价
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
             return 5; //已揭晓 ，获奖
@@ -107,9 +107,9 @@ class Product extends Base
     /** 揭晓模式判断 */
     public function viewAnnouncedType()
     {
-        if ($this->created_by != Yii::$app->user->id && $this->status == Product::STATUS_WAIT_LOTTERY) {
+        if ($this->created_by != Yii::$app->user->id && $this->status == Product::STATUS_WAIT_PUBLISHED) {
             return '请等待系统揭晓'; //买家用户的待揭晓页面，显示“请等待系统揭晓”
-        } elseif ($this->created_by == Yii::$app->user->id && $this->status == Product::STATUS_WAIT_LOTTERY) {
+        } elseif ($this->created_by == Yii::$app->user->id && $this->status == Product::STATUS_WAIT_PUBLISHED) {
             return '我来揭晓'; //卖家用户的待揭晓页面，显示“我来揭晓”
         }
     }
@@ -165,6 +165,7 @@ class Product extends Base
             'status' => '状态',
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
+            'deleted_at' => '删除时间',
             'random_code' => '随机码B, 例如时时彩的5位中奖码',
             'order_award_id' => '中奖id',
             'award_published_at' => '中奖揭晓时间',
@@ -221,9 +222,81 @@ class Product extends Base
     public function headImg()
     {
 
+
     }
 
+    /** 取最大的摇奖代码 */
     public function getMaxAwardCode()
+    {
+        $maxAwardCode = OrderAwardCode::find()->where([
+            'product_id' => $this->id,
+            'deleted_at' => 0
+        ])->one();
+
+        return $maxAwardCode ? $maxAwardCode->code : 1000001;
+    }
+
+    /** 卖家-所有参与的宝贝 */
+    public function sellerProducts($params)
+    {
+        $query = Product::find()->where([
+            'created_by' => $params['seller_id'],
+            'deleted_at' => 0
+        ]);
+
+        if ($params['status']) {
+            $query->andWhere(['status' => $params['status']]);
+        }
+
+        $query->offset($params['offset'])->limit($this->psize);
+    }
+
+    /** 卖家-进行中的宝贝 */
+    public function sellerInProgress()
+    {
+
+    }
+
+    /** 卖家-待揭晓的宝贝 */
+    public function sellerWaitPublish()
+    {
+
+    }
+
+    /** 卖家-已下架的宝贝 */
+    public function cancel()
+    {
+
+    }
+
+    // ---------------------------------------卖家/买家分割线-------------------------------------- //
+
+    /** 买家-所有参与的宝贝 */
+    public function buyerAll()
+    {
+
+    }
+
+    /** 买家-进行中的宝贝 */
+    public function buyerInProgress()
+    {
+
+    }
+
+    /** 买家-待揭晓的宝贝 */
+    public function buyerWaitPublished()
+    {
+
+    }
+
+    /** 买家-已揭晓的宝贝 (可能中奖人不是自己) */
+    public function buyerPublished()
+    {
+
+    }
+
+    /** 用户对宝贝可以进行的操作,编辑删除等 */
+    public function userActions()
     {
 
     }

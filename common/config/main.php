@@ -44,5 +44,22 @@ return [
                 ],
             ],
         ],
+        'log' => [
+            'targets' => [
+                'file' => [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['trace', 'info'],
+                    'categories' => ['yii\*'],
+                ],
+                'email' => [
+                    'class' => 'yii\log\EmailTarget',
+                    'levels' => ['error', 'warning'],
+                    'message' => [
+                        'to' => ['ulee@fangdazhongxin.com', 'oyym@fangdazhongxin.com'],
+                        'subject' => '来自 example.com 的新日志消息',
+                    ],
+                ],
+            ],
+        ],
     ],
 ];

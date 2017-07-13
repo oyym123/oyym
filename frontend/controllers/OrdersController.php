@@ -61,8 +61,24 @@ class OrdersController extends WebController
         ];
     }
 
-    /** 订单列表 */
-    public function actionIndex()
+    /**
+     * Name: actionIndex
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-11
+     * @SWG\Get(path="/order/buyer-products",
+     *   tags={"我参与的"},
+     *   summary="宝贝列表",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="全部",
+     *     description="status的值分为: 全部 || 正在进行 || 待支付 || 待揭晓 || 已揭晓 || 待发货 || 待签收 || 待评价 || 已完成 || 退货申请"
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionBuyerProducts()
     {
         $order = new Order();
         $comment = new Comments();
@@ -225,7 +241,7 @@ class OrdersController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-07
      * @SWG\Get(path="/orders/confirm",
-     *   tags={"订单"},
+     *   tags={"我参与的"},
      *   summary="提交订单前的确认",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(
@@ -310,7 +326,7 @@ class OrdersController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-07
      * @SWG\Get(path="/orders/submit",
-     *   tags={"订单"},
+     *   tags={"我参与的"},
      *   summary="提交订单",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(
@@ -422,20 +438,34 @@ class OrdersController extends WebController
         $params = [];
 
         // 下放摇奖编号
-        $order->createAwardNumber();
+        $order->getAwardCodesByOrder();
 
         $data = [
-            'id' => $order->id,
+            'layout' => $order->isAPriceOrder() ? 1 : 2,
+            'msg' => '您成功参与了1件宝贝共计2人次,摇奖编号如下:',
             'pay_amount' => '￥' . floatval($order->pay_amount),
         ];
-
-
 
         self::showMsg($data);
     }
 
-
-    /** 订单详情 */
+    /**
+     * Name: actionView
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-10
+     * @SWG\Get(path="/orders/view",
+     *   tags={"订单"},
+     *   summary="",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="sn", in="query", required=true, type="string", default="201707101223",
+     *     description=""
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
     public function actionView()
     {
         $comment = new Comments();
@@ -672,7 +702,7 @@ class OrdersController extends WebController
      *   )
      * )
      */
-    public  function actionCheckout()
+    public function actionCheckout()
     {
         $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'user_id' => $this->userId]);
 
@@ -716,7 +746,6 @@ class OrdersController extends WebController
             self::showMsg('订单不存在', -1);
         }
     }
-
 
 
 }
