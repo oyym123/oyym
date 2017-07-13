@@ -12,8 +12,6 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'user_id')->textInput() ?>
-
     <?= $form->field($model, 'type_id')->textInput() ?>
 
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
@@ -21,8 +19,6 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'price')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'original_price')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'unit')->textInput() ?>
 
     <?= $form->field($model, 'contents')->textarea(['rows' => 6]) ?>
 

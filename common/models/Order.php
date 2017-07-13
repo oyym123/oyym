@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\User;
 
 /**
@@ -181,8 +182,6 @@ class Order extends Base
 
                 if (!$orderProduct->save()) {
                     throw new Exception('创建订单商品失败');
-                } else {
-                    $orderProduct->createAwardCode();
                 }
             }
         }
@@ -191,28 +190,54 @@ class Order extends Base
     /** 生成摇奖号码 次方法仅支持一个订单一个宝贝的情况*/
     public function createAwardCode()
     {
+        $r = [0, ''];
+
         if ($this->orderProduct && $this->orderProduct->buy_type == OrderProduct::UNIT_PRICE) {
+            $transaction = Yii::$app->db->beginTransaction();
             // 购买方式是参与众筹,在支付成功后,生成摇奖编码
-            $maxAwardCode = OrderAwardCode::find()->where(['product_id' => $this->orderProduct->product_id]);
-            for ($maxAwardCode; $maxAwardCode > 0; $maxAwardCode--) {
+            $maxAwardCode = $this->orderProduct->product->getMaxAwardCode(); // 最大编码
+            $newAwardCode = $this->orderProduct->product->getMaxAwardCode() + $this->orderProduct->count; // 新增后的最大
+            for ($newAwardCode; $newAwardCode > $maxAwardCode; $newAwardCode--) {
                 $awardCodeModel = new OrderAwardCode();
                 $awardCodeModel->setAttributes([
                     'order_id' => $this->id,
                     'order_product_id' => $this->orderProduct->id,
-                    'code' => $maxAwardCode,
-                    'seller_id' => $maxAwardCode,
+                    'product_id' => $this->orderProduct->product_id,
+                    'code' => $newAwardCode,
+                    'seller_id' => $this->seller_id,
+                    'buyer_id' => $this->buyer_id,
                 ]);
+                if (!$awardCodeModel->save()) {
+                    $transaction->rollBack();
+                    return [400, '保存摇奖号码失败'];
+                }
             }
 
+            $transaction->commit();
         }
+
+        return $r;
     }
 
-    /** 获取摇奖号码 */
-    public function getAwardCodes()
+    /** 获取买家当前订单的摇奖号码 */
+    public function getAwardCodesByOrder()
     {
-        return [
-            '1234567890', '1234567891', '1234567892', '1234567893', '1234567894', '1234567895'
-        ];
+        $query = OrderAwardCode::find();
+        $query->where([
+            'order_id' => $this->id
+        ]);
+        return ArrayHelper::getColumn($query->asArray()->all(), 'code');
+    }
+
+    /** 获取买家所参与宝贝的摇奖号码 */
+    public function getAwardCodesByUser()
+    {
+        $query = OrderAwardCode::find();
+        $query->where([
+            'user_id' => $this->buyer_id,
+            'product_id' => $this->orderProduct->product_id
+        ]);
+        return ArrayHelper::getColumn($query->asArray()->all(), 'code');
     }
 
     /** 修改优惠券已被使用 */
@@ -456,4 +481,80 @@ class Order extends Base
         return $this->hasOne(OrderProduct::className(), ['order_id' => 'id']);
     }
 
+    /** 是否为一口价订单 */
+    public function isAPriceOrder()
+    {
+        return $this->orderProduct->buy_type == OrderProduct::A_PRICE;
+    }
+
+//self::STATUS_WAIT_PAY => '待付款',
+//self::STATUS_WAIT_PAY_CONFIRM => '转账待审核',
+//self::STATUS_PAYED => '交易成功',
+//self::STATUS_COMPLETED => '完成',
+//self::STATUS_CANCEL => '交易关闭',
+//self::STATUS_DELETED => '已删除',
+
+
+    /** 卖家-待发货的订单 */
+    public function sellerWaitShipping()
+    {
+
+    }
+
+    /** 卖家-待签收的宝贝 (买家退货)*/
+    public function sellerWaitReceiving()
+    {
+
+    }
+
+    /** 卖家-待评价的宝贝 */
+    public function sellerWaitAssessment()
+    {
+
+    }
+
+    /** 卖家-已完成的宝贝*/
+    public function sellerCompleted()
+    {
+
+    }
+
+    /** 卖家-买家的退货申请 */
+    public function sellerSalesReturn()
+    {
+
+    }
+
+    // ---------------------------------------卖家/买家分割线-------------------------------------- //
+
+
+    /** 待付款的订单 */
+    public function waitPay()
+    {
+
+    }
+
+    /** 已下架的宝贝 */
+    public function cancel()
+    {
+
+    }
+
+    /** 用户对宝贝可以进行的操作,编辑删除等 */
+    public function userActions()
+    {
+
+    }
+
+    /** 卖家-待评价的宝贝 */
+    public function buyerWaitAssessment()
+    {
+
+    }
+
+    /** 卖家-已完成的宝贝*/
+    public function buyerCompleted()
+    {
+
+    }
 }

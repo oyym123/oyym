@@ -25,7 +25,7 @@ use Yii;
 class OrderProduct extends Base
 {
 
-    const A_PRICE = 1; // 单价
+    const A_PRICE = 1; // 一口价
     const UNIT_PRICE = 2; // 单价
 
     /**
@@ -71,4 +71,5 @@ class OrderProduct extends Base
             'updated_at' => Yii::t('app', '更新时间'),
         ];
     }
+
 }
