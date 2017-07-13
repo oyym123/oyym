@@ -9,7 +9,6 @@ use yii\base\Exception;
  * This is the model class for table "product".
  *
  * @property integer $id
- * @property integer $user_id
  * @property integer $type_id
  * @property integer $model
  * @property integer $likes
@@ -17,7 +16,6 @@ use yii\base\Exception;
  * @property string $title
  * @property string $price
  * @property string $original_price
- * @property integer $unit
  * @property integer $total
  * @property integer $created_by
  * @property string $contents
@@ -85,9 +83,9 @@ class Product extends Base
     public function rules()
     {
         return [
-            [['user_id', 'type_id', 'title', 'created_at', 'updated_at', 'unit_price', 'created_by'], 'required'],
+            [['type_id', 'title', 'created_at', 'updated_at', 'unit_price', 'created_by'], 'required'],
             [['sort', 'order_award_id', 'award_published_at', 'deleted_at'], 'default', 'value' => 0],
-            [['user_id', 'type_id', 'unit', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total', 'random_code'], 'integer'],
+            [['type_id', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total', 'random_code'], 'integer'],
             [['price', 'original_price', 'freight', 'unit_price', 'a_price'], 'number'],
             [['contents'], 'string'],
             [['title', 'lat', 'lng'], 'string', 'max' => 255],
@@ -201,7 +199,6 @@ class Product extends Base
     {
         return [
             'id' => 'ID',
-            'user_id' => '用户ID',
             'type_id' => '产品类型',
             'title' => '名称',
             'a_price' => '一口价',
