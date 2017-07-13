@@ -289,7 +289,6 @@ class ProductsController extends WebController
             $product->lat = $address['lat'];
             $product->lng = $address['lng'];
             $product->model = $data['model'];
-            $product->user_id = $this->userId;
             $product->created_by = $this->userId;
             $product->status = Product::STATUS_IN_PROGRESS;
             $product->created_at = time();
