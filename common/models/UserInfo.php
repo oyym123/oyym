@@ -50,6 +50,12 @@ class UserInfo extends Base
         return empty($this->photo) ? Yii::$app->params['defaultPhoto'] : Yii::$app->params['qiniu_url_images'] . $this->photo;
     }
 
+    /** 取得用户所在地区 */
+    public function getUserArea()
+    {
+        return $this->hasOne(City::className(), ['id' => 'province']);
+    }
+
     /**
      * @inheritdoc
      */

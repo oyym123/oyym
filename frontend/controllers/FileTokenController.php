@@ -34,15 +34,15 @@ class FileTokenController extends WebController
         if (Yii::$app->request->get('token_type') == 1) {
             $bkt = Yii::$app->params['qiniu_bucket_videos'];
             $upToken = $auth->uploadToken($bkt);
-            $data = array('uptoken' => $upToken, 'host' => Yii::$app->params['qiniu_url_images']);
+            $data = array('uptoken' => $upToken, 'host' => Yii::$app->params['qiniu_url_videos']);
         } elseif (Yii::$app->request->get('token_type') == 2) {
             $bkt = Yii::$app->params['qiniu_bucket_videos_private'];
             $upToken = $auth->uploadToken($bkt);
-            $data = array('uptoken' => $upToken, 'host' => Yii::$app->params['qiniu_url_images']);
+            $data = array('uptoken' => $upToken, 'host' => Yii::$app->params['qiniu_url_videos_private']);
         } elseif (Yii::$app->request->get('token_type' == 3)) {
             $bkt = Yii::$app->params['qiniu_bucket_images_private'];
             $upToken = $auth->uploadToken($bkt);
-            $data = array('uptoken' => $upToken, 'host' => Yii::$app->params['qiniu_url_images']);
+            $data = array('uptoken' => $upToken, 'host' => Yii::$app->params['qiniu_url_images_private']);
         } else {
             $bkt = Yii::$app->params['qiniu_bucket_images'];
             $upToken = $auth->uploadToken($bkt);

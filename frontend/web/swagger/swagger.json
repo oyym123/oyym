@@ -667,6 +667,14 @@
                         "required": false,
                         "type": "string",
                         "default": "0"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": false,
+                        "type": "integer",
+                        "default": "1"
                     }
                 ],
                 "responses": {

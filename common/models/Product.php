@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\base\Exception;
 
 /**
  * This is the model class for table "product".
@@ -11,6 +12,8 @@ use Yii;
  * @property integer $user_id
  * @property integer $type_id
  * @property integer $model
+ * @property integer $likes
+ * @property integer $collections
  * @property string $title
  * @property string $price
  * @property string $original_price
@@ -71,6 +74,11 @@ class Product extends Base
         return 'product';
     }
 
+    public static $modelType = [
+        Product::MODEL_NUMBER => '数量模式',
+        Product::MODEL_TIME => '时间模式',
+    ];
+
     /**
      * @inheritdoc
      */
@@ -104,6 +112,46 @@ class Product extends Base
         }
     }
 
+    /** 宝贝列表接口下放布局样式id, 用于控制客户端展示不同的布局  */
+    public function listLayoutType()
+    {
+        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price < 0) {
+            return 1; //正在进行的页面，数量模式 没有一口价
+        } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price > 0) {
+            return 2; //正在进行的页面，数量模式 有一口价
+        } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
+            return 3; //正在进行的页面，时间模式
+        } else {
+            return 4;//显示空页面
+        }
+    }
+
+    /** 获取众筹进度 */
+    public function getProgress($participants)
+    {
+        return round($participants / $this->total * 100, 0);
+    }
+
+    /** 产品收藏数量保存 */
+    public static function collection($id, $count)
+    {
+        $model = self::findModel($id);
+        $model->collections = $count;
+        if (!$model->save()) {
+            throw new Exception('宝贝收藏失败!');
+        }
+    }
+
+    /** 产品点赞数量保存 */
+    public static function like($id, $count)
+    {
+        $model = self::findModel($id);
+        $model->likes = $count;
+        if (!$model->save()) {
+            throw new Exception('宝贝点赞失败!');
+        }
+    }
+
     /** 揭晓模式判断 */
     public function viewAnnouncedType()
     {
@@ -114,31 +162,35 @@ class Product extends Base
         }
     }
 
-
     /** 产品搜索 */
-    public function productSearch($key)
+    public function apiSearch($key)
     {
-
-
+        $sql = "select * from `product` where `status` IN (20, 30)" . self::searchType($key);
+        $query = Product::findBySql($sql);
+        return [
+            Product::findBySql($sql)->all(),
+            $query->count(),
+        ];
     }
 
-    public function searchType($key)
+    /** 默认升序 */
+    public static function searchType($key)
     {
         switch ($key) {
             case 'tuijian':
                 return $sql = "andWhere(['type_id' => 'id'])";
             case 'jindu':
-                return $sql = "andWhere(['type_id' => 'id'])";
+                return $sql = "sort()";
             case 'danjia':
-                return $sql = "andWhere(['type_id' => 'id'])";
+                return $sql = "  ORDER BY  'unit_price' asc";
             case 'zongjia':
-                return $sql = "andWhere(['type_id' => 'id'])";
+                return $sql = "sort('total asc')";
             case 'yikoujia':
-                return $sql = "andWhere(['type_id' => 'id'])";
+                return $sql = "andWhere(['>','a_price', 0])->sort('a_price asc')";
             case 'shijian':
-                return $sql = "andWhere(['type_id' => 'id'])";
+                return $sql = "sort('start_time desc,end_time asc')";
             case 'zuixin':
-                return $sql = "andWhere(['and', 'type=1', ['or', 'id=1', 'id=2']])";
+                return $sql = "andWhere(['>' , 'start_time', now()+864000])->sort('start_time desc , created_at desc')";
         }
     }
 
@@ -299,6 +351,15 @@ class Product extends Base
     public function userActions()
     {
 
+    }
+
+    public static function findModel($id)
+    {
+        if (($model = Product::findOne($id))) {
+            return $model;
+        } else {
+            throw new Exception('宝贝不存在!');
+        }
     }
 }
 

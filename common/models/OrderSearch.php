@@ -18,7 +18,7 @@ class OrderSearch extends Order
     public function rules()
     {
         return [
-            [['id', 'user_id', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['sn', 'user_name'], 'safe'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
         ];
@@ -61,7 +61,6 @@ class OrderSearch extends Order
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'user_id' => $this->user_id,
             'pay_type' => $this->pay_type,
             'pay_amount' => $this->pay_amount,
             'product_amount' => $this->product_amount,
@@ -71,8 +70,7 @@ class OrderSearch extends Order
             'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'sn', $this->sn])
-            ->andFilterWhere(['like', 'user_name', $this->user_name]);
+        $query->andFilterWhere(['like', 'sn', $this->sn]);
 
         return $dataProvider;
     }

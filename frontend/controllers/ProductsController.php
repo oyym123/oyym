@@ -4,6 +4,7 @@ namespace frontend\controllers;
 use common\models\Base;
 use common\models\Collection;
 use common\models\Image;
+use common\models\Like;
 use common\models\Product;
 use common\models\ProductType;
 use common\models\Video;
@@ -13,6 +14,7 @@ use yii\base\Exception;
 use common\helpers\Helper;
 use common\models\Comments;
 use yii\base\InvalidParamException;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
@@ -22,6 +24,16 @@ use yii\web\Controller;
  */
 class ProductsController extends WebController
 {
+    public function init()
+    {
+        parent::init();
+        if (empty($this->userId) && in_array(Yii::$app->requestedRoute, [
+                'products/create'
+            ])
+        ) {
+            self::needLogin();
+        }
+    }
 
     /**
      * Name: actionCategory
@@ -42,6 +54,7 @@ class ProductsController extends WebController
             ProductType::getType()
         );
     }
+
 
     /**
      * Name: actionIndex
@@ -70,6 +83,14 @@ class ProductsController extends WebController
      *     name="offset", in="query", required=false, default="0", type="string",
      *     description="分页用的数据游标"
      *   ),
+     *  @SWG\Parameter(
+     *     name="ky-token",
+     *     in="header",
+     *     default="1",
+     *     description="用户ky-token",
+     *     required=false,
+     *     type="integer",
+     *    ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
      *   )
@@ -77,6 +98,48 @@ class ProductsController extends WebController
      */
     public function actionIndex()
     {
+        $product = new Product();
+        $skip = intval(Yii::$app->request->get('skip', 0));
+        $psize = intval(Yii::$app->request->get('psize', 10));
+        $params['sort_type'] = Yii::$app->request->get('sort_type', 'danjia');
+        $data = [];
+        list($products, $data['count']) = $product->apiSearch($params, "$skip, $psize");
+        $params['type'] = Collection::TYPE_PRODUCT;
+        $params['status'] = Collection::COLLECT;
+        foreach ($products as $product) {
+            $params['type_id'] = $product->id;
+            $collectionFlag = Collection::collectionFlag($params) ? Collection::COLLECT : Collection::NOT_COLLECT;
+            $likeFlag = Like::likeFlag($params) ? Like::STATUS_ENABLE : Like::STATUS_DISABLE;
+            $data['products_list'][] = [
+                'id' => $product->id,
+                'images' => Image::getImages(['type' => Image::TYPE_PRODUCT, 'type_id' => $product->id]),
+                'model_type' => $product->model,
+                'title' => $product->title,
+                'contents' => $product->contents,
+                'progress' => $product->getProgress(100), // 众筹进度,里面数字是参与人数
+                'all_total' => $product->total, // 众筹进度,里面数字是参与人数
+                'comment' => $product->comments,
+                'like' => $product->likes,
+                'collection' => $product->collections,
+                'layout_type' => $product->listLayoutType(), //
+                'a_price' => $product->a_price,
+                // 布局类型
+                'zongjia' => $product->total,
+                'collection_flag' => $collectionFlag,
+                'like_flag' => $likeFlag,
+                'unit_price' => $product->unit_price,
+                'end_time' => $product->end_time,
+                'share_params' => [
+                    'share_title' => '众筹夺宝',
+                    'share_contents' => '夺宝达人!',
+                    'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . Url::to(['invite/signup', 'invite_id' => $this->userId]),
+                    'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
+                ]
+
+            ];
+        }
+
+        $this->showMsg($data);
 
         self::showMsg([
             'sort_type' => 'tuijian',
@@ -109,66 +172,6 @@ class ProductsController extends WebController
                         'share_title' => '众筹夺宝',
                         'share_contents' => '夺宝达人!',
                         'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . Url::to(['invite/signup', 'invite_id' => $this->userId]),
-                        'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
-                    ]
-                ],
-                [
-                    'id' => __LINE__,
-                    'images' => [
-                        [
-                            'id' => __LINE__,
-                            'url' => 'https://www.baidu.com/img/bd_logo1.png',
-                        ],
-                        [
-                            'id' => __LINE__,
-                            'url' => 'https://www.baidu.com/img/bd_logo1.png',
-                        ]
-                    ],
-                    'title' => '保时捷跑车便宜卖了',
-                    'contents' => "保时捷跑车便宜卖了,保时捷跑车便宜卖了,保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了",
-                    'progress' => '80', // 进度
-                    'model_type' => "1", // 众筹模式
-                    'layout_type' => "2", // 布局类型
-                    'like' => 123,
-                    'comment' => '12',
-                    'unit_price' => '12', // 单价
-                    'zongjia' => '12', // 总价
-                    'a_price' => '12', // 一口价
-                    'end_time' => '12', // 时间
-                    'share_params' => [
-                        'share_title' => '众筹夺宝',
-                        'share_contents' => '夺宝达人!',
-                        'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
-                        'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
-                    ]
-                ],
-                [
-                    'id' => __LINE__,
-                    'images' => [
-                        [
-                            'id' => __LINE__,
-                            'url' => 'https://www.baidu.com/img/bd_logo1.png',
-                        ],
-                        [
-                            'id' => __LINE__,
-                            'url' => 'https://www.baidu.com/img/bd_logo1.png',
-                        ]
-                    ],
-                    'title' => '保时捷跑车便宜卖了',
-                    'contents' => "保时捷跑车便宜卖了,保时捷跑车便宜卖了,保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了",
-                    'progress' => '80', // 众筹
-                    'model_type' => 1, // 众筹模式
-                    'layout_type' => "3", // 布局类型
-                    'like' => 123,
-                    'comment' => '12',
-                    'unit_price' => '12', // 单价
-                    'zongjia' => '12', // 总价
-                    'a_price' => '12', // 一口价
-                    'end_time' => '12', // 时间
-                    'share_params' => [
-                        'share_title' => '众筹夺宝',
-                        'share_contents' => '夺宝达人!',
-                        'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
                         'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
                     ]
                 ]
@@ -267,34 +270,9 @@ class ProductsController extends WebController
     public function actionCreate()
     {
 
-        $data = array(
-            'a_price' => '0',
-            'address' =>
-                array(
-                    'detail_address' => '河北省廊坊市三河市',
-                    'lat' => '39.917108',
-                    'lng' => '116.819580',
-                ),
-            'contents' => '哈哈哈',
-            'end_time' => '0',
-            'images' => '[
-              {
-                "name" : "200562",
-                "url" : "200562"
-              }
-            ]',
-            'model' => '1',
-            'start_time' => '0',
-            'title' => '齐全',
-            'total' => '1215',
-            'type_id' => '0',
-            'unit_price' => '4581',
-            'videos' => '[
 
-            ]',
-        );
         //  $data = json_encode($data);
-        //$data = Yii::$app->request->post('data');
+        $data = Yii::$app->request->post('data');
         // $data = json_decode($data, true);
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -385,7 +363,7 @@ class ProductsController extends WebController
         $params['type'] = Collection::TYPE_PRODUCT;
         $params['type_id'] = $item->id;
         $collectionFlag = Collection::collectionFlag($params) ? Collection::COLLECT : Collection::NOT_COLLECT;
-
+        $participants = 100; //已参加人数
         $data = [
             'id' => $item->id,
             'images' => Image::getImages(['type' => Image::TYPE_PRODUCT, 'type_id' => $item->id]),
@@ -394,13 +372,14 @@ class ProductsController extends WebController
             'contents' => $item->contents,
             'progress' => '80', // 众筹进度
             'model_type' => $item->model,
-            'like' => 123, // 喜欢
-            'comments' => '12', // 评论
+            'like' => $item->likes, // 喜欢
+            'collection' => $item->collections, // 喜欢
+            'comments' => $item->comments, // 评论
             'layout_type' => $item->viewLayoutType(), // 布局类型
             'unit_price' => $item->unit_price,
             'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
-            'need_total' => 1000, // 需要参与人次
-            'remaining' => 11, // 剩余人次
+            'need_total' => $item->total, // 需要参与人次
+            'remaining' => $item->total - $participants, // 剩余人次
             'start_time' => $item->start_time, // 开始时间
             'end_time' => $item->end_time, // 结束时间
             'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式
@@ -444,9 +423,8 @@ class ProductsController extends WebController
             'publish_countdown' => '7200', // 揭晓倒计时以秒为单位
         ];
 
-        $this->showMsg($data);
+        self::showMsg($data);
     }
-
 
     /** 取产品实体 */
     protected function findModel($params)

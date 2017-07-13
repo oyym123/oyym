@@ -12,8 +12,6 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'user_id')->textInput() ?>
-
     <?= $form->field($model, 'sn')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'pay_type')->textInput() ?>
@@ -23,8 +21,6 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'product_amount')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'discount_amount')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'user_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'status')->textInput() ?>
 
