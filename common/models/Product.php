@@ -106,7 +106,7 @@ class Product extends Base
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
             return 5; //已揭晓 ，获奖
         } else {
-            return 6; //显示空页面
+            return 1; //显示空页面
         }
     }
 
@@ -120,14 +120,20 @@ class Product extends Base
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
             return 3; //正在进行的页面，时间模式
         } else {
-            return 4;//显示空页面
+            return 1;//显示空页面
         }
     }
 
     /** 获取众筹进度 */
     public function getProgress($participants)
     {
-        return round($participants / $this->total * 100, 0);
+        if ($this->model == Product::MODEL_TIME) {
+            return round((time() - intval($this->start_time)) / (intval($this->end_time) - intval($this->start_time)) * 100, 0);
+        }
+        if ($this->total) {
+            return round($participants / $this->total * 100, 0);
+        }
+        return 0;
     }
 
     /** 产品收藏数量保存 */
