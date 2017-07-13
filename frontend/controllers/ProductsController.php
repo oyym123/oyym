@@ -227,34 +227,9 @@ class ProductsController extends WebController
     public function actionCreate()
     {
 
-        $data = array(
-            'a_price' => '0',
-            'address' =>
-                array(
-                    'detail_address' => '河北省廊坊市三河市',
-                    'lat' => '39.917108',
-                    'lng' => '116.819580',
-                ),
-            'contents' => '哈哈哈',
-            'end_time' => '0',
-            'images' => '[
-              {
-                "name" : "200562",
-                "url" : "200562"
-              }
-            ]',
-            'model' => '1',
-            'start_time' => '0',
-            'title' => '齐全',
-            'total' => '1215',
-            'type_id' => '0',
-            'unit_price' => '4581',
-            'videos' => '[
 
-            ]',
-        );
         //  $data = json_encode($data);
-        //$data = Yii::$app->request->post('data');
+        $data = Yii::$app->request->post('data');
         // $data = json_decode($data, true);
 
         $transaction = Yii::$app->db->beginTransaction();
