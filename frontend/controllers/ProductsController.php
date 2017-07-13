@@ -121,7 +121,7 @@ class ProductsController extends WebController
                 'like' => $product->likes,
                 'collection' => $product->collections,
                 'layout_type' => $product->listLayoutType(), //
-                'a_price' => $product->a_price,
+                'a_price' => $product->a_price ?: 0.00,
                 // 布局类型
                 'zongjia' => $product->total,
                 'collection_flag' => $collectionFlag,
