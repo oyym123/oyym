@@ -268,9 +268,7 @@ class ProductsController extends WebController
      */
     public function actionCreate()
     {
-        //  $data = json_encode($data);
         $data = Yii::$app->request->post();
-        // $data = json_decode($data, true);
         $transaction = Yii::$app->db->beginTransaction();
         $images = json_decode($data['images'], true);
         $videos = json_decode($data['videos'], true);
@@ -296,8 +294,8 @@ class ProductsController extends WebController
             $product->total = $data['total'];
             $product->unit_price = $data['unit_price'];
             $product->a_price = $data['a_price'] ?: '';
-            $product->start_time = $data['start_time'];
-            $product->end_time = $data['end_time'];
+            $product->start_time = $data['start_time'] ?: '';;
+            $product->end_time = $data['end_time'] ?: '';;
             $product->type_id = $data['type_id'];
 
             if (!$product->save()) {

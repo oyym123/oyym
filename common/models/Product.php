@@ -84,7 +84,7 @@ class Product extends Base
     {
         return [
             [['type_id', 'title', 'created_at', 'updated_at', 'unit_price', 'created_by'], 'required'],
-            [['sort', 'order_award_id', 'award_published_at', 'deleted_at'], 'default', 'value' => 0],
+            [['sort', 'order_award_id', 'award_published_at', 'deleted_at', 'total'], 'default', 'value' => 0],
             [['type_id', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total', 'random_code'], 'integer'],
             [['price', 'original_price', 'freight', 'unit_price', 'a_price'], 'number'],
             [['contents'], 'string'],
