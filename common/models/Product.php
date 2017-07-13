@@ -113,7 +113,7 @@ class Product extends Base
     /** 宝贝列表接口下放布局样式id, 用于控制客户端展示不同的布局  */
     public function listLayoutType()
     {
-        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price < 0) {
+        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && empty($this->a_price)) {
             return 1; //正在进行的页面，数量模式 没有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price > 0) {
             return 2; //正在进行的页面，数量模式 有一口价
