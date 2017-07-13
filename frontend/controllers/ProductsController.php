@@ -56,7 +56,6 @@ class ProductsController extends WebController
         );
     }
 
-
     /**
      * Name: actionIndex
      * Desc: 宝贝列表页接口
@@ -226,15 +225,13 @@ class ProductsController extends WebController
      */
     public function actionCreate()
     {
-
-
         //  $data = json_encode($data);
-        $data = Yii::$app->request->post('data');
+        $data = Yii::$app->request->post();
         // $data = json_decode($data, true);
-
         $transaction = Yii::$app->db->beginTransaction();
         $images = json_decode($data['images'], true);
         $videos = json_decode($data['videos'], true);
+        $address = json_decode($data['address'], true);
         try {
             if (count($images) > 6) {
                 throw new Exception('最多上传6张图片');
@@ -245,9 +242,9 @@ class ProductsController extends WebController
             $product = new Product();
             $product->title = $data['title'];
             $product->contents = $data['contents'];
-            $product->detail_address = $data['address']['detail_address'];
-            $product->lat = $data['address']['lat'];
-            $product->lng = $data['address']['lng'];
+            $product->detail_address = $address['detail_address'];
+            $product->lat = $address['lat'];
+            $product->lng = $address['lng'];
             $product->model = $data['model'];
             $product->user_id = $this->userId;
             $product->created_by = $this->userId;
@@ -256,10 +253,10 @@ class ProductsController extends WebController
             $product->updated_at = time();
             $product->total = $data['total'];
             $product->unit_price = $data['unit_price'];
-            $product->type_id = $data['type_id'];
             $product->a_price = $data['a_price'];
             $product->start_time = $data['start_time'];
             $product->end_time = $data['end_time'];
+            $product->type_id = $data['type_id'];
 
             if (!$product->save()) {
                 throw new Exception('宝贝发布失败');
