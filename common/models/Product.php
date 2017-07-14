@@ -95,18 +95,18 @@ class Product extends Base
     /** 宝贝详情接口下放布局样式id, 用于控制客户端展示不同的布局  */
     public function viewLayoutType()
     {
-        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER) {
-            return 1; //正在进行的页面，数量模式 区别有一口价或者没有一口价
+        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && empty($this->a_price)) {
+            return 1; //正在进行的页面，数量模式 没有一口价
+        } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price > 0) {
+            return 2; //正在进行的页面，数量模式 有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
-            return 2; //正在进行的页面，时间模式
+            return 3; //正在进行的页面，时间模式
         } elseif ($this->status == Product::STATUS_WAIT_PUBLISHED) {
-            return 3; //卖家用户的待揭晓页面，显示“我来揭晓” ，买家用户的待揭晓页面，显示“请等待系统揭晓”
-        } elseif ($this->status == Product::STATUS_WAIT_PUBLISHED) {
-            return 4; //已揭晓 , 一口价
-        } elseif ($this->status == Product::STATUS_PUBLISHED) {
-            return 5; //已揭晓 ，获奖
+            return 4; //卖家用户的待揭晓页面，显示“我来揭晓” ，买家用户的待揭晓页面，显示“请等待系统揭晓”
+        } elseif ($this->status = self::STATUS_PUBLISHED) {
+            return 5; //已揭晓 , 一口价 //已揭晓 ，获奖
         } else {
-            return 1; //显示空页面
+            return 6; //显示空页面
         }
     }
 

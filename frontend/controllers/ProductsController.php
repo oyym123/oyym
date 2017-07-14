@@ -20,7 +20,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 
 /**
- * Products controller
+1 * Products controller
  */
 class ProductsController extends WebController
 {
@@ -101,6 +101,10 @@ class ProductsController extends WebController
         $skip = intval(Yii::$app->request->get('skip', 0));
         $psize = intval(Yii::$app->request->get('psize', 10));
         $params['sort_type'] = Yii::$app->request->get('sort_type', 'danjia');
+        $layoutType = 0;
+        if ($params['sort_type'] = 'danjia') {
+            $layoutType = 1;
+        }
         $data = [];
         list($products, $data['count']) = $product->apiSearch($params, "$skip, $psize");
         $params['type'] = Collection::TYPE_PRODUCT;
@@ -120,7 +124,7 @@ class ProductsController extends WebController
                 'comment' => $product->comments,
                 'like' => $product->likes,
                 'collection' => $product->collections,
-                'layout_type' => $product->listLayoutType(), //
+                'layout_type' => $layoutType ? 1 : $product->listLayoutType(),//单价排序,布局默认为1
                 'a_price' => $product->a_price ?: 0.00,
                 // 布局类型
                 'zongjia' => $product->total,
@@ -134,48 +138,9 @@ class ProductsController extends WebController
                     'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . Url::to(['invite/signup', 'invite_id' => $this->userId]),
                     'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
                 ]
-
             ];
         }
-
         $this->showMsg($data);
-
-        self::showMsg([
-            'sort_type' => 'tuijian',
-            'count' => 200,
-            'products_list' => [
-                [
-                    'id' => __LINE__,
-                    'images' => [
-                        [
-                            'id' => __LINE__,
-                            'url' => 'https://www.baidu.com/img/bd_logo1.png',
-                        ],
-                        [
-                            'id' => __LINE__,
-                            'url' => 'https://www.baidu.com/img/bd_logo1.png',
-                        ]
-                    ],
-                    'title' => '保时捷跑车便宜卖了',
-                    'contents' => "保时捷跑车便宜卖了,保时捷跑车便宜卖了,保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了 \n保时捷跑车便宜卖了 保时捷跑车便宜卖了",
-                    'progress' => '80', // 众筹进度
-                    'model_type' => 1, // 众筹模式
-                    'layout_type' => "1", // 布局类型
-                    'like' => 123,
-                    'comment' => '12',
-                    'unit_price' => '12', // 单价
-                    'zongjia' => '12', // 总价
-                    'a_price' => '12', // 一口价
-                    'end_time' => '12', // 时间
-                    'share_params' => [
-                        'share_title' => '众筹夺宝',
-                        'share_contents' => '夺宝达人!',
-                        'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . Url::to(['invite/signup', 'invite_id' => $this->userId]),
-                        'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
-                    ]
-                ]
-            ]
-        ]);
     }
 
     /**
@@ -274,6 +239,9 @@ class ProductsController extends WebController
         $videos = json_decode($data['videos'], true);
         $address = json_decode($data['address'], true);
         try {
+            if ($data['unit_price'] > $data['a_price']) {
+                throw new Exception('单价不能大于一口价');
+            }
             if (count($images) > 6) {
                 throw new Exception('最多上传6张图片');
             }
