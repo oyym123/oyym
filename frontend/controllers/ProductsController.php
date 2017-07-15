@@ -115,7 +115,7 @@ class ProductsController extends WebController
                 'contents' => $product->contents,
                 'progress' => $product->getProgress(100), // 众筹进度,里面数字是参与人数
                 'all_total' => $product->total, // 众筹进度,里面数字是参与人数
-                'comment' => $product->comments,
+                'comments' => $product->comments,
                 'like' => $product->likes,
                 'layout_type' => $layoutType ? 1 : $product->listLayoutType(),//单价排序,布局默认为1
                 'a_price' => $product->a_price ?: 0.00,
@@ -338,6 +338,7 @@ class ProductsController extends WebController
             'model_type' => $item->model,
             'like' => $item->likes, // 喜欢
             'like_flag' => $likeFlag, // 喜欢标志
+            'collection' => $item->collections, // 喜欢
             'comments' => $item->comments, // 评论
             'layout_type' => $item->viewLayoutType(), // 布局类型
             'unit_price' => $item->unit_price,
