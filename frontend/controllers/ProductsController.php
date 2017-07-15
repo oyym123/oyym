@@ -20,7 +20,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 
 /**
-1 * Products controller
+ * 1 * Products controller
  */
 class ProductsController extends WebController
 {

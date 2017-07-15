@@ -99,7 +99,7 @@ class Video extends Base
             if ($video->url) {
                 $data[] = [
                     'id' => $video->id,
-                    'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_videos'], $video->url),
+                    'url' => QiniuHelper::downloadVideoUrl(Yii::$app->params['qiniu_url_videos'], $video->url),
                     'name' => $video->name ?: ''
                 ];
             }
