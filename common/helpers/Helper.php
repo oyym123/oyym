@@ -118,7 +118,7 @@ class Helper extends BaseArrayHelper
     public static function writeLog($data)
     {
         //  file_put_contents('/tmp/request.log', date('Y-m-d-H:i:s') . var_export($data, 1) . "\n", FILE_APPEND);
-        file_put_contents('c:/request.log', date('Y-m-d-H:i:s') . var_export($data, 1) . "\n", FILE_APPEND);
+        file_put_contents('d:/request.log', date('Y-m-d-H:i:s') . var_export($data, 1) . "\n", FILE_APPEND);
     }
 
     public static function errors()

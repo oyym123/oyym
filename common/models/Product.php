@@ -85,6 +85,7 @@ class Product extends Base
         return [
             [['type_id', 'title', 'created_at', 'updated_at', 'unit_price', 'created_by'], 'required'],
             [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at'], 'default', 'value' => 0],
+            [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at', 'total'], 'default', 'value' => 0],
             [['type_id', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total', 'random_code'], 'integer'],
             [['price', 'original_price', 'freight', 'unit_price', 'a_price'], 'number'],
             [['contents'], 'string'],
@@ -95,16 +96,16 @@ class Product extends Base
     /** 宝贝详情接口下放布局样式id, 用于控制客户端展示不同的布局  */
     public function viewLayoutType()
     {
-        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER) {
-            return 1; //正在进行的页面，数量模式 区别有一口价或者没有一口价
+        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && empty($this->a_price)) {
+            return 1; //正在进行的页面，数量模式 没有一口价
+        } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price > 0) {
+            return 2; //正在进行的页面，数量模式 有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
-            return 2; //正在进行的页面，时间模式
+            return 3; //正在进行的页面，时间模式
         } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
-            return 3; //卖家用户的待揭晓页面，显示“我来揭晓” ，买家用户的待揭晓页面，显示“请等待系统揭晓”
-        } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
-            return 4; //已揭晓 , 一口价
-        } elseif ($this->status == Product::STATUS_PUBLISHED) {
-            return 5; //已揭晓 ，获奖
+            return 4; //卖家用户的待揭晓页面，显示“我来揭晓” ，买家用户的待揭晓页面，显示“请等待系统揭晓”
+        } elseif ($this->status = self::STATUS_PUBLISHED) {
+            return 5; //已揭晓 , 一口价 //已揭晓 ，获奖
         } else {
             return 6; //显示空页面
         }
@@ -113,21 +114,27 @@ class Product extends Base
     /** 宝贝列表接口下放布局样式id, 用于控制客户端展示不同的布局  */
     public function listLayoutType()
     {
-        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price < 0) {
+        if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && empty($this->a_price)) {
             return 1; //正在进行的页面，数量模式 没有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price > 0) {
             return 2; //正在进行的页面，数量模式 有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
             return 3; //正在进行的页面，时间模式
         } else {
-            return 4;//显示空页面
+            return 1;//显示空页面
         }
     }
 
     /** 获取众筹进度 */
     public function getProgress($participants)
     {
-        return round($participants / $this->total * 100, 0);
+        if ($this->model == Product::MODEL_TIME) {
+            return round((time() - intval($this->start_time)) / (intval($this->end_time) - intval($this->start_time)) * 100, 0);
+        }
+        if ($this->total) {
+            return round($participants / $this->total * 100, 0);
+        }
+        return 0;
     }
 
     /** 产品收藏数量保存 */
