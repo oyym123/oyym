@@ -141,7 +141,7 @@ class ProductsController extends WebController
      * Desc:
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-12
-     * @SWG\Get(path="/products/my-sell",
+     * @SWG\Get(path="/products/my-products",
      *   tags={"我发布的"},
      *   summary="宝贝列表",
      *   description="Author: lixinxin",
@@ -167,7 +167,7 @@ class ProductsController extends WebController
      * )
      */
 
-    public function actionMySell($status)
+    public function actionMyProducts($status)
     {
         $productModel = new Product();
         list($sellerAllProducts, $count) = $productModel->sellerProducts([
@@ -184,6 +184,32 @@ class ProductsController extends WebController
         ];
 
         self::showMsg($data);
+    }
+
+    /**
+     * Name: actionMySale
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-15
+     * @SWG\Get(path="/products/my-sale",
+     *   tags={"我卖出的"},
+     *   summary="",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
+     *     description="宝贝状态,传的值有: 全部=0 || 待发货=20 || 已发货=25 || 待评价=70 || 已完成=100 || 退款申请=60
+     *   ),
+     *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
+     *     description="数据游标"
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          id=1
+     *          name=测试"
+     *   )
+     * )
+     */
+    public function actionMySale(){
+
     }
 
     /**
@@ -331,12 +357,13 @@ class ProductsController extends WebController
      *          unit_price=宝贝单价
      *          a_price=宝贝一口价
      *          need_total=需要参与人次
+     *          order_award_count=已参与人次
      *          remaining=剩余人数,在数量模式时使用
      *          start_time=宝贝开始时间
      *          end_time=宝贝结束时间
      *          announced_mode=揭晓模式(卖家用户的待揭晓页面，显示“我来揭晓”, 买家用户的待揭晓页面，显示“请等待系统揭晓”)
-     *          need_total=总需人次
-     *          remaining=剩余人数,在数量模式时使用
+     *              layout=当值为1时,意味着可以点击,则title=”我来揭晓”,当值为2时,意味着不可点击,则title=”请等待系统揭晓”
+     *              title=文案目前只有'我来揭晓'和'请等待系统揭晓'
      *          luck_user=中奖用户
      *              user_img=头像地址
      *              luck_number=幸运号码
@@ -362,7 +389,7 @@ class ProductsController extends WebController
      *                  reply=回复此评论的评论
      *                      id=评论id
      *                      user_name=用户名
-     *                      contents=用户名
+     *                      contents=评论内容
      *          publish_countdown=揭晓截止时间
      *
      *     "
@@ -370,9 +397,9 @@ class ProductsController extends WebController
      * )
      */
 
-    public function actionView()
+    public function actionView($id)
     {
-        $item = $this->findModel(['id' => Yii::$app->request->get('id')]);
+        $item = $this->findModel(['id' => $id]);
         $params['type'] = Collection::TYPE_PRODUCT;
         $params['type_id'] = $item->id;
         $collectionFlag = Collection::collectionFlag($params);

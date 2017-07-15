@@ -39,7 +39,7 @@ class Product extends Base
     const STATUS_NOT_SALE = 10; // 未上架
     const STATUS_IN_PROGRESS = 20; // 进行中
     const STATUS_WAIT_PUBLISH = 30; // 待揭晓
-    const STATUS_PUBLISHED = 40; // 已揭晓 是宝贝的中点状态
+    const STATUS_PUBLISHED = 40; // 已揭晓 是宝贝的终点状态
     const STATUS_CANCELED = 50; // 已取消
 
 
@@ -161,9 +161,15 @@ class Product extends Base
     public function viewAnnouncedType()
     {
         if ($this->created_by != Yii::$app->user->id && $this->status == Product::STATUS_WAIT_PUBLISH) {
-            return '请等待系统揭晓'; //买家用户的待揭晓页面，显示“请等待系统揭晓”
+            return [
+                'layout' => 2,
+                'title' => '请等待系统揭晓'
+            ]; // 买家用户的待揭晓页面，显示“请等待系统揭晓”
         } elseif ($this->created_by == Yii::$app->user->id && $this->status == Product::STATUS_WAIT_PUBLISH) {
-            return '我来揭晓'; //卖家用户的待揭晓页面，显示“我来揭晓”
+            return [
+                'layout' => 1,
+                'title' => '我来揭晓'
+            ]; //卖家用户的待揭晓页面，显示“我来揭晓”
         }
     }
 
