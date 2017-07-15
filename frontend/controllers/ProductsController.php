@@ -84,12 +84,7 @@ class ProductsController extends WebController
      *     description="分页用的数据游标"
      *   ),
      *  @SWG\Parameter(
-     *     name="ky-token",
-     *     in="header",
-     *     default="1",
-     *     description="用户ky-token",
-     *     required=false,
-     *     type="integer",
+     *     name="ky-token", in="header", required=false, type="integer", default="1",
      *    ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
@@ -195,10 +190,21 @@ class ProductsController extends WebController
      *     description="数据游标"
      *   ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *          all_total=总需人次
+     *          residual_total=剩余
+     *          residual_time=结束时间
+     *          progress=进度
+     *          publish_countdown=揭晓倒计时
+     *          a_price=一口价
+     *          status=状态
+     *          layout=布局类型[进行中]
+     *          layout=布局类型[进行中]
+     *          order_award_count=已参与人次"
      *   )
      * )
      */
+
     public function actionMySell($status)
     {
         $productModel = new Product();
@@ -345,12 +351,8 @@ class ProductsController extends WebController
      *   summary="宝贝详情页",
      *   description="Author: OYYM",
      *   @SWG\Parameter(
-     *     name="id",
-     *     in="query",
-     *     default="1",
+     *     name="id", in="query", required=true, type="integer", default="1",
      *     description="产品ID",
-     *     required=true,
-     *     type="integer",
      *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
@@ -380,8 +382,8 @@ class ProductsController extends WebController
             'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
             'need_total' => $item->total, // 需要参与人次
             'remaining' => $item->total - $participants, // 剩余人次
-            'start_time' => $item->start_time, // 开始时间
-            'end_time' => $item->end_time, // 结束时间
+            'start_time' => date('Y-m-d H:i', $item->start_time), // 开始时间
+            'end_time' => date('Y-m-d H:i', $item->end_time), // 结束时间
             'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式
             'all_total' => 3245, // 总参与人次
             'luck_user' => [
