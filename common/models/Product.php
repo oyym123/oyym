@@ -38,8 +38,8 @@ class Product extends Base
 {
     const STATUS_NOT_SALE = 10; // 未上架
     const STATUS_IN_PROGRESS = 20; // 进行中
-    const STATUS_WAIT_PUBLISHED = 30; // 待揭晓
-    const STATUS_PUBLISHED = 40; // 已揭晓
+    const STATUS_WAIT_PUBLISH = 30; // 待揭晓
+    const STATUS_PUBLISHED = 40; // 已揭晓 是宝贝的中点状态
     const STATUS_CANCELED = 50; // 已取消
 
 
@@ -47,7 +47,7 @@ class Product extends Base
     public static $status = [
         self::STATUS_NOT_SALE => '未上架',
         self::STATUS_IN_PROGRESS => '进行中',
-        self::STATUS_WAIT_PUBLISHED => '待揭晓',
+        self::STATUS_WAIT_PUBLISH => '待揭晓',
         self::STATUS_PUBLISHED => '已揭晓',
         self::STATUS_CANCELED => '已取消',
     ];
@@ -84,7 +84,8 @@ class Product extends Base
     {
         return [
             [['type_id', 'title', 'created_at', 'updated_at', 'unit_price', 'created_by'], 'required'],
-            [['sort', 'order_award_id', 'award_published_at', 'deleted_at', 'total'], 'default', 'value' => 0],
+            [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at'], 'default', 'value' => 0],
+            [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at', 'total'], 'default', 'value' => 0],
             [['type_id', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total', 'random_code'], 'integer'],
             [['price', 'original_price', 'freight', 'unit_price', 'a_price'], 'number'],
             [['contents'], 'string'],
@@ -101,7 +102,7 @@ class Product extends Base
             return 2; //正在进行的页面，数量模式 有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
             return 3; //正在进行的页面，时间模式
-        } elseif ($this->status == Product::STATUS_WAIT_PUBLISHED) {
+        } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
             return 4; //卖家用户的待揭晓页面，显示“我来揭晓” ，买家用户的待揭晓页面，显示“请等待系统揭晓”
         } elseif ($this->status = self::STATUS_PUBLISHED) {
             return 5; //已揭晓 , 一口价 //已揭晓 ，获奖
@@ -159,9 +160,9 @@ class Product extends Base
     /** 揭晓模式判断 */
     public function viewAnnouncedType()
     {
-        if ($this->created_by != Yii::$app->user->id && $this->status == Product::STATUS_WAIT_PUBLISHED) {
+        if ($this->created_by != Yii::$app->user->id && $this->status == Product::STATUS_WAIT_PUBLISH) {
             return '请等待系统揭晓'; //买家用户的待揭晓页面，显示“请等待系统揭晓”
-        } elseif ($this->created_by == Yii::$app->user->id && $this->status == Product::STATUS_WAIT_PUBLISHED) {
+        } elseif ($this->created_by == Yii::$app->user->id && $this->status == Product::STATUS_WAIT_PUBLISH) {
             return '我来揭晓'; //卖家用户的待揭晓页面，显示“我来揭晓”
         }
     }
@@ -223,6 +224,7 @@ class Product extends Base
             'deleted_at' => '删除时间',
             'random_code' => '随机码B, 例如时时彩的5位中奖码',
             'order_award_id' => '中奖id',
+            'order_id' => '中奖订单id',
             'award_published_at' => '中奖揭晓时间',
         ];
     }
@@ -280,6 +282,12 @@ class Product extends Base
 
     }
 
+    /** 获取该宝贝中奖的订单 */
+    public function getAwardOrder()
+    {
+        return $this->hasOne(Order::className(), ['id' => 'order_id']);
+    }
+
     /** 取最大的摇奖代码 */
     public function getMaxAwardCode()
     {
@@ -288,10 +296,74 @@ class Product extends Base
             'deleted_at' => 0
         ])->one();
 
-        return $maxAwardCode ? $maxAwardCode->code : 1000001;
+        return $maxAwardCode ? $maxAwardCode->code : 10000001;
     }
 
-    /** 卖家-所有参与的宝贝 */
+    const STATUS_WAIT_PAY = 10; // 待付款
+//    const STATUS_WAIT_PAY_SUCCESS = 20; // 已付款
+    const STATUS_WAIT_SHIPPING = 30; // 待发货
+    const STATUS_CONFIRM_RECEIVING = 40; // 待签收
+    const STATUS_WAIT_COMMENT = 50; // 待评价
+    const STATUS_COMPLETE = 90; // 已完成
+
+    /** 卖家-我发布的产品列表 样式布局 */
+    public function sellerProductLayout()
+    {
+        $r = '正在进行';
+        if ($this->status == Product::STATUS_NOT_SALE) {
+            $r = '未上架';
+        } elseif ($this->status == Product::STATUS_IN_PROGRESS) {
+            $r = '正在进行';
+        } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
+            $r = '待揭晓';
+        } elseif ($this->status == Product::STATUS_PUBLISHED) {
+            // 已揭晓
+            if ($awardOrder = $this->awardOrder()) {
+                if ($awardOrder->status == Order::STATUS_WAIT_SHIPPING) {
+                    $r = '待发货';
+                }elseif ($awardOrder->status == Order::STATUS_CONFIRM_RECEIVING) {
+                    $r = '待签收';
+                }elseif ($awardOrder->status == Order::STATUS_WAIT_COMMENT) {
+                    $r = '待评价';
+                }elseif ($awardOrder->status == Order::STATUS_COMPLETE) {
+                    $r = '已完成';
+                }
+            }
+        } elseif ($this->status == Product::STATUS_CANCELED) {
+            // 已取消
+            $r = '正在进行';
+        } elseif ($this->status == Product::STATUS_NOT_SALE) {
+            // 未上架
+        }
+        return $r;
+    }
+
+    /** 卖家-我发布的产品列表 链接地址 */
+    public function sellerProductUrl()
+    {
+
+    }
+
+    /** 卖家宝贝列表 字段 */
+    public function sellerProductListField($items)
+    {
+        $r = [];
+        foreach ($items as $key => $item) {
+            $r[] = [
+                'title' => $item->title,
+                'layout' => $item->sellerProductLayout(),
+                'need_total' => $item->total,
+                'all_total' => $item->total , // 总需要多少人次
+                'residual_total' => max(0, $item->total - $item->order_award_count), // 剩余多少人次
+                'order_award_count' => $item->order_award_count, // 已参与人次
+                'url' => $item->sellerProductAction(),
+            ];
+        }
+
+        return $r;
+    }
+
+    /** 卖家-所有发布的的宝贝 */
     public function sellerProducts($params)
     {
         $query = Product::find()->where([
@@ -304,6 +376,8 @@ class Product extends Base
         }
 
         $query->offset($params['offset'])->limit($this->psize);
+
+        return [$this->sellerProductListField($query->all()), $query->count()];
     }
 
     /** 卖家-进行中的宝贝 */

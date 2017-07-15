@@ -33,21 +33,26 @@ class Order extends Base
     public $coupons = []; // 优惠券
 
     const STATUS_WAIT_PAY = 10; // 待付款
-    const STATUS_WAIT_PAY_SUCCESS = 20; // 已付款
-    const STATUS_PAYED = 30; // 待发货
-    const STATUS_COMPLETED = 40; // 待签收
-    const STATUS_CANCEL = 50; // 待评价
-    const STATUS_DELETED = 90; // 已完成
+    const STATUS_PAYED = 20; // 已付款
+    const STATUS_WAIT_SHIP = 30; // 待发货
+    const STATUS_SHIPPED = 35; // 已发货
+//    const STATUS_CONFIRM_RECEIVING = 60; // 待签收
+    const STATUS_RETURN_APPLY = 40; // 退款中
+    const STATUS_WAIT_REFUND = 24; // 待退款 (揭晓后, 给没中奖的客户退款)
+    const STATUS_REFUNDED = 25; // 已退款 (退款成功, )
+    const STATUS_WAIT_COMMENT = 70; // 待评价
+    const STATUS_COMPLETE = 90; // 已完成
 
     public static function orderStatus()
     {
         return [
             self::STATUS_WAIT_PAY => '待付款',
-            self::STATUS_WAIT_PAY_CONFIRM => '转账待审核',
-            self::STATUS_PAYED => '交易成功',
-            self::STATUS_COMPLETED => '完成',
-            self::STATUS_CANCEL => '交易关闭',
-            self::STATUS_DELETED => '已删除',
+//            self::STATUS_WAIT_PAY_SUCCESS => '已付款',
+            self::STATUS_WAIT_SHIPPING => '待发货',
+            self::STATUS_CONFIRM_RECEIVING => '待签收',
+            self::STATUS_RETURN_APPLY => '退货申请',
+            self::STATUS_WAIT_COMMENT => '待评价',
+            self::STATUS_COMPLETE => '已完成',
         ];
     }
 
