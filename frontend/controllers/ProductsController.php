@@ -317,10 +317,60 @@ class ProductsController extends WebController
      *     description="产品ID",
      *   ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *          id=宝贝id
+     *          images=相册
+     *          videos=视频
+     *          title=宝贝标题
+     *          contents=宝贝介绍
+     *          progress=众筹进度
+     *          like=被赞数
+     *          like_flag=是否已赞
+     *          collection_flag=是否已收藏
+     *          comments=评论数
+     *          layout_type=布局类型
+     *          unit_price=宝贝单价
+     *          a_price=宝贝一口价
+     *          need_total=需要参与人次
+     *          remaining=剩余人数,在数量模式时使用
+     *          start_time=宝贝开始时间
+     *          end_time=宝贝结束时间
+     *          announced_mode=揭晓模式(卖家用户的待揭晓页面，显示“我来揭晓”, 买家用户的待揭晓页面，显示“请等待系统揭晓”)
+     *          need_total=总需人次
+     *          remaining=剩余人数,在数量模式时使用
+     *          luck_user=中奖用户
+     *              user_img=头像地址
+     *              luck_number=幸运号码
+     *              list=列表数组
+     *                  title=获得者
+     *                  value=小李
+     *          share_params=分享参数字典
+     *              share_title=众筹夺宝
+     *              share_contents=夺宝达人
+     *              share_link=链接
+     *              share_img_url=图标url
+     *          comment_count=评论总数
+     *          comment_list=评论列表数组
+     *              user_count=评论人数
+     *              list
+     *                  id=评论id
+     *                  user_photo=评论用户头像地址
+     *                  comment_line_id=评论的上级id,用于区分我评论的谁的评论
+     *                  like_count=赞数统计
+     *                  user_name=用户名
+     *                  contents=评论内容
+     *                  date=评论时间
+     *                  reply=回复此评论的评论
+     *                      id=评论id
+     *                      user_name=用户名
+     *                      contents=用户名
+     *          publish_countdown=揭晓截止时间
+     *
+     *     "
      *   )
      * )
      */
+
     public function actionView()
     {
         $item = $this->findModel(['id' => Yii::$app->request->get('id')]);
@@ -335,9 +385,8 @@ class ProductsController extends WebController
             'title' => $item->title,
             'contents' => $item->contents,
             'progress' => '80', // 众筹进度
-            'model_type' => $item->model,
             'like' => $item->likes, // 喜欢
-            'collection' => $item->collections, // 喜欢
+            'collection' => $item->collections, // 收藏
             'comments' => $item->comments, // 评论
             'layout_type' => $item->viewLayoutType(), // 布局类型
             'unit_price' => $item->unit_price,
@@ -346,8 +395,8 @@ class ProductsController extends WebController
             'remaining' => $item->total - $participants, // 剩余人次
             'start_time' => date('Y-m-d H:i', $item->start_time), // 开始时间
             'end_time' => date('Y-m-d H:i', $item->end_time), // 结束时间
-            'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式
-            'all_total' => 3245, // 总参与人次
+            'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式(卖家用户的待揭晓页面，显示“我来揭晓”, 买家用户的待揭晓页面，显示“请等待系统揭晓”)
+            'order_award_count' => $item->order_award_count, // 已参与人次
             'luck_user' => [
                 'user_img' => '',
                 'luck_number' => '3707863272837',
@@ -372,8 +421,6 @@ class ProductsController extends WebController
                 'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
                 'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
             ],
-            'address' => $item->detail_address,
-            'intro' => '',
             'collection_flag' => $collectionFlag,
             //    'can_buy' => $item->isCanBuy(),
             'comment_count' => $item->comments,
@@ -382,7 +429,7 @@ class ProductsController extends WebController
                 'img' => '',
                 'name' => '',
                 'zhima' => '芝麻信用:700',
-                'intro' => '来到众筹夺宝20天了,成功卖出30件商品',
+                'intro' => "2天前发布于 北京, 来到众筹夺宝20天了,成功卖出30件商品",
             ],
             'publish_countdown' => '7200', // 揭晓倒计时以秒为单位
         ];

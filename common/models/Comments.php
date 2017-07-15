@@ -107,7 +107,7 @@ class Comments extends Base
                 $data[] = [
                     'id' => $item->id,
                     'user_name' => $item->user ? $item->user->getName() : '',
-                    'conetnts' => $item->contents
+                    'contents' => $item->contents
                 ];
             }
             $datas['list'][] = [
@@ -123,7 +123,7 @@ class Comments extends Base
             ];
         }
         $datas['user_count'] = $product->comments;
-        $datas['product_id'] = $product_id;
+
         return $datas;
     }
 
