@@ -342,6 +342,7 @@ class ProductsController extends WebController
             'comments' => $item->comments, // 评论
             'layout_type' => $item->viewLayoutType(), // 布局类型
             'unit_price' => $item->unit_price,
+            'freight' => $item->freight,
             'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
             'need_total' => $item->total, // 需要参与人次
             'remaining' => $item->total - $participants, // 剩余人次
