@@ -386,9 +386,9 @@ class ProductsController extends WebController
             'contents' => $item->contents,
             'progress' => '80', // 众筹进度
             'like' => $item->likes, // 喜欢
+            'model_type' => $item->model,
             'collection' => $item->collections, // 收藏
             'like_flag' => $likeFlag, // 喜欢标志
-            'collection' => $item->collections, // 喜欢
             'comments' => $item->comments, // 评论
             'layout_type' => $item->viewLayoutType(), // 布局类型
             'unit_price' => $item->unit_price,
