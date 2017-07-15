@@ -20,7 +20,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 
 /**
-1 * Products controller
+ * 1 * Products controller
  */
 class ProductsController extends WebController
 {
@@ -106,19 +106,17 @@ class ProductsController extends WebController
         $params['status'] = Collection::COLLECT;
         foreach ($products as $product) {
             $params['type_id'] = $product->id;
-            $collectionFlag = Collection::collectionFlag($params) ? Collection::COLLECT : Collection::NOT_COLLECT;
-            $likeFlag = Like::likeFlag($params) ? Like::STATUS_ENABLE : Like::STATUS_DISABLE;
+            $collectionFlag = Collection::collectionFlag($params);
+            $likeFlag = Like::likeFlag($params);
             $data['products_list'][] = [
                 'id' => $product->id,
                 'images' => Image::getImages(['type' => Image::TYPE_PRODUCT, 'type_id' => $product->id]),
-                'model_type' => $product->model,
                 'title' => $product->title,
                 'contents' => $product->contents,
                 'progress' => $product->getProgress(100), // 众筹进度,里面数字是参与人数
                 'all_total' => $product->total, // 众筹进度,里面数字是参与人数
-                'comment' => $product->comments,
+                'comments' => $product->comments,
                 'like' => $product->likes,
-                'collection' => $product->collections,
                 'layout_type' => $layoutType ? 1 : $product->listLayoutType(),//单价排序,布局默认为1
                 'a_price' => $product->a_price ?: 0.00,
                 // 布局类型
@@ -262,6 +260,7 @@ class ProductsController extends WebController
             $product->lng = $address['lng'];
             $product->model = $data['model'];
             $product->created_by = $this->userId;
+            $product->freight = $data['freight'];
             $product->status = Product::STATUS_IN_PROGRESS;
             $product->created_at = time();
             $product->updated_at = time();
@@ -376,7 +375,8 @@ class ProductsController extends WebController
         $item = $this->findModel(['id' => Yii::$app->request->get('id')]);
         $params['type'] = Collection::TYPE_PRODUCT;
         $params['type_id'] = $item->id;
-        $collectionFlag = Collection::collectionFlag($params) ? Collection::COLLECT : Collection::NOT_COLLECT;
+        $collectionFlag = Collection::collectionFlag($params);
+        $likeFlag = Like::likeFlag($params);
         $participants = 100; //已参加人数
         $data = [
             'id' => $item->id,
@@ -387,9 +387,12 @@ class ProductsController extends WebController
             'progress' => '80', // 众筹进度
             'like' => $item->likes, // 喜欢
             'collection' => $item->collections, // 收藏
+            'like_flag' => $likeFlag, // 喜欢标志
+            'collection' => $item->collections, // 喜欢
             'comments' => $item->comments, // 评论
             'layout_type' => $item->viewLayoutType(), // 布局类型
             'unit_price' => $item->unit_price,
+            'freight' => $item->freight,
             'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
             'need_total' => $item->total, // 需要参与人次
             'remaining' => $item->total - $participants, // 剩余人次

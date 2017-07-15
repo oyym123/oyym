@@ -103,7 +103,7 @@ class Image extends Base
             if ($image->url) {
                 $data[] = [
                     'id' => $image->id,
-                    'url' => QiniuHelper::downloadUrl(Yii::$app->params['qiniu_url_images'], $image->url),
+                    'url' => QiniuHelper::downloadImageUrl(Yii::$app->params['qiniu_url_images'], $image->url),
                     'name' => $image->name ?: ''
                 ];
             }

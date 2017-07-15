@@ -24,7 +24,7 @@ class QiniuHelper extends BaseArrayHelper
     }
 
     /** 获取七牛图片存储地址 */
-    public static function downloadUrl($url, $key)
+    public static function downloadImageUrl($url, $key)
     {
         require_once Yii::getAlias('@vendor') . '/qiniu/php-sdk/autoload.php';
 
@@ -32,7 +32,20 @@ class QiniuHelper extends BaseArrayHelper
         $auth = new Auth(Yii::$app->params['qiniu_access_key'], Yii::$app->params['qiniu_secret_key']);
 
         //baseUrl构造成私有空间的域名/key的形式
-        return $auth->privateDownloadUrl($url . $key).'&imageMogr2/strip';
+        return $auth->privateDownloadUrl($url . $key) . '&imageMogr2/strip';
+    }
+
+
+    /** 获取七牛图片存储地址 */
+    public static function downloadVideoUrl($url, $key)
+    {
+        require_once Yii::getAlias('@vendor') . '/qiniu/php-sdk/autoload.php';
+
+        //初始化Auth状态
+        $auth = new Auth(Yii::$app->params['qiniu_access_key'], Yii::$app->params['qiniu_secret_key']);
+
+        //baseUrl构造成私有空间的域名/key的形式
+        return $auth->privateDownloadUrl($url . $key);
     }
 
     /**视频操作 */
@@ -127,7 +140,7 @@ class QiniuHelper extends BaseArrayHelper
     }
 
     /** 上传base64编码的图片 */
-    public static function  requestByCurl($remote_server, $post_string)
+    public static function requestByCurl($remote_server, $post_string)
     {
         require_once '../../vendor/qiniu/php-sdk/autoload.php';
         $auth = new Auth(Yii::$app->params['qiniu_access_key'], Yii::$app->params['qiniu_secret_key']);
