@@ -208,7 +208,8 @@ class ProductsController extends WebController
      *   )
      * )
      */
-    public function actionMySale(){
+    public function actionMySale()
+    {
 
     }
 
@@ -424,7 +425,7 @@ class ProductsController extends WebController
             'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式(卖家用户的待揭晓页面，显示“我来揭晓”, 买家用户的待揭晓页面，显示“请等待系统揭晓”)
             'order_award_count' => $item->order_award_count ?: 0, // 已参与人次
             'luck_user' => [
-                'user_img' => $item->userInfo->photoUrl($item->created_by),
+                'user_img' => $item->userInfo ? $item->userInfo->photoUrl($item->created_by) : Yii::$app->params['defaultPhoto'],
                 'luck_number' => $item->orderAwardCode ? $item->orderAwardCode->code : 10000001,
                 'list' => [
                     [
