@@ -212,9 +212,14 @@ class User extends ActiveRecord implements IdentityInterface
         } else {
             $userName = $userName = Helper::formatStr($this->username);
         }
-        return ($this->info ? mb_substr($this->info->name,0,11,'utf-8') : '') ?: $userName;
+        return ($this->info ? mb_substr($this->info->name, 0, 11, 'utf-8') : '') ?: $userName;
     }
 
+    /** 获取加入时间，按天 */
+    public function getJoinTime($time)
+    {
+        return round((time() - $time) / 86400, 0);
+    }
 
     /** 获取用户昵称 */
     public function getMobile()

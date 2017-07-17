@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\helpers\QiniuHelper;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -15,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $like_count
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $sold_products
  */
 class UserInfo extends Base
 {
@@ -44,16 +46,17 @@ class UserInfo extends Base
         return ArrayHelper::getValue(Base::$phoneSystem, $this->phone_system, '未知');
     }
 
-    /** 用户头像地址 */
-    public function photoUrl()
-    {
-        return empty($this->photo) ? Yii::$app->params['defaultPhoto'] : Yii::$app->params['qiniu_url_images'] . $this->photo;
-    }
-
     /** 取得用户所在地区 */
     public function getUserArea()
     {
         return $this->hasOne(City::className(), ['id' => 'province']);
+    }
+
+    /** 用户头像地址 */
+    public function photoUrl($userId)
+    {
+        $image = Image::findOne(['type' => Image::TYPE_USER_PHOTO, 'type_id' => $userId, 'status' => Base::STATUS_ENABLE]);
+        return $image ? QiniuHelper::downloadImageUrl(Yii::$app->params['qiniu_url_images'], $image->url) : Yii::$app->params['defaultPhoto'];
     }
 
     /**

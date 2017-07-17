@@ -21,6 +21,7 @@ use yii\base\Exception;
  * @property string $contents
  * @property string $detail_address
  * @property string $lat
+ * @property integer $count_down
  * @property string $lng
  * @property integer $watches
  * @property integer $comments
@@ -125,6 +126,7 @@ class Product extends Base
         }
     }
 
+
     /** 获取众筹进度 */
     public function getProgress($participants)
     {
@@ -135,6 +137,15 @@ class Product extends Base
             return round($participants / $this->total * 100, 0);
         }
         return 0;
+    }
+
+    /** 获取揭晓倒计时 */
+    public function getPublishCountdown()
+    {
+        if ($this->count_down) {
+            return time() - $this->count_down;
+        }
+        return 365 * 24 * 3600;
     }
 
     /** 产品收藏数量保存 */
@@ -157,6 +168,30 @@ class Product extends Base
         }
     }
 
+    /** 获取产品图片 */
+    public function getImages()
+    {
+        return Image::getImages(['type' => Image::TYPE_PRODUCT, 'type_id' => $this->id]);
+    }
+
+    /** 获取产品视频 */
+    public function getVideos()
+    {
+        return Video::getVideos(['type' => Video::TYPE_PRODUCT, 'type_id' => $this->id]);
+    }
+
+    /** 获取是否点赞标志 */
+    public function getIsLike()
+    {
+        return Like::likeFlag(['type' => Like::TYPE_PRODUCT, 'type_id' => $this->id]);
+    }
+
+    /** 获取是否收藏标志 */
+    public function getIsCollection()
+    {
+        return Collection::collectionFlag(['type' => Collection::TYPE_PRODUCT, 'type_id' => $this->id]);
+    }
+
     /** 揭晓模式判断 */
     public function viewAnnouncedType()
     {
@@ -164,6 +199,8 @@ class Product extends Base
             return '请等待系统揭晓'; //买家用户的待揭晓页面，显示“请等待系统揭晓”
         } elseif ($this->created_by == Yii::$app->user->id && $this->status == Product::STATUS_WAIT_PUBLISH) {
             return '我来揭晓'; //卖家用户的待揭晓页面，显示“我来揭晓”
+        } else {
+            return '';
         }
     }
 
@@ -282,10 +319,64 @@ class Product extends Base
 
     }
 
+    /** 获取中奖者姓名 */
+    public function getLuckUserName()
+    {
+        if ($this->status == self::STATUS_PUBLISHED) {
+            return $this->orderProduct->user ? $this->orderProduct->user->getName() : '佚名';
+        }
+        return '佚名';
+    }
+
+    /** 获取中奖方式 */
+    public function getLuckType()
+    {
+        $buyType = $this->orderProduct ? $this->orderProduct->buy_type : '';
+        if ($buyType == OrderProduct::A_PRICE && $this->status == self::STATUS_PUBLISHED) {
+            return "一口价{$this->a_price}元购买";
+        }
+
+        if ($buyType == OrderProduct::UNIT_PRICE && $this->status == self::STATUS_PUBLISHED) {
+            return "众筹夺宝";
+        }
+
+        return '';
+    }
+
+    /** 获取参加者人数 */
+    public function getJoinCount()
+    {
+        return OrderAwardCode::getJoinCount($this->id);
+    }
+
+    /** 获取该宝贝中产品订单 */
+    public function getOrderProduct()
+    {
+        return $this->hasOne(OrderProduct::className(), ['pid' => 'id']);
+    }
+
     /** 获取该宝贝中奖的订单 */
     public function getAwardOrder()
     {
         return $this->hasOne(Order::className(), ['id' => 'order_id']);
+    }
+
+    /** 获取用户信息 */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'created_by']);
+    }
+
+    /** 获取用户详情 */
+    public function getUserInfo()
+    {
+        return $this->hasOne(UserInfo::className(), ['user_id' => 'created_by']);
+    }
+
+    /** 获取获奖幸运号 */
+    public function getOrderAwardCode()
+    {
+        return $this->hasOne(OrderAwardCode::className(), ['id' => 'order_award_id']);
     }
 
     /** 取最大的摇奖代码 */
@@ -321,11 +412,11 @@ class Product extends Base
             if ($awardOrder = $this->awardOrder()) {
                 if ($awardOrder->status == Order::STATUS_WAIT_SHIPPING) {
                     $r = '待发货';
-                }elseif ($awardOrder->status == Order::STATUS_CONFIRM_RECEIVING) {
+                } elseif ($awardOrder->status == Order::STATUS_CONFIRM_RECEIVING) {
                     $r = '待签收';
-                }elseif ($awardOrder->status == Order::STATUS_WAIT_COMMENT) {
+                } elseif ($awardOrder->status == Order::STATUS_WAIT_COMMENT) {
                     $r = '待评价';
-                }elseif ($awardOrder->status == Order::STATUS_COMPLETE) {
+                } elseif ($awardOrder->status == Order::STATUS_COMPLETE) {
                     $r = '已完成';
                 }
             }
@@ -353,7 +444,7 @@ class Product extends Base
                 'title' => $item->title,
                 'layout' => $item->sellerProductLayout(),
                 'need_total' => $item->total,
-                'all_total' => $item->total , // 总需要多少人次
+                'all_total' => $item->total, // 总需要多少人次
                 'residual_total' => max(0, $item->total - $item->order_award_count), // 剩余多少人次
                 'order_award_count' => $item->order_award_count, // 已参与人次
                 'url' => $item->sellerProductAction(),

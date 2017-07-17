@@ -39,6 +39,25 @@ class OrderAwardCode extends Base
         ];
     }
 
+
+    /** 获取卖家用户信息 */
+    public function getSeller()
+    {
+        return $this->hasOne(User::className(), ['id' => 'seller_id']);
+    }
+
+    /** 获取买家用户信息 */
+    public function getBuyer()
+    {
+        return $this->hasOne(User::className(), ['id' => 'buyer_id']);
+    }
+
+    /** 获取参加的人数 */
+    public static function getJoinCount($id)
+    {
+        return self::find()->where(['product_id' => $id])->count();
+    }
+
     /**
      * @inheritdoc
      */

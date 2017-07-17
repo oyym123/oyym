@@ -110,7 +110,7 @@ class ProductsController extends WebController
             $likeFlag = Like::likeFlag($params);
             $data['products_list'][] = [
                 'id' => $product->id,
-                'images' => Image::getImages(['type' => Image::TYPE_PRODUCT, 'type_id' => $product->id]),
+                'images' => $product->getImages(),
                 'title' => $product->title,
                 'contents' => $product->contents,
                 'progress' => $product->getProgress(100), // 众筹进度,里面数字是参与人数
@@ -369,26 +369,21 @@ class ProductsController extends WebController
      *   )
      * )
      */
-
     public function actionView()
     {
         $item = $this->findModel(['id' => Yii::$app->request->get('id')]);
-        $params['type'] = Collection::TYPE_PRODUCT;
-        $params['type_id'] = $item->id;
-        $collectionFlag = Collection::collectionFlag($params);
-        $likeFlag = Like::likeFlag($params);
-        $participants = 100; //已参加人数
+        $participants = $item->getJoinCount(); //已参加人数
         $data = [
             'id' => $item->id,
-            'images' => Image::getImages(['type' => Image::TYPE_PRODUCT, 'type_id' => $item->id]),
-            'videos' => Video::getVideos(['type' => Video::TYPE_PRODUCT, 'type_id' => $item->id]),
+            'images' => $item->getImages(),
+            'videos' => $item->getVideos(),
             'title' => $item->title,
             'contents' => $item->contents,
-            'progress' => '80', // 众筹进度
+            'progress' => $item->getProgress($participants), // 众筹进度
             'like' => $item->likes, // 喜欢
             'model_type' => $item->model,
             'collection' => $item->collections, // 收藏
-            'like_flag' => $likeFlag, // 喜欢标志
+            'like_flag' => $item->getIsLike(), // 喜欢标志
             'comments' => $item->comments, // 评论
             'layout_type' => $item->viewLayoutType(), // 布局类型
             'unit_price' => $item->unit_price,
@@ -399,44 +394,45 @@ class ProductsController extends WebController
             'start_time' => date('Y-m-d H:i', $item->start_time), // 开始时间
             'end_time' => date('Y-m-d H:i', $item->end_time), // 结束时间
             'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式(卖家用户的待揭晓页面，显示“我来揭晓”, 买家用户的待揭晓页面，显示“请等待系统揭晓”)
-            'order_award_count' => $item->order_award_count, // 已参与人次
+            'order_award_count' => $item->order_award_count ?: 0, // 已参与人次
             'luck_user' => [
-                'user_img' => '',
-                'luck_number' => '3707863272837',
+                'user_img' => $item->userInfo->photoUrl($item->created_by),
+                'luck_number' => $item->orderAwardCode ? $item->orderAwardCode->code : 10000001,
                 'list' => [
                     [
                         'title' => '获得者:',
-                        'value' => '李新新'
-                    ],
-                    [
-                        'title' => '参与方式:',
-                        'value' => "一口价{$item->a_price}元购买"
-                    ],
-                    [
-                        'title' => '购买时间:',
-                        'value' => '2017-07-08 08:12:22'
-                    ],
-                ]
-            ],
-            'share_params' => [
-                'share_title' => '众筹夺宝',
-                'share_contents' => '夺宝达人!',
-                'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
-                'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
-            ],
-            'collection_flag' => $collectionFlag,
-            //    'can_buy' => $item->isCanBuy(),
-            'comment_count' => $item->comments,
-            'comment_list' => Comments::getProduct($item->id, 0, 5),
-            'sale_user' => [
-                'img' => '',
-                'name' => '',
-                'zhima' => '芝麻信用:700',
-                'intro' => "2天前发布于 北京, 来到众筹夺宝20天了,成功卖出30件商品",
-            ],
-            'publish_countdown' => '7200', // 揭晓倒计时以秒为单位
+                        'value' => $item->getLuckUserName(),
+                        [
+                            'title' => '参与方式:',
+                            'value' => "一口价{$item->a_price}元购买"
+                        ],
+                        [
+                            'title' => '购买时间:',
+                            'value' => date('Y-m-d H:i:s', $item->orderProduct ? $item->orderProduct->created_at : 0)
+                        ],
+                    ]
+                ],
+                'share_params' => [
+                    'share_title' => '众筹夺宝',
+                    'share_contents' => '夺宝达人!',
+                    'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
+                    'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
+                ],
+                'collection_flag' => $item->getIsCollection(),
+                //'can_buy' => $item->isCanBuy(),
+                'comment_count' => $item->comments,
+                'comment_list' => Comments::getProduct($item->id, 0, 5),
+                'sale_user' => [
+                    'img' => '',
+                    'name' => '',
+                    'zhima' => '芝麻信用:700',
+                    'intro' => Helper::tranTime($item->created_at) . "发布于 " . $item->detail_address . ", 来到众筹夺宝"
+                        . ($item->user ? $item->user->getJoinTime($item->user->created_at) : 0) . "天了,成功卖出"
+                        . ($item->userInfo ? $item->userInfo->sold_products : 0) . "件商品",
+                ],
+                'publish_countdown' => $item->getPublishCountdown(), // 揭晓倒计时以秒为单位
+            ]
         ];
-
         self::showMsg($data);
     }
 

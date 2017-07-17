@@ -2,16 +2,16 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m170714_071609_alter_product extends Migration
+class m170715_073027_add_to_user_info extends Migration
 {
     public function safeUp()
     {
-        $this->addColumn('product', 'order_id', Schema::TYPE_INTEGER . '(11) COMMENT "中奖订单id"');
+        $this->addColumn('user_info', 'sold_products', Schema::TYPE_INTEGER . '(11) NOT NULL DEFAULT 0 COMMENT "卖出的宝贝数量"');
     }
 
     public function safeDown()
     {
-        echo "m170714_071609_alter_product cannot be reverted.\n";
+        echo "m170715_073027_add_to_user_info cannot be reverted.\n";
 
         return false;
     }
@@ -25,7 +25,7 @@ class m170714_071609_alter_product extends Migration
 
     public function down()
     {
-        echo "m170714_071609_alter_product cannot be reverted.\n";
+        echo "m170715_073027_add_to_user_info cannot be reverted.\n";
 
         return false;
     }
