@@ -461,7 +461,6 @@ class ProductsController extends WebController
             ],
             'actions' => $item->buttonType(),
             'publish_countdown' => $item->getPublishCountdown(), // 揭晓倒计时以秒为单位
-        ]
         ];
         self::showMsg($data);
     }
