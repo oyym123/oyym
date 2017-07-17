@@ -460,6 +460,33 @@ class Product extends Base
         $r = [];
         foreach ($items as $key => $item) {
             $r[] = [
+                'layout' => function ($item) {
+                    $r = 1;
+                    if ($item->model == Product::MODEL_NUMBER) { // 数量模式
+                        if ($item->status == Product::STATUS_NOT_SALE) { // 未上架
+                            return 1;
+                        } elseif ($item->status == Product::STATUS_IN_PROGRESS) { // 进行中
+                            return 1;
+                        } elseif ($item->status == Product::STATUS_WAIT_PUBLISH) { // 待揭晓
+                            return 2;
+                        } elseif ($item->status == Product::STATUS_PUBLISHED) { // 已揭晓
+                            return 4;
+                        }
+                    } else { // 时间模式
+                        if ($item->status == Product::STATUS_NOT_SALE) { // 未上架
+                            return 1;
+                        } elseif ($item->status == Product::STATUS_IN_PROGRESS) { // 进行中
+                            return 2;
+                        } elseif ($item->status == Product::STATUS_WAIT_PUBLISH) { // 待揭晓
+                            return 3;
+                        } elseif ($item->status == Product::STATUS_PUBLISHED) { // 已揭晓
+                            return 4;
+                        }
+                    }
+
+                    return $r;
+                },
+                'id' => $item->id,
                 'title' => $item->title,
                 'layout' => $item->sellerProductLayout(),
                 'need_total' => $item->total,
@@ -474,7 +501,7 @@ class Product extends Base
     }
 
     /** 卖家-所有发布的的宝贝 */
-    public function sellerProducts($params)
+    public function myProducts($params)
     {
         $query = Product::find()->where([
             'created_by' => $params['seller_id'],

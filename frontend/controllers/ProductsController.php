@@ -141,23 +141,27 @@ class ProductsController extends WebController
      *   summary="宝贝列表",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
-     *     description="宝贝状态,传的值有: 全部=0 || 正在进行=20 || 待揭晓=30 , 这儿没有 待发货,代签收"
+     *     description="宝贝状态,传的值有: 全部=0 || 进行中=20 || 待揭晓=30 || 已揭晓=40, 这儿没有 待发货,代签收"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
      *     description="数据游标"
      *   ),
      *   @SWG\Response(
      *       response=200,description="
-     *          all_total=总需人次
-     *          residual_total=剩余
-     *          residual_time=结束时间
-     *          progress=进度
-     *          publish_countdown=揭晓倒计时
-     *          a_price=一口价
-     *          status=状态
-     *          layout=布局类型[进行中]
-     *          layout=布局类型[进行中]
-     *          order_award_count=已参与人次"
+     *          product_count=宝贝总数
+     *          product_list=宝贝列表
+     *              layout=布局类型[进行中]
+     *              id=宝贝id
+     *              title=标题
+     *              img=宝贝头图
+     *              all_total=总需人次
+     *              residual_total=剩余
+     *              residual_time=结束时间
+     *              progress=进度
+     *              publish_countdown=揭晓倒计时
+     *              a_price=一口价
+     *              status=状态 [下架 || 进行中 || 待揭晓 || 已揭晓]
+     *              order_award_count=已参与人次"
      *   )
      * )
      */
@@ -165,17 +169,15 @@ class ProductsController extends WebController
     public function actionMyProducts($status)
     {
         $productModel = new Product();
-        list($sellerAllProducts, $count) = $productModel->sellerProducts([
+        list($sellerAllProducts, $count) = $productModel->myProducts([
             'status' => $status,
             'created_by' => $this->userId,
             'offset' => Yii::$app->request->get('offset', 0)
         ]);
 
         $data = [
-            'product' => [
-                'count' => $count,
-                'list' => $sellerAllProducts
-            ]
+            'product_count' => $count,
+            'product_list' => $sellerAllProducts
         ];
 
         self::showMsg($data);
