@@ -33,15 +33,20 @@ class Order extends Base
     public $coupons = []; // 优惠券
 
     const STATUS_WAIT_PAY = 10; // 待付款
-    const STATUS_PAYED = 20; // 已付款
-    const STATUS_WAIT_SHIP = 30; // 待发货
-    const STATUS_SHIPPED = 35; // 已发货
-//    const STATUS_CONFIRM_RECEIVING = 60; // 待签收
-    const STATUS_RETURN_APPLY = 40; // 退款中
-    const STATUS_WAIT_REFUND = 24; // 待退款 (揭晓后, 给没中奖的客户退款)
-    const STATUS_REFUNDED = 25; // 已退款 (退款成功, )
+    const STATUS_PAYED = 15; // 已付款
+    const STATUS_WAIT_SHIP = 20; // 待发货
+    const STATUS_SHIPPED = 25; // 已发货
+//    const STATUS_CONFIRM_RECEIVING = 40; // 待签收
+//    const STATUS_CONFIRM_RECEIVING = 50; // 已签收
+    const STATUS_RETURN_APPLY = 60; // 退款申请 (发货后, 买家不想要了)
+    const STATUS_RETURN_AGREE = 61; // 卖家同意退款申请 (发货后, 买家不想要了)
+    const STATUS_WAIT_REFUND = 65; // 待退款 (揭晓后, 给没中奖的客户退款,卖家同意退款)
+    const STATUS_REFUNDED = 68; // 已退款 (退款成功)
     const STATUS_WAIT_COMMENT = 70; // 待评价
-    const STATUS_COMPLETE = 90; // 已完成
+    const STATUS_SELLER_COMMENTED = 71; // 卖家已评价
+    const STATUS_BUYER_COMMENTED = 72; // 买家已评价
+//    const STATUS_ALL_COMMENTED = 73; // 买卖双方已评价
+    const STATUS_COMPLETE = 100; // 已完成 买卖双方已评价后状态变为已完成
 
     public static function orderStatus()
     {
