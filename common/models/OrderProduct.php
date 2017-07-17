@@ -59,8 +59,7 @@ class OrderProduct extends Base
     {
         return $this->hasOne(User::className(), ['id' => 'buyer_id']);
     }
-
-
+    
     /**
      * @inheritdoc
      */

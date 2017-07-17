@@ -138,10 +138,19 @@ class Product extends Base
     public function getProgress($participants)
     {
         if ($this->model == Product::MODEL_TIME) {
-            return round((time() - intval($this->start_time)) / (intval($this->end_time) - intval($this->start_time)) * 100, 0);
+            $result = round((time() - intval($this->start_time)) / (intval($this->end_time) - intval($this->start_time)) * 100, 0);
+            if ($result <= 100) {   //限制进度最大值为100%
+                return $result;
+            }
+            return 100;
         }
+
         if ($this->total) {
-            return round($participants / $this->total * 100, 0);
+            $result = round($participants / $this->total * 100, 0);
+            if ($result <= 100) {   //限制进度最大值为100%
+                return $result;
+            }
+            return 100;
         }
         return 0;
     }
@@ -190,13 +199,15 @@ class Product extends Base
     /** 获取是否点赞标志 */
     public function getIsLike()
     {
-        return Like::likeFlag(['type' => Like::TYPE_PRODUCT, 'type_id' => $this->id]);
+        $query = Like::likeFlag(['type' => Like::TYPE_PRODUCT, 'type_id' => $this->id, 'status' => self::STATUS_ENABLE]);
+        return $query ? self::STATUS_ENABLE : self::STATUS_DISABLE;
     }
 
     /** 获取是否收藏标志 */
     public function getIsCollection()
     {
-        return Collection::collectionFlag(['type' => Collection::TYPE_PRODUCT, 'type_id' => $this->id]);
+        $query = Collection::collectionFlag(['type' => Collection::TYPE_PRODUCT, 'type_id' => $this->id, 'status' => self::STATUS_ENABLE]);
+        return $query ? self::STATUS_ENABLE : self::STATUS_DISABLE;
     }
 
     /** 揭晓模式判断 */
@@ -334,7 +345,17 @@ class Product extends Base
     public function getLuckUserName()
     {
         if ($this->status == self::STATUS_PUBLISHED) {
-            return $this->orderProduct->user ? $this->orderProduct->user->getName() : '佚名';
+            return ($this->order ? $this->order->buyer : '') ? $this->order->buyer->getName() : '佚名';
+        }
+        return '佚名';
+    }
+
+    /** 获取中奖者头像 */
+    public function getLuckUserPhoto()
+    {
+        if ($this->status == self::STATUS_PUBLISHED) {
+            return ($this->order ? $this->order->buyer : '') ?
+                (($x = $this->order->buyer->info) ? $x->photoUrl($this->order->buyer_id) : '') : '佚名';
         }
         return '佚名';
     }
@@ -354,6 +375,30 @@ class Product extends Base
         return '';
     }
 
+    /** 参与按钮的样式 */
+    public function buttonType()
+    {
+        if ($this->model == self::MODEL_NUMBER && ($this->a_price > 0)) {
+            return [
+                [
+                    'title' => '立即参与',
+                    'url' => 'join_now',
+                ],
+                [
+                    'title' => '一口价',
+                    'url' => 'a_price',
+                ]
+            ];
+        } else {
+            return [
+                [
+                    'title' => '立即参与',
+                    'url' => 'join_now',
+                ]
+            ];
+        }
+    }
+
     /** 获取参加者人数 */
     public function getJoinCount()
     {
@@ -361,13 +406,7 @@ class Product extends Base
     }
 
     /** 获取该宝贝中产品订单 */
-    public function getOrderProduct()
-    {
-        return $this->hasOne(OrderProduct::className(), ['pid' => 'id']);
-    }
-
-    /** 获取该宝贝中奖的订单 */
-    public function getAwardOrder()
+    public function getOrder()
     {
         return $this->hasOne(Order::className(), ['id' => 'order_id']);
     }
@@ -388,6 +427,12 @@ class Product extends Base
     public function getOrderAwardCode()
     {
         return $this->hasOne(OrderAwardCode::className(), ['id' => 'order_award_id']);
+    }
+
+    /** 获取获奖幸运号 */
+    public function getOrderAward()
+    {
+        return $this->hasMany(OrderAwardCode::className(), ['product_id' => 'id']);
     }
 
     /** 取最大的摇奖代码 */

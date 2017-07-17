@@ -851,6 +851,30 @@
                 }
             }
         },
+        "/products/participate-record": {
+            "get": {
+                "tags": [
+                    "\u4ea7\u54c1"
+                ],
+                "summary": "\u7528\u6237\u53c2\u4e0e\u8bb0\u5f55",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u4ea7\u54c1Id",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\n     *         user_img = \u7528\u6237\u5934\u50cf\n     *         user_name = \u7528\u6237\u59d3\u540d\n     *         address = \u7528\u6237\u5730\u5740\n     *         ip = \u7528\u6237ip\n     *         times = \u7528\u6237\u53c2\u4e0e\u6b21\u6570\n     *         date = \u53c2\u4e0e\u7684\u65e5\u671f\n     *     "
+                    }
+                }
+            }
+        },
         "/user-address/area-info": {
             "post": {
                 "tags": [

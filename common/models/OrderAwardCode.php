@@ -52,7 +52,20 @@ class OrderAwardCode extends Base
         return $this->hasOne(User::className(), ['id' => 'buyer_id']);
     }
 
-    /** 获取参加的人数 */
+    /** 获取订单信息 */
+    public function getOrder()
+    {
+        return $this->hasOne(Order::className(), ['id' => 'order_id']);
+    }
+
+    /** 获取单个用户参与的次数 */
+    public function getJoinTimes($userId)
+    {
+        return self::find()->where(['buyer_id' => $userId])->count();
+    }
+
+
+    /** 获取所有参加的人数 */
     public static function getJoinCount($id)
     {
         return self::find()->where(['product_id' => $id])->count();

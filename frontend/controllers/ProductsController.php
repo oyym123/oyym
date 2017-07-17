@@ -5,10 +5,12 @@ use common\models\Base;
 use common\models\Collection;
 use common\models\Image;
 use common\models\Like;
+use common\models\OrderProduct;
 use common\models\Product;
 use common\models\ProductType;
 use common\models\Video;
 use frontend\components\WebController;
+use SebastianBergmann\Diff\LCS\TimeEfficientImplementation;
 use Yii;
 use yii\base\Exception;
 use common\helpers\Helper;
@@ -106,12 +108,7 @@ class ProductsController extends WebController
         }
         $data = [];
         list($products, $data['count']) = $product->apiSearch($params, "$skip, $psize");
-        $params['type'] = Collection::TYPE_PRODUCT;
-        $params['status'] = Collection::COLLECT;
         foreach ($products as $product) {
-            $params['type_id'] = $product->id;
-            $collectionFlag = Collection::collectionFlag($params);
-            $likeFlag = Like::likeFlag($params);
             $data['products_list'][] = [
                 'id' => $product->id,
                 'images' => $product->getImages(),
@@ -125,8 +122,8 @@ class ProductsController extends WebController
                 'a_price' => $product->a_price ?: 0.00,
                 // 布局类型
                 'zongjia' => $product->total,
-                'collection_flag' => $collectionFlag,
-                'like_flag' => $likeFlag,
+                'collection_flag' => $product->getIsCollection(),
+                'like_flag' => $product->getIsLike(),
                 'unit_price' => $product->unit_price,
                 'end_time' => $product->end_time,
                 'share_params' => [
@@ -432,7 +429,7 @@ class ProductsController extends WebController
             'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式(卖家用户的待揭晓页面，显示“我来揭晓”, 买家用户的待揭晓页面，显示“请等待系统揭晓”)
             'order_award_count' => $item->order_award_count ?: 0, // 已参与人次
             'luck_user' => [
-                'user_img' => $item->userInfo ? $item->userInfo->photoUrl($item->created_by) : Yii::$app->params['defaultPhoto'],
+                'user_img' => $item->getLuckUserPhoto(),
                 'luck_number' => $item->orderAwardCode ? $item->orderAwardCode->code : 10000001,
                 'list' => [
                     [
@@ -444,32 +441,77 @@ class ProductsController extends WebController
                         ],
                         [
                             'title' => '购买时间:',
-                            'value' => date('Y-m-d H:i:s', $item->orderProduct ? $item->orderProduct->created_at : 0)
+                            'value' => date('Y-m-d H:i:s', $item->order ? $item->order->created_at : 0)
                         ],
                     ]
                 ],
-                'share_params' => [
-                    'share_title' => '众筹夺宝',
-                    'share_contents' => '夺宝达人!',
-                    'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
-                    'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
-                ],
-                'collection_flag' => $item->getIsCollection(),
-                //'can_buy' => $item->isCanBuy(),
-                'comment_count' => $item->comments,
-                'comment_list' => Comments::getProduct($item->id, 0, 5),
-                'sale_user' => [
-                    'img' => '',
-                    'name' => '',
-                    'zhima' => '芝麻信用:700',
-                    'intro' => Helper::tranTime($item->created_at) . "发布于 " . $item->detail_address . ", 来到众筹夺宝"
-                        . ($item->user ? $item->user->getJoinTime($item->user->created_at) : 0) . "天了,成功卖出"
-                        . ($item->userInfo ? $item->userInfo->sold_products : 0) . "件商品",
-                ],
-                'publish_countdown' => $item->getPublishCountdown(), // 揭晓倒计时以秒为单位
-            ]
+            ],
+            'share_params' => [
+                'share_title' => '众筹夺宝',
+                'share_contents' => '夺宝达人!',
+                'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
+                'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
+            ],
+            'collection_flag' => $item->getIsCollection(),
+            //'can_buy' => $item->isCanBuy(),
+            'comment_count' => $item->comments,
+            'comment_list' => Comments::getProduct($item->id, 0, 5),
+            'sale_user' => [
+                'img' => $item->userInfo ? $item->userInfo->photoUrl($item->created_by) : Yii::$app->params['defaultPhoto'],
+                'name' => $item->user ? $item->user->getName() : '',
+                'zhima' => '芝麻信用:700',
+                'intro' => Helper::tranTime($item->created_at) . "发布于 " . $item->detail_address . ", 来到众筹夺宝"
+                    . ($item->user ? $item->user->getJoinTime($item->user->created_at) : 0) . "天了,成功卖出"
+                    . ($item->userInfo ? $item->userInfo->sold_products : 0) . "件商品",
+            ],
+            'actions' => $item->buttonType(),
+            'publish_countdown' => $item->getPublishCountdown(), // 揭晓倒计时以秒为单位
         ];
         self::showMsg($data);
+    }
+
+    /**
+     * @SWG\Get(path="/products/participate-record",
+     *   tags={"产品"},
+     *   summary="用户参与记录",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(
+     *     name="id",
+     *     in="query",
+     *     default="1",
+     *     description="产品Id",
+     *     required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *         user_img = 用户头像
+     *         user_name = 用户姓名
+     *         address = 用户地址
+     *         ip = 用户ip
+     *         times = 用户参与次数
+     *         date = 参与的日期
+     *     "
+     *   )
+     * )
+     */
+    public function actionParticipateRecord()
+    {
+        $product = $this->findModel(['id' => Yii::$app->request->get('id')]);
+        $data = [];
+        foreach ($product->orderAward as $item) {
+            $ip = $item->order->ip ?: '';
+            $address = Helper::ipToAddress($ip);
+            $data['list'][] = [
+                'user_img' => ($x = $item->buyer->info) ? $x->photoUrl($item->buyer_id) : Yii::$app->params['defaultPhoto'],
+                'user_name' => $item->buyer->getName(),
+                'address' => $address['region'] . $address['city'],
+                'ip' => $ip,
+                'times' => $item->getJoinTimes($item->buyer_id),
+                'date' => date('Y-m-d H:i', $item->created_at)
+            ];
+        }
+        $this->showMsg($data);
     }
 
     /** 取产品实体 */
