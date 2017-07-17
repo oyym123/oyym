@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "product".
@@ -92,6 +93,12 @@ class Product extends Base
             [['contents'], 'string'],
             [['title', 'lat', 'lng'], 'string', 'max' => 255],
         ];
+    }
+
+    /** 取宝贝状态 */
+    public function getStatusText()
+    {
+        return ArrayHelper::getValue(self::$status, $this->status, '');
     }
 
     /** 宝贝详情接口下放布局样式id, 用于控制客户端展示不同的布局  */
@@ -446,26 +453,26 @@ class Product extends Base
         foreach ($items as $key => $item) {
             $r[] = [
                 'layout' => function ($item) {
-                    $r = 1;
+                    $r = '数量模式_未上架';
                     if ($item->model == Product::MODEL_NUMBER) { // 数量模式
                         if ($item->status == Product::STATUS_NOT_SALE) { // 未上架
-                            return 1;
+                            return '数量模式_未上架';
                         } elseif ($item->status == Product::STATUS_IN_PROGRESS) { // 进行中
-                            return 1;
+                            return '数量模式_进行中';
                         } elseif ($item->status == Product::STATUS_WAIT_PUBLISH) { // 待揭晓
-                            return 2;
+                            return '数量模式_待揭晓';
                         } elseif ($item->status == Product::STATUS_PUBLISHED) { // 已揭晓
-                            return 4;
+                            return '数量模式_已揭晓';
                         }
                     } else { // 时间模式
                         if ($item->status == Product::STATUS_NOT_SALE) { // 未上架
-                            return 1;
+                            return '时间模式_未上架';
                         } elseif ($item->status == Product::STATUS_IN_PROGRESS) { // 进行中
-                            return 2;
+                            return '时间模式_进行中';
                         } elseif ($item->status == Product::STATUS_WAIT_PUBLISH) { // 待揭晓
-                            return 3;
+                            return '时间模式_待揭晓';
                         } elseif ($item->status == Product::STATUS_PUBLISHED) { // 已揭晓
-                            return 4;
+                            return '时间模式_已揭晓';
                         }
                     }
 
@@ -474,10 +481,14 @@ class Product extends Base
                 'id' => $item->id,
                 'title' => $item->title,
                 'layout' => $item->sellerProductLayout(),
-                'need_total' => $item->total,
-                'all_total' => $item->total, // 总需要多少人次
-                'residual_total' => max(0, $item->total - $item->order_award_count), // 剩余多少人次
+                'status' => $item->getStatusText(),
+                'total' => $item->total, // 总需要多少人次
                 'order_award_count' => $item->order_award_count, // 已参与人次
+                'residual_total' => max(0, $item->total - $item->order_award_count), // 剩余多少人次
+                'progress' => $item->getPr,
+                'publish_countdown' => '',// 揭晓倒计时
+                'a_price' => '',// 一口价
+                'unit_price' => '',// 单价
                 'url' => $item->sellerProductAction(),
             ];
         }
