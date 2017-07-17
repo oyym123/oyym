@@ -501,7 +501,7 @@ class ProductsController extends WebController
                 'user_img' => ($x = $item->buyer->info) ? $x->photoUrl($item->buyer_id) : Yii::$app->params['defaultPhoto'],
                 'user_name' => $item->buyer->getName(),
                 'address' => $address['region'] . $address['city'],
-                'ip' => $ip,
+                'ip' => substr($ip, 0, strrpos($ip, '.')) . '.***',
                 'times' => $item->getJoinTimes($item->buyer_id),
                 'date' => date('Y-m-d H:i', $item->created_at)
             ];
