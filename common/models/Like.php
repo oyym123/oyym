@@ -86,7 +86,7 @@ class Like extends Base
             ->andWhere(["type" => ArrayHelper::getValue($params, 'type')])
             ->andWhere(["user_id" => Yii::$app->user->id])
             ->andFilterWhere(["status" => ArrayHelper::getValue($params, 'status')]);
-        return $query->one() ? Like::STATUS_ENABLE : Like::STATUS_DISABLE;
+        return $query->one();
     }
 
     /** 点赞  */

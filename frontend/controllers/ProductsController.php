@@ -102,12 +102,7 @@ class ProductsController extends WebController
         }
         $data = [];
         list($products, $data['count']) = $product->apiSearch($params, "$skip, $psize");
-        $params['type'] = Collection::TYPE_PRODUCT;
-        $params['status'] = Collection::COLLECT;
         foreach ($products as $product) {
-            $params['type_id'] = $product->id;
-            $collectionFlag = Collection::collectionFlag($params);
-            $likeFlag = Like::likeFlag($params);
             $data['products_list'][] = [
                 'id' => $product->id,
                 'images' => $product->getImages(),
@@ -121,8 +116,8 @@ class ProductsController extends WebController
                 'a_price' => $product->a_price ?: 0.00,
                 // 布局类型
                 'zongjia' => $product->total,
-                'collection_flag' => $collectionFlag,
-                'like_flag' => $likeFlag,
+                'collection_flag' => $product->getIsCollection(),
+                'like_flag' => $product->getIsLike(),
                 'unit_price' => $product->unit_price,
                 'end_time' => $product->end_time,
                 'share_params' => [
@@ -425,7 +420,7 @@ class ProductsController extends WebController
             'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式(卖家用户的待揭晓页面，显示“我来揭晓”, 买家用户的待揭晓页面，显示“请等待系统揭晓”)
             'order_award_count' => $item->order_award_count ?: 0, // 已参与人次
             'luck_user' => [
-                'user_img' => $item->userInfo ? $item->userInfo->photoUrl($item->created_by) : Yii::$app->params['defaultPhoto'],
+                'user_img' => $item->getLuckUserPhoto(),
                 'luck_number' => $item->orderAwardCode ? $item->orderAwardCode->code : 10000001,
                 'list' => [
                     [
@@ -437,7 +432,7 @@ class ProductsController extends WebController
                         ],
                         [
                             'title' => '购买时间:',
-                            'value' => date('Y-m-d H:i:s', $item->orderProduct ? $item->orderProduct->created_at : 0)
+                            'value' => date('Y-m-d H:i:s', $item->order ? $item->order->created_at : 0)
                         ],
                     ]
                 ],
@@ -452,7 +447,7 @@ class ProductsController extends WebController
                 'comment_count' => $item->comments,
                 'comment_list' => Comments::getProduct($item->id, 0, 5),
                 'sale_user' => [
-                    'img' => '',
+                    'img' => $item->userInfo ? $item->userInfo->photoUrl($item->created_by) : Yii::$app->params['defaultPhoto'],
                     'name' => '',
                     'zhima' => '芝麻信用:700',
                     'intro' => Helper::tranTime($item->created_at) . "发布于 " . $item->detail_address . ", 来到众筹夺宝"

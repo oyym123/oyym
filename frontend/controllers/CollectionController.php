@@ -60,7 +60,7 @@ class CollectionController extends WebController
         $params['type_id'] = Yii::$app->request->get('id');
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $collection->checkType($params['type']);
+           $collection->checkType($params['type']);
             if ($model = $collection->collectionFlag($params)) {
                 $model->status = Base::STATUS_ENABLE;
                 if (!$model->save()) {

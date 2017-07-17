@@ -4,7 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use yii\web\User;
+
 
 /**
  * This is the model class for table "order".

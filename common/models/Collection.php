@@ -91,7 +91,7 @@ class Collection extends Base
             ->andWhere(["type" => ArrayHelper::getValue($params, 'type')])
             ->andWhere(["user_id" => Yii::$app->user->id])
             ->andFilterWhere(["status" => ArrayHelper::getValue($params, 'status')]);
-        return $query->one() ? Collection::COLLECT : Collection::NOT_COLLECT;
+        return $query->one();
     }
 
     /** 收藏  */
