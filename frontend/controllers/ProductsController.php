@@ -5,10 +5,12 @@ use common\models\Base;
 use common\models\Collection;
 use common\models\Image;
 use common\models\Like;
+use common\models\OrderProduct;
 use common\models\Product;
 use common\models\ProductType;
 use common\models\Video;
 use frontend\components\WebController;
+use SebastianBergmann\Diff\LCS\TimeEfficientImplementation;
 use Yii;
 use yii\base\Exception;
 use common\helpers\Helper;
@@ -450,16 +452,61 @@ class ProductsController extends WebController
                 'comment_list' => Comments::getProduct($item->id, 0, 5),
                 'sale_user' => [
                     'img' => $item->userInfo ? $item->userInfo->photoUrl($item->created_by) : Yii::$app->params['defaultPhoto'],
-                    'name' => '',
+                    'name' => $item->user ? $item->user->getName() : '',
                     'zhima' => '芝麻信用:700',
                     'intro' => Helper::tranTime($item->created_at) . "发布于 " . $item->detail_address . ", 来到众筹夺宝"
                         . ($item->user ? $item->user->getJoinTime($item->user->created_at) : 0) . "天了,成功卖出"
                         . ($item->userInfo ? $item->userInfo->sold_products : 0) . "件商品",
                 ],
+                'actions' => $item->buttonType(),
                 'publish_countdown' => $item->getPublishCountdown(), // 揭晓倒计时以秒为单位
             ]
         ];
         self::showMsg($data);
+    }
+
+    /**
+     * @SWG\Get(path="/products/participate-record",
+     *   tags={"产品"},
+     *   summary="用户参与记录",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(
+     *     name="id",
+     *     in="query",
+     *     default="1",
+     *     description="产品Id",
+     *     required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *         user_img = 用户头像
+     *         user_name = 用户姓名
+     *         address = 用户地址
+     *         ip = 用户ip
+     *         times = 用户参与次数
+     *         date = 参与的日期
+     *     "
+     *   )
+     * )
+     */
+    public function actionParticipateRecord()
+    {
+        $product = $this->findModel(['id' => Yii::$app->request->get('id')]);
+        $data = [];
+        foreach ($product->orderAward as $item) {
+            $ip = $item->order->ip ?: '';
+            $address = Helper::ipToAddress($ip);
+            $data[] = [
+                'user_img' => ($x = $item->buyer->info) ? $x->photoUrl($item->buyer_id) : Yii::$app->params['defaultPhoto'],
+                'user_name' => $item->buyer->getName(),
+                'address' => $address['region'] . $address['city'],
+                'ip' => $ip,
+                'times' => $item->getJoinTimes($item->buyer_id),
+                'date' => date('Y-m-d H:i', $item->created_at)
+            ];
+        }
+        $this->showMsg($data);
     }
 
     /** 取产品实体 */

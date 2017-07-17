@@ -112,7 +112,7 @@ class Comments extends Base
             }
             $datas['list'][] = [
                 'id' => $comment->id,
-                'user_photo' => Image::getImages(['psize' => 1, 'type_id' => Yii::$app->user->id, 'type' => Image::TYPE_USER_PHOTO]),
+                'user_photo' => $comment->userInfo->photoUrl($comment->user_id),
                 'comment_count' => $comment->comment_count ?: 0,
                 'comment_line_id' => $comment->comment_line_id,
                 'like_count' => $comment->like_count,

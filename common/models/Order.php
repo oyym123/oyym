@@ -17,6 +17,7 @@ use yii\helpers\ArrayHelper;
  * @property string $pay_amount
  * @property string $product_amount
  * @property string $discount_amount
+ * @property string $ip
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
@@ -75,10 +76,10 @@ class Order extends Base
     public function rules()
     {
         return [
-            [['buyer_id', 'seller_id', 'sn', 'pay_type', 'status', 'created_at', 'updated_at'], 'required'],
+            [['buyer_id', 'seller_id', 'sn', 'pay_type', 'status', 'created_at', 'updated_at', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
-            [['sn'], 'string', 'max' => 100],
+            [['sn', 'ip'], 'string', 'max' => 100],
         ];
     }
 

@@ -241,4 +241,48 @@ class Helper extends BaseArrayHelper
             return $contents;
         }
     }
+
+    /** 通过IP获取归属地，调用阿里的免费接口 */
+    public static function ipToAddress($ip)
+    {
+        $ip = @file_get_contents("http://ip.taobao.com/service/getIpInfo.php?ip=" . $ip);
+        $data = json_decode($ip, true);
+        if ($data['code'] == 0) {
+            return $data['data'];
+        } else {
+            return [
+                'country' => '中国',
+                'country_id' => 'CN',
+                'area' => '',
+                'area_id' => '',
+                'region' => '',
+                'region_id' => '',
+                'city' => '',
+                'city_id' => '',
+                'county' => '',
+                'county_id' => '',
+                'isp' => '',
+                'isp_id' => '',
+                'ip' => $ip
+            ];
+        }
+
+        //传入的ip为39.108.97.89，获取的值
+//        ['code' => 0,
+//            'data' => [
+//                'country' => '中国',
+//                'country_id' => 'CN',
+//                'area' => '华东',
+//                'area_id' => '300000',
+//                'region' => '浙江省',
+//                'region_id' => '330000',
+//                'city' => '杭州市',
+//                'city_id' => '330100',
+//                'county' => '',
+//                'county_id' => '-1',
+//                'isp' => '阿里巴巴',
+//                'isp_id' => '100098',
+//                'ip' => '39.108.97.89']
+//        ];
+    }
 }

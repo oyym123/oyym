@@ -368,6 +368,30 @@ class Product extends Base
         return '';
     }
 
+    /** 参与按钮的样式 */
+    public function buttonType()
+    {
+        if ($this->model == self::MODEL_NUMBER && ($this->a_price > 0)) {
+            return [
+                [
+                    'title' => '立即参与',
+                    'url' => 'join_now',
+                ],
+                [
+                    'title' => '一口价',
+                    'url' => 'a_price',
+                ]
+            ];
+        } else {
+            return [
+                [
+                    'title' => '立即参与',
+                    'url' => 'join_now',
+                ]
+            ];
+        }
+    }
+
     /** 获取参加者人数 */
     public function getJoinCount()
     {
@@ -396,6 +420,12 @@ class Product extends Base
     public function getOrderAwardCode()
     {
         return $this->hasOne(OrderAwardCode::className(), ['id' => 'order_award_id']);
+    }
+
+    /** 获取获奖幸运号 */
+    public function getOrderAward()
+    {
+        return $this->hasMany(OrderAwardCode::className(), ['product_id' => 'id']);
     }
 
     /** 取最大的摇奖代码 */
