@@ -113,7 +113,7 @@ class WebController extends Controller
             echo "{$item}";
         }
 
-        // file_put_contents(Yii::$app->basePath . '/runtime/log.html', date('Y-m-d H:i:s ') . var_export($res, 1) . "\t{$state}\t{$msg}\n\n", FILE_APPEND);
+        // file_put_contents(Yii::$app->basePath . '/runtime/log.html',e('Y-m-d H:i:s ') . var_export($res, 1) . "\t{$state}\t{$msg}\n\n", FILE_APPEND);
 
         exit;
     }

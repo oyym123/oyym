@@ -497,7 +497,7 @@ class ProductsController extends WebController
         foreach ($product->orderAward as $item) {
             $ip = $item->order->ip ?: '';
             $address = Helper::ipToAddress($ip);
-            $data[] = [
+            $data['list'][] = [
                 'user_img' => ($x = $item->buyer->info) ? $x->photoUrl($item->buyer_id) : Yii::$app->params['defaultPhoto'],
                 'user_name' => $item->buyer->getName(),
                 'address' => $address['region'] . $address['city'],
