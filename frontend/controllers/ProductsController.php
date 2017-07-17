@@ -440,27 +440,28 @@ class ProductsController extends WebController
                         ],
                     ]
                 ],
-                'share_params' => [
-                    'share_title' => '众筹夺宝',
-                    'share_contents' => '夺宝达人!',
-                    'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
-                    'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
-                ],
-                'collection_flag' => $item->getIsCollection(),
-                //'can_buy' => $item->isCanBuy(),
-                'comment_count' => $item->comments,
-                'comment_list' => Comments::getProduct($item->id, 0, 5),
-                'sale_user' => [
-                    'img' => $item->userInfo ? $item->userInfo->photoUrl($item->created_by) : Yii::$app->params['defaultPhoto'],
-                    'name' => $item->user ? $item->user->getName() : '',
-                    'zhima' => '芝麻信用:700',
-                    'intro' => Helper::tranTime($item->created_at) . "发布于 " . $item->detail_address . ", 来到众筹夺宝"
-                        . ($item->user ? $item->user->getJoinTime($item->user->created_at) : 0) . "天了,成功卖出"
-                        . ($item->userInfo ? $item->userInfo->sold_products : 0) . "件商品",
-                ],
-                'actions' => $item->buttonType(),
-                'publish_countdown' => $item->getPublishCountdown(), // 揭晓倒计时以秒为单位
-            ]
+            ],
+            'share_params' => [
+                'share_title' => '众筹夺宝',
+                'share_contents' => '夺宝达人!',
+                'share_link' => 'http://' . $_SERVER['HTTP_HOST'] . \yii\helpers\Url::to(['invite/signup', 'invite_id' => $this->userId]),
+                'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
+            ],
+            'collection_flag' => $item->getIsCollection(),
+            //'can_buy' => $item->isCanBuy(),
+            'comment_count' => $item->comments,
+            'comment_list' => Comments::getProduct($item->id, 0, 5),
+            'sale_user' => [
+                'img' => $item->userInfo ? $item->userInfo->photoUrl($item->created_by) : Yii::$app->params['defaultPhoto'],
+                'name' => $item->user ? $item->user->getName() : '',
+                'zhima' => '芝麻信用:700',
+                'intro' => Helper::tranTime($item->created_at) . "发布于 " . $item->detail_address . ", 来到众筹夺宝"
+                    . ($item->user ? $item->user->getJoinTime($item->user->created_at) : 0) . "天了,成功卖出"
+                    . ($item->userInfo ? $item->userInfo->sold_products : 0) . "件商品",
+            ],
+            'actions' => $item->buttonType(),
+            'publish_countdown' => $item->getPublishCountdown(), // 揭晓倒计时以秒为单位
+        ]
         ];
         self::showMsg($data);
     }
@@ -501,7 +502,7 @@ class ProductsController extends WebController
                 'user_img' => ($x = $item->buyer->info) ? $x->photoUrl($item->buyer_id) : Yii::$app->params['defaultPhoto'],
                 'user_name' => $item->buyer->getName(),
                 'address' => $address['region'] . $address['city'],
-                'ip' => substr($ip, 0, strrpos($ip, '.')) . '.***',
+                'ip' => $ip,
                 'times' => $item->getJoinTimes($item->buyer_id),
                 'date' => date('Y-m-d H:i', $item->created_at)
             ];
