@@ -106,6 +106,14 @@
                         "default": "1"
                     },
                     {
+                        "name": "comment_id",
+                        "in": "formData",
+                        "description": "\u8bc4\u8bbaID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
                         "name": "ky-token",
                         "in": "header",
                         "description": "\u7528\u6237ky-token",
@@ -121,34 +129,18 @@
                 }
             }
         },
-        "/comments/get-product": {
+        "/comments/product": {
             "get": {
                 "tags": [
                     "\u8bc4\u8bba"
                 ],
-                "summary": "\u83b7\u53d6\u4ea7\u54c1\u8bc4\u8bba",
+                "summary": "\u83b7\u53d6\u8bc4\u8bba",
                 "description": "Author: OYYM",
                 "parameters": [
                     {
-                        "name": "comment_id",
+                        "name": "id",
                         "in": "query",
                         "description": "\u8bc4\u8bbaID",
-                        "required": true,
-                        "type": "integer",
-                        "default": "1"
-                    },
-                    {
-                        "name": "comment_line_id",
-                        "in": "query",
-                        "description": "\u8bc4\u8bba\u6807\u8bb0ID",
-                        "required": true,
-                        "type": "integer",
-                        "default": "1"
-                    },
-                    {
-                        "name": "product_id",
-                        "in": "query",
-                        "description": "\u4ea7\u54c1ID",
                         "required": true,
                         "type": "integer",
                         "default": "1"

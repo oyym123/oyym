@@ -411,6 +411,12 @@ class Product extends Base
         return $this->hasOne(Order::className(), ['id' => 'order_id']);
     }
 
+    /** 获取该宝贝中产品订单 */
+    public function getOrderProduct()
+    {
+        return $this->hasMany(OrderProduct::className(), ['pid' => 'id']);
+    }
+
     /** 获取用户信息 */
     public function getUser()
     {

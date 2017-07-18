@@ -80,10 +80,12 @@ class Order extends Base
     public function rules()
     {
         return [
-            [['buyer_id', 'seller_id', 'sn', 'pay_type', 'status', 'created_at', 'updated_at', 'ip'], 'required'],
+
+            [['buyer_id', 'seller_id', 'sn', 'pay_type', 'status', 'created_at', 'updated_at', 'ip', 'user_address'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
             [['sn', 'ip'], 'string', 'max' => 100],
+            [['user_address'], 'string', 'max' => 255],
         ];
     }
 

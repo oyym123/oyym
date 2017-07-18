@@ -59,7 +59,19 @@ class OrderProduct extends Base
     {
         return $this->hasOne(User::className(), ['id' => 'buyer_id']);
     }
-    
+
+    /** 获取订单信息 */
+    public function getOrder()
+    {
+        return $this->hasOne(Order::className(), ['id' => 'order_id']);
+    }
+
+    /** 获取参与次数订单信息 */
+    public function getOrderAward()
+    {
+        return $this->hasMany(OrderAwardCode::className(), ['order_product_id' => 'id']);
+    }
+
     /**
      * @inheritdoc
      */

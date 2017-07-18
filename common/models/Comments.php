@@ -128,6 +128,38 @@ class Comments extends Base
     }
 
 
+    /** 获取话题评论 */
+    public static function product($id)
+    {
+
+        $datas['list'] = [];
+        $comment = Comments::findOne(['id' => $id, 'status' => self::STATUS_ENABLE]);
+        if (!$comment) {
+            return ['该评论不存在', -1];
+        }
+        $sonProduct = Comments::find()->where(['id' => explode(',', $comment->child_ids), 'status' => Comments::STATUS_ENABLE])->all();
+        $data = [];
+        foreach ($sonProduct as $item) {
+            $data[] = [
+                'id' => $item->id,
+                'user_photo' => $comment->userInfo?$comment->userInfo->photoUrl($comment->user_id):'',
+                'user_name' => $item->user ? $item->user->getName() : '',
+                'contents' => $item->contents
+            ];
+        }
+        $datas['list'][] = [
+            'id' => $comment->id,
+            'user_photo' => $comment->userInfo?$comment->userInfo->photoUrl($comment->user_id):'',
+            'comment_count' => $comment->comment_count ?: 0,
+            'like_count' => $comment->like_count,
+            'user_name' => $comment->user ? $comment->user->getName() : '',
+            'contents' => $comment->contents,
+            'reply' => $data,
+            'date' => Helper::tranTime($comment->created_at),
+        ];
+        return [$datas, 1];
+    }
+
     /**
      * @inheritdoc
      */
