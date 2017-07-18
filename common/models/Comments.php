@@ -105,44 +105,44 @@ class Comments extends Base
         return $query->all();
     }
 
-//    /** 获取话题评论 */
-//    public static function getProduct($product_id, $skip, $psize)
-//    {
-//        $model = new Comments();
-//        $product = self::findProductModel($product_id);
-//        $params['skip'] = $skip;
-//        $params['psize'] = $psize;
-//        $params['product_id'] = $product_id;
-//        $params['type'] = Comments::TYPE_PRODUCT;
-//        $comments = $model->commentProductSearch($params);
-//        $datas['list'] = [];
-//        foreach ($comments as $comment) {
-//            $sonProduct = Comments::find()->where(['id' => explode(',', $comment->child_ids), 'status' => Comments::STATUS_ENABLE])->all();
-//            $data = [];
-//            foreach ($sonProduct as $item) {
-//                $data[] = [
-//                    'id' => $item->id,
-//                    'user_name' => $item->user ? $item->user->getName() : '',
-//                    'contents' => $item->contents
-//                ];
-//            }
-//            $datas['list'][] = [
-//                'id' => $comment->id,
-//                'user_photo' => $comment->userInfo->photoUrl($comment->user_id),
-//                'comment_count' => $comment->comment_count ?: 0,
-//                'comment_line_id' => $comment->comment_line_id,
-//                'like_count' => $comment->like_count ?: 0,
-//                'like_flag' => $comment->getIsLike(),
-//                'user_name' => $comment->user ? $comment->user->getName() : '',
-//                'contents' => $comment->contents,
-//                'reply' => $data,
-//                'date' => Helper::tranTime($comment->created_at),
-//            ];
-//        }
-//        $datas['user_count'] = $product->comments;
-//
-//        return $datas;
-//    }
+    /** 获取话题评论 */
+    public static function getProduct($product_id, $skip, $psize)
+    {
+        $model = new Comments();
+        $product = self::findProductModel($product_id);
+        $params['skip'] = $skip;
+        $params['psize'] = $psize;
+        $params['product_id'] = $product_id;
+        $params['type'] = Comments::TYPE_PRODUCT;
+        $comments = $model->commentProductSearch($params);
+        $datas['list'] = [];
+        foreach ($comments as $comment) {
+            $sonProduct = Comments::find()->where(['id' => explode(',', $comment->child_ids), 'status' => Comments::STATUS_ENABLE])->all();
+            $data = [];
+            foreach ($sonProduct as $item) {
+                $data[] = [
+                    'id' => $item->id,
+                    'user_name' => $item->user ? $item->user->getName() : '',
+                    'contents' => $item->contents
+                ];
+            }
+            $datas['list'][] = [
+                'id' => $comment->id,
+                'user_photo' => $comment->userInfo->photoUrl($comment->user_id),
+                'comment_count' => $comment->comment_count ?: 0,
+                'comment_line_id' => $comment->comment_line_id,
+                'like_count' => $comment->like_count ?: 0,
+                'like_flag' => $comment->getIsLike(),
+                'user_name' => $comment->user ? $comment->user->getName() : '',
+                'contents' => $comment->contents,
+                'reply' => $data,
+                'date' => Helper::tranTime($comment->created_at),
+            ];
+        }
+        $datas['user_count'] = $product->comments;
+
+        return $datas;
+    }
 
 
     /** 获取话题评论 */
