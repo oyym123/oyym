@@ -66,7 +66,7 @@ class Comments extends Base
     /** 获取是否点赞标志 */
     public function getIsLike()
     {
-        $query = Like::likeFlag(['type' => Like::TYPE_PRODUCT, 'type_id' => $this->id, 'status' => self::STATUS_ENABLE]);
+        $query = Like::likeFlag(['type' => Like::TYPE_COMMENT, 'type_id' => $this->id, 'status' => self::STATUS_ENABLE]);
         return $query ? self::STATUS_ENABLE : self::STATUS_DISABLE;
     }
 
