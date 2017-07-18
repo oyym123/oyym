@@ -33,6 +33,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $end_time
  * @property integer $sort
  * @property integer $status
+ * @property integer $progress
  * @property integer $created_at
  * @property integer $updated_at
  */
@@ -134,7 +135,7 @@ class Product extends Base
     }
 
     /** 获取众筹进度 */
-    public function getProgress($participants)
+    public function getProgress()
     {
         if ($this->model == Product::MODEL_TIME) {
             $result = round((time() - intval($this->start_time)) / (intval($this->end_time) - intval($this->start_time)) * 100, 0);
@@ -143,15 +144,6 @@ class Product extends Base
             }
             return 100;
         }
-
-        if ($this->total) {
-            $result = round($participants / $this->total * 100, 0);
-            if ($result <= 100) {   //限制进度最大值为100%
-                return $result;
-            }
-            return 100;
-        }
-        return 0;
     }
 
     /** 获取揭晓倒计时 */

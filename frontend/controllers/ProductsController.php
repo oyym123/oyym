@@ -114,7 +114,7 @@ class ProductsController extends WebController
                 'images' => $product->getImages(),
                 'title' => $product->title,
                 'contents' => $product->contents,
-                'progress' => $product->getProgress(100), // 众筹进度,里面数字是参与人数
+                'progress' => $product->progress ?: 0, // 众筹进度,里面数字是参与人数
                 'total' => $product->total, // 总需人次
                 'comments' => $product->comments,
                 'like' => $product->likes,
@@ -293,7 +293,7 @@ class ProductsController extends WebController
         $videos = json_decode($data['videos'], true);
         $address = json_decode($data['address'], true);
         try {
-            if ($data['unit_price'] > $data['a_price'] && !empty($data['a_price'])) {
+            if ($data['unit_price'] > $data['a_price'] || $data['a_price']) {
                 throw new Exception('单价不能大于一口价');
             }
             if (count($images) > 6) {
@@ -429,7 +429,7 @@ class ProductsController extends WebController
             'videos' => $item->getVideos(),
             'title' => $item->title,
             'contents' => $item->contents,
-            'progress' => $item->getProgress($participants), // 众筹进度
+            'progress' => $item->progress ?: 0, // 众筹进度
             'like' => $item->likes, // 喜欢
             'model_type' => $item->model,
             'collection' => $item->collections, // 收藏

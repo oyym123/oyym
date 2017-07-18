@@ -43,4 +43,24 @@ class ProductController extends Controller
     {
 
     }
+
+    /** 测试 */
+    public function actionCrontab()
+    {
+        date_default_timezone_set('PRC');
+        echo date('Y-m-d H:i:s') . "\r\n";
+    }
+
+    /** 定时更新时间模式下产品进度值 */
+    public function actionProgress()
+    {
+        $products = Product::findAll(['model' => Product::MODEL_TIME, 'status' => Product::STATUS_IN_PROGRESS]);
+        foreach ($products as $product) {
+            $product->progress = $product->getProgress();
+            if (!$product->save()) {
+                echo ($product->id) . '保存出错!-------' . date('Y-m-d H:i:s') . "\r\n";
+            }
+        }
+        echo '产品进度更新成功!-------' . date('Y-m-d H:i:s') . "\r\n";
+    }
 }
