@@ -231,9 +231,9 @@ class Product extends Base
         $sql = "select * from `product` where `status` IN (20, 30)" . self::searchType($key);
         $sql9 = "select p.*,count(DISTINCT p.id) as counts from product as p ,order_award_code as o where p.id = o.product_id and p.id > 0 ORDER BY counts desc";
         $sql3 = "select p.*,if(p.model=1,(count(o.id)/p.total),(now()-p.start_time)/(p.end_time-p.start_time)) as result from product as p ,order_award_code as o where p.id = o.product_id ORDER BY  `result` desc";
-        $query = Product::findBySql($sql9);
+        $query = Product::findBySql($sql);
         return [
-            Product::findBySql($sql9)->all(),
+            Product::findBySql($sql)->all(),
             $query->count(),
         ];
     }
