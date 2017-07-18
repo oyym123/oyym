@@ -298,8 +298,8 @@ class ProductsController extends WebController
             $product->total = $data['total'];
             $product->unit_price = $data['unit_price'];
             $product->a_price = $data['a_price'] ?: '';
-            $product->start_time = $data['start_time'] ?: '';;
-            $product->end_time = $data['end_time'] ?: '';;
+            $product->start_time = $data['start_time'] ?: '';
+            $product->end_time = $data['end_time'] ?: '';
             $product->type_id = $data['type_id'];
 
             if (!$product->save()) {
