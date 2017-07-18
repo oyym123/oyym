@@ -657,5 +657,72 @@ class Product extends Base
             throw new Exception('宝贝不存在!');
         }
     }
+
+    /** 是否允许开奖 */
+    public function canOpenLottery()
+    {
+        if (in_array($this->status, [Product::STATUS_WAIT_PUBLISH])
+            && Yii::$app->user->identity
+            && $this->created_by == Yii::$app->user->identity->id
+        ) {
+            // 待揭晓状态 且 是卖家
+            return 1;
+        }
+        return 0;
+    }
+
+    /** 开奖 */
+    public function openLottery()
+    {
+        if (!$this->canOpenLottery()) {
+            return [1, '不允许开奖'];
+        }
+
+        $query = OrderAwardCode::find()->where(['product_id' => $this->id, 'deleted_at' => 0]);
+
+        $a = $query->sum('created_at');
+        $b = mt_rand(10000, 99999);
+
+        $luckCode = ($a + $b) % $query->count() + 10000001;
+
+        $awardCode = $query->andWhere(['code' => $luckCode])->one();
+
+        if (!$awardCode) {
+            return [1, '开奖失败'];
+        }
+
+        // 修改宝贝状态
+        $this->order_award_id = $awardCode->id;
+        $this->order_id = $awardCode->order_id;
+        $this->award_published_at = time();
+        $this->random_code = $b;
+        $this->status = Product::STATUS_PUBLISHED;
+
+        try {
+            $transaction = Yii::$app->db->beginTransaction();
+
+            if (!$this->save()) {
+                throw new Exception('更新宝贝开奖结果失败');
+                Yii::error($this->getErrorys(), 'product');
+            }
+
+            if (!$this->order) {
+                throw new Exception('订单不存在');
+                Yii::error($this->getErrorys(), 'order');
+            } else {
+                $this->order->status = Order::STATUS_WAIT_SHIP; // 等待发货
+                if (!$this->order->save()) {
+                    throw new Exception('更新订单失败');
+                    Yii::error($this->getErrorys(), 'order');
+                }
+            }
+
+            $transaction->commit();
+            return [0, '您成功抽中一名中奖用户'];
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            return [1, $e->getMessage()];
+        }
+    }
 }
 
