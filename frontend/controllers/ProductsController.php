@@ -499,14 +499,15 @@ class ProductsController extends WebController
     {
         $product = $this->findModel(['id' => Yii::$app->request->get('id')]);
         $data = [];
-        foreach ($product->orderAward as $item) {
+        foreach ($product->orderProduct as $item) {
             $ip = $item->order->ip ?: '';
             $data['list'][] = [
+                'id' => $item->id,
                 'user_img' => ($x = $item->buyer->info) ? $x->photoUrl($item->buyer_id) : Yii::$app->params['defaultPhoto'],
                 'user_name' => $item->buyer->getName(),
                 'address' => $item->order->user_address,
                 'ip' => substr($ip, 0, strrpos($ip, '.')) . '.***',
-                'times' => $item->getJoinTimes($item->buyer_id),
+                'times' => count($item->orderAward),
                 'date' => date('Y-m-d H:i', $item->created_at)
             ];
         }
