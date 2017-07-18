@@ -524,4 +524,30 @@ class ProductsController extends WebController
         }
     }
 
+    /**
+     * Name: actionLottery
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-18
+     * @SWG\Get(path="/products/lottery",
+     *   tags={"产品"},
+     *   summary="卖家我来开奖接口",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="id", in="query", required=true, type="integer", default="1",
+     *     description="宝贝id"
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          code=0
+     *          msg=您成功抽中一名中奖用户; 当code=-1时,返回的是错误提示,例如:不能重复开奖, 开奖成功后需刷新宝贝详情"
+     *   )
+     * )
+     */
+    public function actionLottery()
+    {
+        $msg = '您成功抽中一名中奖用户';
+
+        self::showMsg($msg);
+    }
+
 }

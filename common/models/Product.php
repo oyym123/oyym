@@ -405,7 +405,7 @@ class Product extends Base
         return OrderAwardCode::getJoinCount($this->id);
     }
 
-    /** 获取该宝贝中订单 */
+    /** 获取该宝贝中奖订单 */
     public function getOrder()
     {
         return $this->hasOne(Order::className(), ['id' => 'order_id']);
@@ -461,42 +461,67 @@ class Product extends Base
         return $maxAwardCode ? $maxAwardCode->code : 10000001;
     }
 
-    const STATUS_WAIT_PAY = 10; // 待付款
-//    const STATUS_WAIT_PAY_SUCCESS = 20; // 已付款
-    const STATUS_WAIT_SHIPPING = 30; // 待发货
-    const STATUS_CONFIRM_RECEIVING = 40; // 待签收
-    const STATUS_WAIT_COMMENT = 50; // 待评价
-    const STATUS_COMPLETE = 90; // 已完成
-
-    /** 卖家-我发布的产品列表 样式布局 */
+    /** 卖家-我发布的/卖出的宝贝列表 样式布局 */
     public function sellerProductLayout()
     {
-        $r = '正在进行';
+        $r = '买家_正在进行';
         if ($this->status == Product::STATUS_NOT_SALE) {
-            $r = '未上架';
+            $r = '买家_未上架';
         } elseif ($this->status == Product::STATUS_IN_PROGRESS) {
-            $r = '正在进行';
+            $r = '买家_正在进行';
         } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
-            $r = '待揭晓';
+            $r = '买家_待揭晓';
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
             // 已揭晓
-            if ($awardOrder = $this->awardOrder()) {
-                if ($awardOrder->status == Order::STATUS_WAIT_SHIPPING) {
-                    $r = '待发货';
-                } elseif ($awardOrder->status == Order::STATUS_CONFIRM_RECEIVING) {
-                    $r = '待签收';
-                } elseif ($awardOrder->status == Order::STATUS_WAIT_COMMENT) {
-                    $r = '待评价';
-                } elseif ($awardOrder->status == Order::STATUS_COMPLETE) {
-                    $r = '已完成';
+            if ($luckOrder = $this->order) {
+                if ($luckOrder->status == Order::STATUS_WAIT_SHIPPING) {
+                    $r = '卖家_待发货';
+                } elseif ($luckOrder->status == Order::STATUS_SHIPPED) {
+                    $r = '卖家_已发货';
+                } elseif ($luckOrder->status == Order::STATUS_CONFIRM_RECEIVING) {
+                    // 已签收 如果双方评价, 则状态为 已完成
+                    if (in_array($luckOrder->evaluation_status, [0, 1])) {
+                        $r = '卖家_待评价';
+                    }
+                } elseif ($luckOrder->status == Order::STATUS_COMPLETE) {
+                    // 双方都评价后进入该状态
+                    $r = '卖家_已完成';
                 }
             }
-        } elseif ($this->status == Product::STATUS_CANCELED) {
-            // 已取消
-            $r = '正在进行';
-        } elseif ($this->status == Product::STATUS_NOT_SALE) {
-            // 未上架
         }
+
+        return $r;
+    }
+
+    /** 买家-我参与的/买到的宝贝列表 样式布局 */
+    public function buyerProductLayout()
+    {
+        $r = '买家_正在进行';
+        if ($this->status == Product::STATUS_IN_PROGRESS) {
+            $r = '买家_正在进行';
+        } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
+            $r = '买家_待揭晓';
+        } elseif ($this->status == Product::STATUS_PUBLISHED) {
+            // 已揭晓
+            if ($this->order && $this->order->buyer_id == Yii::$app->user->identity->id) {
+                if ($this->order->status == Order::STATUS_WAIT_SHIPPING) {
+                    $r = '买家_待发货';
+                } elseif ($this->order->status == Order::STATUS_SHIPPED) {
+                    $r = '买家_已发货';
+                } elseif ($this->order->status == Order::STATUS_CONFIRM_RECEIVING) {
+                    // 已签收
+                    if (in_array($this->order->evaluation_status, [0, 1])) {
+                        $r = '卖家_待评价';
+                    }
+                } elseif ($this->order->status == Order::STATUS_COMPLETE) {
+                    // 双方都评价后进入该状态
+                    $r = '卖家_已完成';
+                }
+            } else {
+                $r = '买家_已揭晓'; // 未中奖用户
+            }
+        }
+
         return $r;
     }
 
@@ -550,6 +575,7 @@ class Product extends Base
                 'a_price' => '',// 一口价
                 'unit_price' => '',// 单价
                 'url' => $item->sellerProductAction(),
+                'actions' => $item->sellerProductActions(),
             ];
         }
 

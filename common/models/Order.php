@@ -38,7 +38,7 @@ class Order extends Base
     const STATUS_WAIT_SHIP = 20; // 待发货
     const STATUS_SHIPPED = 25; // 已发货
 //    const STATUS_CONFIRM_RECEIVING = 40; // 待签收
-//    const STATUS_CONFIRM_RECEIVING = 50; // 已签收
+    const STATUS_CONFIRM_RECEIVING = 50; // 已签收
     const STATUS_RETURN_APPLY = 60; // 退款申请 (发货后, 买家不想要了)
     const STATUS_RETURN_AGREE = 61; // 卖家同意退款申请 (发货后, 买家不想要了)
     const STATUS_WAIT_REFUND = 65; // 待退款 (揭晓后, 给没中奖的客户退款,卖家同意退款)
@@ -48,6 +48,10 @@ class Order extends Base
     const STATUS_BUYER_COMMENTED = 72; // 买家已评价
 //    const STATUS_ALL_COMMENTED = 73; // 买卖双方已评价
     const STATUS_COMPLETE = 100; // 已完成 买卖双方已评价后状态变为已完成
+
+    const EVALUATION_STATUS_1 = 1; // 卖家已评价
+    const EVALUATION_STATUS_2 = 2; // 买家已评价
+    const EVALUATION_STATUS_3 = 3; // 双方已评价
 
     public static function orderStatus()
     {
@@ -76,8 +80,9 @@ class Order extends Base
     public function rules()
     {
         return [
+
             [['buyer_id', 'seller_id', 'sn', 'pay_type', 'status', 'created_at', 'updated_at', 'ip', 'user_address'], 'required'],
-            [['buyer_id', 'seller_id', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
             [['sn', 'ip'], 'string', 'max' => 100],
             [['user_address'], 'string', 'max' => 255],
@@ -101,6 +106,7 @@ class Order extends Base
             'status' => '状态',
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
+            'evaluation_status' => '评价状态,卖家已评价=1,买家已评价=2,双方已评价=3',
         ];
     }
 

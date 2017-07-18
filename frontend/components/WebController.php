@@ -79,18 +79,18 @@ class WebController extends Controller
      * @param  int $msg 是否直接输出,1为返回值
      * @return array
      **/
-    public function showMsg($res, $state = 0, $msg = '')
+    public function showMsg($res, $code = 0, $msg = '')
     {
-        //header("Content-type: application/json; charset=utf-8");
+        header("Content-type: application/json; charset=utf-8");
 
         empty($res) && $res = '';
         // 构造数据
-        $item = array('errcode' => 0, 'errmsg' => $msg, 'version' => 1, 'state' => (int)$state, 'res' => ['list' => null]);
-        if (is_array($res) && !empty($res)) {
+        $item = array('code' => $code, 'msg' => $msg, 'version' => 1, 'res' => null);
 
+        if (is_array($res) && !empty($res)) {
             $item['res'] = $this->int2String($res); // 强制转换为string类型下放
         } elseif (is_string($res)) {
-            $item['errmsg'] = $res;
+            $item['msg'] = $res;
         }
 
         // 是否需要送出get
@@ -114,8 +114,6 @@ class WebController extends Controller
             // 送出信息
             echo "{$item}";
         }
-
-        // file_put_contents(Yii::$app->basePath . '/runtime/log.html', date('Y-m-d H:i:s ') . var_export($res, 1) . "\t{$state}\t{$msg}\n\n", FILE_APPEND);
 
         exit;
     }
