@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Symfony\Component\Console\Tests\Command\CommandTest;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\base\Exception;
@@ -19,6 +20,7 @@ use yii\base\Exception;
 class Like extends Base
 {
     const TYPE_PRODUCT = 1; //产品类型
+    const TYPE_COMMENT = 2; //评论类型
 
     /**
      * @inheritdoc
@@ -58,6 +60,7 @@ class Like extends Base
     {
         return [
             self::TYPE_PRODUCT => '宝贝商品',
+            self::TYPE_COMMENT => '评论',
         ];
     }
 
@@ -73,8 +76,10 @@ class Like extends Base
     public function saveTypeNumbers($type, $type_id)
     {
         switch ($type) {
-            case Collection::TYPE_PRODUCT:
+            case Like::TYPE_PRODUCT:
                 return Product::like($type_id, self::likeCount($type, $type_id));
+            case Like::TYPE_COMMENT:
+                return Comments::like($type_id, self::likeCount($type, $type_id));
         }
     }
 

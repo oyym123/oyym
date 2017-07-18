@@ -133,7 +133,6 @@ class Product extends Base
         }
     }
 
-
     /** 获取众筹进度 */
     public function getProgress($participants)
     {
@@ -230,12 +229,15 @@ class Product extends Base
     public function apiSearch($key)
     {
         $sql = "select * from `product` where `status` IN (20, 30)" . self::searchType($key);
-        $query = Product::findBySql($sql);
+        $sql9 = "select p.*,count(DISTINCT p.id) as counts from product as p ,order_award_code as o where p.id = o.product_id and p.id > 0 ORDER BY counts desc";
+        $sql3 = "select p.*,if(p.model=1,(count(o.id)/p.total),(now()-p.start_time)/(p.end_time-p.start_time)) as result from product as p ,order_award_code as o where p.id = o.product_id ORDER BY  `result` desc";
+        $query = Product::findBySql($sql9);
         return [
-            Product::findBySql($sql)->all(),
+            Product::findBySql($sql9)->all(),
             $query->count(),
         ];
     }
+
 
     /** 默认升序 */
     public static function searchType($key)
@@ -246,11 +248,11 @@ class Product extends Base
             case 'jindu':
                 return $sql = "sort()";
             case 'danjia':
-                return $sql = "  ORDER BY  'unit_price' asc";
+                return $sql = " ORDER BY  'unit_price' asc";
             case 'zongjia':
                 return $sql = "sort('total asc')";
             case 'yikoujia':
-                return $sql = "andWhere(['>','a_price', 0])->sort('a_price asc')";
+                return $sql = " ORDER BY  'a_price' asc";
             case 'shijian':
                 return $sql = "sort('start_time desc,end_time asc')";
             case 'zuixin':
@@ -355,9 +357,9 @@ class Product extends Base
     {
         if ($this->status == self::STATUS_PUBLISHED) {
             return ($this->order ? $this->order->buyer : '') ?
-                (($x = $this->order->buyer->info) ? $x->photoUrl($this->order->buyer_id) : '') : '佚名';
+                (($x = $this->order->buyer->info) ? $x->photoUrl($this->order->buyer_id) : '') : Yii::$app->params['defaultPhoto'];
         }
-        return '佚名';
+        return Yii::$app->params['defaultPhoto'];
     }
 
     /** 获取中奖方式 */

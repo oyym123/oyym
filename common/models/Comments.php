@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Codeception\Lib\Actor\Shared\Comment;
 use Yii;
 use common\helpers\Helper;
 use yii\base\Exception;
@@ -52,6 +53,22 @@ class Comments extends Base
         ];
     }
 
+    /** 产品点赞数量保存 */
+    public static function like($id, $count)
+    {
+        $model = self::findModel($id);
+        $model->like_count = $count;
+        if (!$model->save()) {
+            throw new Exception('评论点赞失败!');
+        }
+    }
+
+    /** 获取是否点赞标志 */
+    public function getIsLike()
+    {
+        $query = Like::likeFlag(['type' => Like::TYPE_PRODUCT, 'type_id' => $this->id, 'status' => self::STATUS_ENABLE]);
+        return $query ? self::STATUS_ENABLE : self::STATUS_DISABLE;
+    }
 
     /** 获取用户名字 */
     public function getUser()
@@ -64,7 +81,6 @@ class Comments extends Base
     {
         return $this->hasOne(UserInfo::className(), ['user_id' => 'user_id']);
     }
-
 
     /** 判断该用户是否能评论 */
     public function commentFlag($params)
@@ -89,49 +105,49 @@ class Comments extends Base
         return $query->all();
     }
 
-    /** 获取话题评论 */
-    public static function getProduct($product_id, $skip, $psize)
-    {
-        $model = new Comments();
-        $product = self::findProductModel($product_id);
-        $params['skip'] = $skip;
-        $params['psize'] = $psize;
-        $params['product_id'] = $product_id;
-        $params['type'] = Comments::TYPE_PRODUCT;
-        $comments = $model->commentProductSearch($params);
-        $datas['list'] = [];
-        foreach ($comments as $comment) {
-            $sonProduct = Comments::find()->where(['id' => explode(',', $comment->child_ids), 'status' => Comments::STATUS_ENABLE])->all();
-            $data = [];
-            foreach ($sonProduct as $item) {
-                $data[] = [
-                    'id' => $item->id,
-                    'user_name' => $item->user ? $item->user->getName() : '',
-                    'contents' => $item->contents
-                ];
-            }
-            $datas['list'][] = [
-                'id' => $comment->id,
-                'user_photo' => $comment->userInfo->photoUrl($comment->user_id),
-                'comment_count' => $comment->comment_count ?: 0,
-                'comment_line_id' => $comment->comment_line_id,
-                'like_count' => $comment->like_count,
-                'user_name' => $comment->user ? $comment->user->getName() : '',
-                'contents' => $comment->contents,
-                'reply' => $data,
-                'date' => Helper::tranTime($comment->created_at),
-            ];
-        }
-        $datas['user_count'] = $product->comments;
-
-        return $datas;
-    }
+//    /** 获取话题评论 */
+//    public static function getProduct($product_id, $skip, $psize)
+//    {
+//        $model = new Comments();
+//        $product = self::findProductModel($product_id);
+//        $params['skip'] = $skip;
+//        $params['psize'] = $psize;
+//        $params['product_id'] = $product_id;
+//        $params['type'] = Comments::TYPE_PRODUCT;
+//        $comments = $model->commentProductSearch($params);
+//        $datas['list'] = [];
+//        foreach ($comments as $comment) {
+//            $sonProduct = Comments::find()->where(['id' => explode(',', $comment->child_ids), 'status' => Comments::STATUS_ENABLE])->all();
+//            $data = [];
+//            foreach ($sonProduct as $item) {
+//                $data[] = [
+//                    'id' => $item->id,
+//                    'user_name' => $item->user ? $item->user->getName() : '',
+//                    'contents' => $item->contents
+//                ];
+//            }
+//            $datas['list'][] = [
+//                'id' => $comment->id,
+//                'user_photo' => $comment->userInfo->photoUrl($comment->user_id),
+//                'comment_count' => $comment->comment_count ?: 0,
+//                'comment_line_id' => $comment->comment_line_id,
+//                'like_count' => $comment->like_count ?: 0,
+//                'like_flag' => $comment->getIsLike(),
+//                'user_name' => $comment->user ? $comment->user->getName() : '',
+//                'contents' => $comment->contents,
+//                'reply' => $data,
+//                'date' => Helper::tranTime($comment->created_at),
+//            ];
+//        }
+//        $datas['user_count'] = $product->comments;
+//
+//        return $datas;
+//    }
 
 
     /** 获取话题评论 */
     public static function product($id)
     {
-
         $datas['list'] = [];
         $comment = Comments::findOne(['id' => $id, 'status' => self::STATUS_ENABLE]);
         if (!$comment) {
@@ -142,16 +158,17 @@ class Comments extends Base
         foreach ($sonProduct as $item) {
             $data[] = [
                 'id' => $item->id,
-                'user_photo' => $comment->userInfo?$comment->userInfo->photoUrl($comment->user_id):'',
+                'user_photo' => $comment->userInfo ? $comment->userInfo->photoUrl($comment->user_id) : '',
                 'user_name' => $item->user ? $item->user->getName() : '',
                 'contents' => $item->contents
             ];
         }
         $datas['list'][] = [
             'id' => $comment->id,
-            'user_photo' => $comment->userInfo?$comment->userInfo->photoUrl($comment->user_id):'',
+            'user_photo' => $comment->userInfo ? $comment->userInfo->photoUrl($comment->user_id) : '',
             'comment_count' => $comment->comment_count ?: 0,
-            'like_count' => $comment->like_count,
+            'like_count' => $comment->like_count ?: 0,
+            'like_flag' => $comment->getIsLike(),
             'user_name' => $comment->user ? $comment->user->getName() : '',
             'contents' => $comment->contents,
             'reply' => $data,
@@ -193,4 +210,12 @@ class Comments extends Base
         }
     }
 
+    public static function findModel($id)
+    {
+        if (($model = Comments::findOne($id))) {
+            return $model;
+        } else {
+            throw new Exception('评论不存在!');
+        }
+    }
 }
