@@ -84,6 +84,10 @@ class ProductsController extends WebController
      *     name="offset", in="query", required=false, default="0", type="string",
      *     description="分页用的数据游标"
      *   ),
+     *   @SWG\Parameter(
+     *     name="user_id", in="query", required=false, default="0", type="string",
+     *     description="取某个卖家的数据"
+     *   ),
      *  @SWG\Parameter(
      *     name="ky-token", in="header", required=false, type="integer", default="1",
      *    ),
@@ -111,7 +115,7 @@ class ProductsController extends WebController
                 'title' => $product->title,
                 'contents' => $product->contents,
                 'progress' => $product->getProgress(100), // 众筹进度,里面数字是参与人数
-                'all_total' => $product->total, // 众筹进度,里面数字是参与人数
+                'total' => $product->total, // 总需人次
                 'comments' => $product->comments,
                 'like' => $product->likes,
                 'layout_type' => $layoutType ? 1 : $product->listLayoutType(),//单价排序,布局默认为1
@@ -143,7 +147,7 @@ class ProductsController extends WebController
      *   summary="宝贝列表",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
-     *     description="宝贝状态,传的值有: 全部=0 || 进行中=20 || 待揭晓=30 || 已揭晓=40, 这儿没有 待发货,代签收"
+     *     description="宝贝状态,传的值有: 全部=0 || 未上架=10 || 进行中=20 || 待揭晓=30 || 已揭晓=40, 这儿没有 待发货,代签收"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
      *     description="数据游标"
@@ -152,16 +156,17 @@ class ProductsController extends WebController
      *       response=200,description="
      *          product_count=宝贝总数
      *          product_list=宝贝列表
-     *              layout=布局类型[进行中]
+     *              layout=布局类型[数量模式_未上架 || 数量模式_进行中 || 数量模式_待揭晓 || 数量模式_已揭晓 || 时间模式_未上架 || 时间模式_进行中 || 时间模式_待揭晓 || 时间模式_已揭晓]
      *              id=宝贝id
      *              title=标题
      *              img=宝贝头图
-     *              all_total=总需人次
-     *              residual_total=剩余
+     *              total=总需人次
+     *              residual_total=剩余人次
      *              residual_time=结束时间
      *              progress=进度
      *              publish_countdown=揭晓倒计时
      *              a_price=一口价
+     *              unit_price=单价
      *              status=状态 [下架 || 进行中 || 待揭晓 || 已揭晓]
      *              order_award_count=已参与人次"
      *   )
@@ -356,7 +361,7 @@ class ProductsController extends WebController
      *          layout_type=布局类型
      *          unit_price=宝贝单价
      *          a_price=宝贝一口价
-     *          need_total=需要参与人次
+     *          total=需要参与人次
      *          order_award_count=已参与人次
      *          remaining=剩余人数,在数量模式时使用
      *          start_time=宝贝开始时间
@@ -417,7 +422,7 @@ class ProductsController extends WebController
             'unit_price' => $item->unit_price,
             'freight' => $item->freight,
             'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
-            'need_total' => $item->total, // 需要参与人次
+            'total' => $item->total, // 需要参与人次
             'remaining' => $item->total - $participants, // 剩余人次
             'start_time' => date('Y-m-d H:i', $item->start_time), // 开始时间
             'end_time' => date('Y-m-d H:i', $item->end_time), // 结束时间
