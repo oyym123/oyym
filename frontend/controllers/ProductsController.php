@@ -293,7 +293,7 @@ class ProductsController extends WebController
         $videos = json_decode($data['videos'], true);
         $address = json_decode($data['address'], true);
         try {
-            if ($data['unit_price'] > $data['a_price'] || empty($data['a_price'])) {
+            if ($data['unit_price'] > $data['a_price'] && !empty($data['a_price'])) {
                 throw new Exception('单价不能大于一口价');
             }
             if (count($images) > 6) {
