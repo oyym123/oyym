@@ -86,7 +86,7 @@ class Product extends Base
     {
         return [
             [['type_id', 'title', 'created_at', 'updated_at', 'unit_price', 'created_by'], 'required'],
-            [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at'], 'default', 'value' => 0],
+            [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at', 'progress'], 'default', 'value' => 0],
             [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at', 'total'], 'default', 'value' => 0],
             [['type_id', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total', 'random_code'], 'integer'],
             [['price', 'original_price', 'freight', 'unit_price', 'a_price'], 'number'],
@@ -287,6 +287,7 @@ class Product extends Base
             'order_award_id' => '中奖id',
             'order_id' => '中奖订单id',
             'award_published_at' => '中奖揭晓时间',
+            'progress' => '进度',
         ];
     }
 
@@ -476,7 +477,7 @@ class Product extends Base
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
             // 已揭晓
             if ($luckOrder = $this->order) {
-                if ($luckOrder->status == Order::STATUS_WAIT_SHIPPING) {
+                if ($luckOrder->status == Order::STATUS_WAIT_SHIP) {
                     $r = '卖家_待发货';
                 } elseif ($luckOrder->status == Order::STATUS_SHIPPED) {
                     $r = '卖家_已发货';
@@ -506,7 +507,7 @@ class Product extends Base
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
             // 已揭晓
             if ($this->order && $this->order->buyer_id == Yii::$app->user->identity->id) {
-                if ($this->order->status == Order::STATUS_WAIT_SHIPPING) {
+                if ($this->order->status == Order::STATUS_WAIT_SHIP) {
                     $r = '买家_待发货';
                 } elseif ($this->order->status == Order::STATUS_SHIPPED) {
                     $r = '买家_已发货';
@@ -527,10 +528,67 @@ class Product extends Base
         return $r;
     }
 
-    /** 卖家-我发布的产品列表 链接地址 */
-    public function sellerProductUrl()
+    /** 卖家-我发布的/我卖出的 宝贝列表 控制链接跳转 */
+    public function sellerProductUrlRoute()
     {
+        if (in_array($this->status, [
+            Product::STATUS_NOT_SALE, // 未上架
+            Product::STATUS_IN_PROGRESS, // 进行中
+            Product::STATUS_WAIT_PUBLISH, // 待揭晓
+        ])) {
+            return 'product'; // 跳转到宝贝详情
+        }
 
+        return 'order'; // 跳转到订单详情
+    }
+
+    /** 买家-我参与的/我买到的 宝贝列表 控制链接跳转 */
+    public function buyerProductUrlRoute()
+    {
+        if (in_array($this->status, [
+            Product::STATUS_NOT_SALE, // 未上架
+            Product::STATUS_IN_PROGRESS, // 进行中
+            Product::STATUS_WAIT_PUBLISH, // 待揭晓
+        ])) {
+            return 'product'; // 跳转到宝贝详情
+        } else {
+            // 已揭晓
+            if ($this->order && $this->order->buyer_id == Yii::$app->user->identity->id) {
+                // 中奖用户
+                return 'order';
+            }
+        }
+
+        return 'product'; // 跳转到订单详情
+    }
+
+    /** 卖家-我发布的/我卖出的 宝贝列表 */
+    public function sellerProductActions()
+    {
+        $r = [
+            [
+                'title' => '编辑',
+                'url' => 'edit',
+            ],
+            [
+                'title' => '删除',
+                'url' => 'delete',
+            ],
+        ];
+
+        if ($this->status == Product::STATUS_NOT_SALE) {
+            $r[] = [
+                'title' => '上架',
+                'url' => 'up_sell',
+            ];
+        } else {
+            $r[] = [
+                'title' => '下架',
+                'url' => 'down_sell',
+            ];
+        }
+
+        return $r;
     }
 
     /** 卖家宝贝列表 字段 */
@@ -565,19 +623,20 @@ class Product extends Base
 
                     return $r;
                 },
-                'id' => $item->id,
+                'product_id' => $item->id,
+                'order_id' => $item->order ? $item->order->id : 0,
                 'title' => $item->title,
                 'layout' => $item->sellerProductLayout(),
                 'status' => $item->getStatusText(),
                 'total' => $item->total, // 总需要多少人次
                 'order_award_count' => $item->order_award_count, // 已参与人次
                 'residual_total' => max(0, $item->total - $item->order_award_count), // 剩余多少人次
-                'progress' => $item->getPr,
+                'progress' => $item->progress,
                 'publish_countdown' => '',// 揭晓倒计时
-                'a_price' => '',// 一口价
-                'unit_price' => '',// 单价
-                'url' => $item->sellerProductAction(),
-                'actions' => $item->sellerProductActions(),
+                'a_price' => $item->a_price,// 一口价
+                'unit_price' => $item->unit_price,// 单价
+                'url' => $item->sellerProductUrlRoute(), // 卖家宝贝路由
+                'actions' => $item->sellerProductActions(), // 卖家宝贝动作
             ];
         }
 
@@ -588,7 +647,7 @@ class Product extends Base
     public function myProducts($params)
     {
         $query = Product::find()->where([
-            'created_by' => $params['seller_id'],
+            'created_by' => $params['created_by'],
             'deleted_at' => 0
         ]);
 
@@ -677,7 +736,7 @@ class Product extends Base
     public function openLottery()
     {
         if (!$this->canOpenLottery()) {
-            return [1, '不允许开奖'];
+            return [-1, '不允许开奖'];
         }
 
         $query = OrderAwardCode::find()->where(['product_id' => $this->id, 'deleted_at' => 0]);
@@ -690,7 +749,7 @@ class Product extends Base
         $awardCode = $query->andWhere(['code' => $luckCode])->one();
 
         if (!$awardCode) {
-            return [1, '开奖失败'];
+            return [-1, '开奖失败'];
         }
 
         // 修改宝贝状态
@@ -723,7 +782,7 @@ class Product extends Base
             return [0, '您成功抽中一名中奖用户'];
         } catch (Exception $e) {
             $transaction->rollBack();
-            return [1, $e->getMessage()];
+            return [-1, $e->getMessage()];
         }
     }
 }

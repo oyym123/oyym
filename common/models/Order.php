@@ -58,7 +58,7 @@ class Order extends Base
         return [
             self::STATUS_WAIT_PAY => '待付款',
 //            self::STATUS_WAIT_PAY_SUCCESS => '已付款',
-            self::STATUS_WAIT_SHIPPING => '待发货',
+            self::STATUS_WAIT_SHIP => '待发货',
             self::STATUS_CONFIRM_RECEIVING => '待签收',
             self::STATUS_RETURN_APPLY => '退货申请',
             self::STATUS_WAIT_COMMENT => '待评价',
