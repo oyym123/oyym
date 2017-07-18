@@ -12,6 +12,7 @@ class WebController extends Controller
 {
 
     public $enableCsrfValidation = false;
+    public $offset = 0;
     public $skip = 0;
     public $psize = 10;
     public $userId = 0;
@@ -20,6 +21,7 @@ class WebController extends Controller
 
     function init()
     {
+        Yii::$app->request->get('offset') && $this->offset = Yii::$app->request->get('offset');
         Yii::$app->request->get('skip') && $this->skip = Yii::$app->request->get('skip');
         Yii::$app->request->get('psize') && $this->psize = Yii::$app->request->get('psize');
         $this->token = empty($_SERVER['HTTP_KY_TOKEN']) ? '' : $_SERVER['HTTP_KY_TOKEN'];

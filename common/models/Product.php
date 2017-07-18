@@ -417,6 +417,15 @@ class Product extends Base
         return $this->hasMany(OrderProduct::className(), ['pid' => 'id']);
     }
 
+    /** 获取该宝贝中支付成功的产品订单 */
+    public function getSuccessOrderProduct($offset)
+    {
+        $orderProduct = OrderProduct::find()->where(['order_product.pid' => $this->id])->
+        join('LEFT JOIN', 'order', 'order.id = order_product.order_id')->andWhere(['>=', 'order.status', Order::STATUS_PAYED])
+            ->orderBy('order_product.created_at desc')->offset($offset)->limit(20)->all();
+        return $orderProduct;
+    }
+
     /** 获取用户信息 */
     public function getUser()
     {

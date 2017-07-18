@@ -499,7 +499,7 @@ class ProductsController extends WebController
     {
         $product = $this->findModel(['id' => Yii::$app->request->get('id')]);
         $data = [];
-        foreach ($product->orderProduct as $item) {
+        foreach ($product->getSuccessOrderProduct($this->offset) as $item) {
             $ip = $item->order->ip ?: '';
             $data['list'][] = [
                 'id' => $item->id,
