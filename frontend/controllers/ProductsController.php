@@ -30,7 +30,7 @@ class ProductsController extends WebController
     {
         parent::init();
         if (empty($this->userId) && in_array(str_replace('products/', '', Yii::$app->requestedRoute), [
-                'create', 'lottery'
+                'create', 'lottery', 'my-products'
             ])
         ) {
             self::needLogin();
@@ -152,12 +152,16 @@ class ProductsController extends WebController
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
      *     description="数据游标"
      *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
      *   @SWG\Response(
      *       response=200,description="
      *          product_count=宝贝总数
      *          product_list=宝贝列表
      *              layout=布局类型[数量模式_未上架 || 数量模式_进行中 || 数量模式_待揭晓 || 数量模式_已揭晓 || 时间模式_未上架 || 时间模式_进行中 || 时间模式_待揭晓 || 时间模式_已揭晓]
-     *              id=宝贝id
+     *              product_id=宝贝id
+     *              order_id=订单id
      *              title=标题
      *              img=宝贝头图
      *              total=总需人次
@@ -168,6 +172,24 @@ class ProductsController extends WebController
      *              a_price=一口价
      *              unit_price=单价
      *              status=状态 [下架 || 进行中 || 待揭晓 || 已揭晓]
+     *              actions=数组下是字典
+     *                  [
+     *                      title=上架
+     *                      url=up_sell
+     *                  ],
+     *                  [
+     *                      title=下架
+     *                      url=down_sell
+     *                  ],
+     *                  [
+     *                      title=编辑
+     *                      url=edit
+     *                  ],
+     *                  [
+     *                      title=删除
+     *                      url=edit
+     *                  ]
+     *              url=链接地址[跳转到宝贝详情页=product, 跳转到订单详情页=order]
      *              order_award_count=已参与人次"
      *   )
      * )
@@ -177,6 +199,7 @@ class ProductsController extends WebController
     {
         $productModel = new Product();
         list($sellerAllProducts, $count) = $productModel->myProducts([
+            'created_by' => Yii::$app->user->identity->id,
             'status' => $status,
             'created_by' => $this->userId,
             'offset' => Yii::$app->request->get('offset', 0)
@@ -248,18 +271,14 @@ class ProductsController extends WebController
      *   @SWG\Parameter(
      *     name="data",
      *     in="formData",
-     *     default="{'model':1,'title':'Iphone9','contents':'\u4e70\u5b8c\u5c31\u5403\u571f:)','images':[{'name':'\u6d4b\u8bd5\u56fe\u7247','url':'demo321'},{'name':'\u6d4b\u8bd5\u56fe\u72472','url':'demo456'}],'videos':[{'name':'\u6d4b\u8bd5\u89c6\u98911','url':'demo321'}],'address':{'lat':'0.232512','lng':'1.2335432','detail_address':'\u6cb3\u5317\u7701\u5eca\u574a\u5e02\u71d5\u90ca\u9547'},'total':10000,'a_price':8000,'type_id':2,'start_time':1499392688,'end_time':1499692688,'unit_price':1}",
+     *     default="{'freight':'运费','model':1,'title':'Iphone9','contents':'\u4e70\u5b8c\u5c31\u5403\u571f:)','images':[{'name':'\u6d4b\u8bd5\u56fe\u7247','url':'demo321'},{'name':'\u6d4b\u8bd5\u56fe\u72472','url':'demo456'}],'videos':[{'name':'\u6d4b\u8bd5\u89c6\u98911','url':'demo321'}],'address':{'lat':'0.232512','lng':'1.2335432','detail_address':'\u6cb3\u5317\u7701\u5eca\u574a\u5e02\u71d5\u90ca\u9547'},'total':10000,'a_price':8000,'type_id':2,'start_time':1499392688,'end_time':1499692688,'unit_price':1}",
      *     description= "发布产品需要的数据，可在http://www.bejson.com/jsonviewernew/上解析",
      *     required=true,
      *     type="string",
      *   ),
      *   @SWG\Parameter(
-     *     name="ky-token",
-     *     in="header",
-     *     default="1",
+     *     name="ky-token", in="header", required=true, type="integer", default="1",
      *     description="用户ky-token",
-     *     required=true,
-     *     type="integer",
      *    ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
@@ -395,9 +414,7 @@ class ProductsController extends WebController
      *                      id=评论id
      *                      user_name=用户名
      *                      contents=评论内容
-     *          publish_countdown=揭晓截止时间
-     *
-     *     "
+     *          publish_countdown=揭晓截止时间"
      *   )
      * )
      */
@@ -536,10 +553,9 @@ class ProductsController extends WebController
      *   @SWG\Parameter(name="id", in="query", required=true, type="integer", default="1",
      *     description="宝贝id"
      *   ),
-     *  @SWG\Parameter(
-     *     name="ky-token", in="header", required=false, type="integer", default="1",
+     *   @SWG\Parameter(name="ky-token", in="header", required=false, type="integer", default="1",
      *     description="ky-token"
-     *    ),
+     *   ),
      *   @SWG\Response(
      *       response=200,description="
      *          code=0
