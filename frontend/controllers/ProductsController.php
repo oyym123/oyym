@@ -439,7 +439,7 @@ class ProductsController extends WebController
                             'value' => date('Y-m-d H:i:s', $item->order ? $item->order->created_at : 0)
                         ],
                     ]
-                ],
+                ]
             ],
             'share_params' => [
                 'share_title' => '众筹夺宝',
@@ -496,12 +496,11 @@ class ProductsController extends WebController
         $data = [];
         foreach ($product->orderAward as $item) {
             $ip = $item->order->ip ?: '';
-            $address = Helper::ipToAddress($ip);
             $data['list'][] = [
                 'user_img' => ($x = $item->buyer->info) ? $x->photoUrl($item->buyer_id) : Yii::$app->params['defaultPhoto'],
                 'user_name' => $item->buyer->getName(),
-                'address' => $address['region'] . $address['city'],
-                'ip' => $ip,
+                'address' => $item->order->user_address,
+                'ip' => substr($ip, 0, strrpos($ip, '.')) . '.***',
                 'times' => $item->getJoinTimes($item->buyer_id),
                 'date' => date('Y-m-d H:i', $item->created_at)
             ];

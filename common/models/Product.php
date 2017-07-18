@@ -398,8 +398,14 @@ class Product extends Base
         return OrderAwardCode::getJoinCount($this->id);
     }
 
-    /** 获取该宝贝中产品订单 */
+    /** 获取该宝贝中订单 */
     public function getOrder()
+    {
+        return $this->hasOne(Order::className(), ['id' => 'order_id']);
+    }
+
+    /** 获取该宝贝中产品订单 */
+    public function getOrderProduct()
     {
         return $this->hasOne(Order::className(), ['id' => 'order_id']);
     }

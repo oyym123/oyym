@@ -63,11 +63,19 @@ class CommentsController extends WebController
      *     required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(
+     *    @SWG\Parameter(
      *     name="product_id",
      *     in="formData",
      *     default="1",
      *     description="产品ID",
+     *     required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="comment_id",
+     *     in="formData",
+     *     default="1",
+     *     description="评论ID",
      *     required=true,
      *     type="integer",
      *   ),
@@ -96,20 +104,19 @@ class CommentsController extends WebController
         $comment->status = Base::STATUS_ENABLE;
         $comment->star = 5; //星级评论为5，用于兼容之前的视频评论
         $parentId = Yii::$app->request->post('comment_id') ?: 0;
-        $commentLineId = Yii::$app->request->post('comment_line_id');
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $product = $this->findProductModel($product_id);
             if ($comment->save()) {
                 $comment->parent_id = $parentId;
                 $comment->comment_line_id = $comment->id;
-                if ($parentId && $commentLineId) {
-                    $comment->comment_line_id = $commentLineId;
+                if ($parentId) {
                     $childId = '';
                     $model = Comments::find()->where(['id' => $parentId, 'status' => Comments::STATUS_ENABLE])->one();
-                    $childId .= $model->child_id ? $model->child_id . ',' . $comment->id : $comment->id;
-                    $model->child_id = $childId;
-                    $model->comments_count += 1;
+                    $childId .= $model->child_ids ? $model->child_ids . ',' . $comment->id : $comment->id;
+                    $model->child_ids = $childId;
+                    $model->comment_count += 1;
                     $model->status = Base::STATUS_ENABLE;
                     if (!$model->save()) {
                         throw new Exception('保存评论失败');
@@ -138,33 +145,16 @@ class CommentsController extends WebController
         self::showMsg('评论已提交', 1);
     }
 
-
     /**
-     * @SWG\Get(path="/comments/get-product",
+     * @SWG\Get(path="/comments/product",
      *   tags={"评论"},
-     *   summary="获取产品评论",
+     *   summary="获取评论",
      *   description="Author: OYYM",
      *   @SWG\Parameter(
-     *     name="comment_id",
+     *     name="id",
      *     in="query",
      *     default="1",
      *     description="评论ID",
-     *     required=true,
-     *     type="integer",
-     *   ),
-     *   @SWG\Parameter(
-     *     name="comment_line_id",
-     *     in="query",
-     *     default="1",
-     *     description="评论标记ID",
-     *     required=true,
-     *     type="integer",
-     *   ),
-     *   @SWG\Parameter(
-     *     name="product_id",
-     *     in="query",
-     *     default="1",
-     *     description="产品ID",
      *     required=true,
      *     type="integer",
      *   ),
@@ -173,54 +163,10 @@ class CommentsController extends WebController
      *   )
      * )
      */
-    public function actionGetProduct()
+    public function actionProduct()
     {
-        $comment_id = Yii::$app->request->get('comment_id');
-        $product_id = Yii::$app->request->get('product_id', 0);
-        $comment_line_id = Yii::$app->request->get('comment_line_id');
-        $data = [];
-        if ($comment_id && $comment_line_id) {
-            $comments = Comments::find()->where(['comment_line_id' => $comment_line_id])->orderBy('sort desc, created_at desc')->all();
-            $topComment = Comments::find()->where(['id' => $comment_id])->one();
-            $name = $topComment->user ? $topComment->user->getName() : '';
-            $data = [];
-            $data['top_comment'] = [
-                'id' => $topComment->id,
-                'user_photo' => ($x = $topComment->userInfo) ? $x->photoUrl() : '',
-                'comment_count' => $topComment->comment_count,
-                'like_count' => $topComment->like_count,
-                'user_name' => $name,
-                'user_id' => $topComment->user ? $topComment->user->id : '',
-                'user_tag' => [],
-                'contents' => $topComment->contents,
-                'date' => Helper::tranTime($topComment->created_at),
-            ];
-            $data['list'] = [];
-            foreach ($comments as $comment) {
-                $userName = $comment->user ? $comment->user->getName() : '';
-                if ($comment->parent_id != 0) {
-                    $parentComment = Comments::find()->where(['id' => $comment->parent_id])->one();
-                    $parentUserName = $parentComment->user ? $parentComment->user->getName() : '';
-                    $data['list'][] = [
-                        'id' => $comment->id,
-                        'user_photo' => ($x = $comment->userInfo) ? $x->photoUrl() : '',
-                        'comment_count' => $comment->comment_count,
-                        'like_count' => $comment->like_count,
-                        'user_name' => $userName,
-                        'user_id' => $comment->user ? $comment->user->id : '',
-                        'user_tag' => [],
-                        'product_id' => $product_id,
-                        'parent_id' => $parentComment->id,
-                        'to_user_name' => $parentUserName,
-                        'to_user_id' => $parentComment->user ? $parentComment->user->id : '',
-                        'comment_line_id' => $comment_line_id,
-                        'contents' => $comment->contents,
-                        'date' => Helper::tranTime($comment->created_at),
-                    ];
-                }
-            }
-        }
-        self::showMsg($data);
+        list($data, $state) = Comments::product(Yii::$app->request->get('id'));
+        self::showMsg($data, $state);
     }
 
 
