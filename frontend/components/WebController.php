@@ -81,7 +81,7 @@ class WebController extends Controller
      **/
     public function showMsg($res, $code = 0, $msg = '')
     {
-        header("Content-type: application/json; charset=utf-8");
+        //header("Content-type: application/json; charset=utf-8");
 
         empty($res) && $res = '';
         // 构造数据
