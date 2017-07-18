@@ -740,7 +740,8 @@ class Product extends Base
             return [-1, '不允许开奖'];
         }
 
-        $query = OrderAwardCode::find()->where(['product_id' => $this->id, 'deleted_at' => 0]);
+        $query = $this->getNumberAModel();
+
         $count = $query->count();
         if ($count < 1) {
             return [-1, '没有人参与不能开奖'];
@@ -768,17 +769,17 @@ class Product extends Base
 
             if (!$this->save()) {
                 throw new Exception('更新宝贝开奖结果失败');
-                Yii::error($this->getErrorys(), 'product');
+                Yii::error($this->getErrors(), 'product');
             }
 
             if (!$this->order) {
                 throw new Exception('订单不存在');
-                Yii::error($this->getErrorys(), 'order');
+                Yii::error($this->getErrors(), 'order');
             } else {
                 $this->order->status = Order::STATUS_WAIT_SHIP; // 等待发货
                 if (!$this->order->save()) {
                     throw new Exception('更新订单失败');
-                    Yii::error($this->getErrorys(), 'order');
+                    Yii::error($this->order->getErrors(), 'order');
                 }
             }
 
@@ -788,6 +789,12 @@ class Product extends Base
             $transaction->rollBack();
             return [-1, $e->getMessage()];
         }
+    }
+
+    /** 计算开奖编码A */
+    public function getNumberAModel()
+    {
+        return OrderAwardCode::find()->where(['product_id' => $this->id, 'deleted_at' => 0]);
     }
 }
 

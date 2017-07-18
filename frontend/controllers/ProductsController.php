@@ -573,4 +573,37 @@ class ProductsController extends WebController
         self::showMsg($msg, $code);
     }
 
+    /**
+     * Name: actionLotteryArithmetic
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-18
+     * @SWG\Get(path="/products/lottery-arithmetic",
+     *   tags={"产品"},
+     *   summary="抽奖计算详情",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="id", in="query", required=true, type="integer", default="1",
+     *     description="宝贝id"
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          number_a=12345689
+     *          number_b=123456890
+     *          product_title=iphone 6s 9成新 便宜出了 800包邮不议价,手快有手慢无
+     *          luck_number=幸运号码"
+     *   )
+     * )
+     */
+    public function actionLotteryArithmetic($id)
+    {
+        $product = $this->findModel(['id' => $id]);
+        $r = [
+            'number_a' => $product->getNumberAModel()->sum('created_at'),
+            'number_b' => $product->random_code,
+            'product_title' => $product->title,
+            'luck_number' => $product->orderAwardCode ? $product->orderAwardCode->code : '',
+        ];
+
+        self::showMsg($r);
+    }
 }
