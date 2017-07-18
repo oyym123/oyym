@@ -907,6 +907,30 @@
                 }
             }
         },
+        "/products/lottery-arithmetic": {
+            "get": {
+                "tags": [
+                    "\u4ea7\u54c1"
+                ],
+                "summary": "\u62bd\u5956\u8ba1\u7b97\u8be6\u60c5",
+                "description": "Author: lixinxin",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u5b9d\u8d1did",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\n     *          number_a=12345689\n     *          number_b=123456890\n     *          product_title=iphone 6s 9\u6210\u65b0 \u4fbf\u5b9c\u51fa\u4e86 800\u5305\u90ae\u4e0d\u8bae\u4ef7,\u624b\u5feb\u6709\u624b\u6162\u65e0\n     *          luck_number=\u5e78\u8fd0\u53f7\u7801"
+                    }
+                }
+            }
+        },
         "/user-address/area-info": {
             "post": {
                 "tags": [
