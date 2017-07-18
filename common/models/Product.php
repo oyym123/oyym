@@ -724,6 +724,7 @@ class Product extends Base
     {
         if (in_array($this->status, [Product::STATUS_WAIT_PUBLISH])
             && Yii::$app->user->identity
+            && $this->created_by > 0
             && $this->created_by == Yii::$app->user->identity->id
         ) {
             // 待揭晓状态 且 是卖家
@@ -740,11 +741,14 @@ class Product extends Base
         }
 
         $query = OrderAwardCode::find()->where(['product_id' => $this->id, 'deleted_at' => 0]);
-
+        $count = $query->count();
+        if ($count < 1) {
+            return [-1, '没有人参与不能开奖'];
+        }
         $a = $query->sum('created_at');
         $b = mt_rand(10000, 99999);
 
-        $luckCode = ($a + $b) % $query->count() + 10000001;
+        $luckCode = ($a + $b) % $count + 10000001;
 
         $awardCode = $query->andWhere(['code' => $luckCode])->one();
 
