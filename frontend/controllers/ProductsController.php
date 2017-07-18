@@ -29,8 +29,8 @@ class ProductsController extends WebController
     public function init()
     {
         parent::init();
-        if (empty($this->userId) && in_array(Yii::$app->requestedRoute, [
-                'products/create'
+        if (empty($this->userId) && in_array(str_replace('products/', '', Yii::$app->requestedRoute), [
+                'create', 'lottery'
             ])
         ) {
             self::needLogin();
@@ -536,18 +536,25 @@ class ProductsController extends WebController
      *   @SWG\Parameter(name="id", in="query", required=true, type="integer", default="1",
      *     description="宝贝id"
      *   ),
+     *  @SWG\Parameter(
+     *     name="ky-token", in="header", required=false, type="integer", default="1",
+     *     description="ky-token"
+     *    ),
      *   @SWG\Response(
      *       response=200,description="
      *          code=0
      *          msg=您成功抽中一名中奖用户; 当code=-1时,返回的是错误提示,例如:不能重复开奖, 开奖成功后需刷新宝贝详情"
      *   )
+     *
      * )
      */
-    public function actionLottery()
+    public function actionLottery($id)
     {
-        $msg = '您成功抽中一名中奖用户';
+        $product = $this->findModel(['id' => $id]);
 
-        self::showMsg($msg);
+        list($code, $msg) = $product->openLottery();
+
+        self::showMsg($msg, $code);
     }
 
 }

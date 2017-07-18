@@ -882,6 +882,14 @@
                         "required": true,
                         "type": "integer",
                         "default": "1"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "ky-token",
+                        "required": false,
+                        "type": "integer",
+                        "default": "1"
                     }
                 ],
                 "responses": {
