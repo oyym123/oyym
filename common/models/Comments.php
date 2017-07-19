@@ -159,7 +159,10 @@ class Comments extends Base
                 'id' => $item->id,
                 'user_photo' => $comment->userInfo ? $comment->userInfo->photoUrl($comment->user_id) : '',
                 'user_name' => $item->user ? $item->user->getName() : '',
-                'contents' => $item->contents
+                'contents' => $item->contents,
+                'date' => Helper::tranTime($item->created_at),
+                'like_count' => $item->like_count ?: 0,
+                'like_flag' => $item->getIsLike(),
             ];
         }
         $datas['list'][] = [

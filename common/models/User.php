@@ -231,6 +231,13 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
+    /** 处理用户ID，用于环信username */
+    public static function makeUserName($id)
+    {
+
+
+    }
+
     public function getStatus()
     {
         return ArrayHelper::getValue(static::status(), $this->status);

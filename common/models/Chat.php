@@ -49,9 +49,9 @@ class Chat extends Base
         $user->hx_password = $password;
         if ($user->save()) {
             $data = [
-                'username' => $user->info ? $user->info->name : '',
+                'username' => $user->id,
                 'password' => $password,
-                'nickname' => '公子小白'
+                'nickname' => $user->info ? $user->info->name : ''
             ];
             $res = Helper::post2(Yii::$app->params['hx_api_url'] . 'users', json_encode($data), $this->getHeader());
             return $result = json_decode($res, true);
