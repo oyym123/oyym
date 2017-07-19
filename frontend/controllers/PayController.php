@@ -367,7 +367,7 @@ class PayController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-00-00
      * @SWG\Get(path="/pay/success",
-     *   tags={"demo"},
+     *   tags={"订单"},
      *   summary="",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(

@@ -143,8 +143,8 @@ class ProductsController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-12
      * @SWG\Get(path="/products/my-products",
-     *   tags={"我发布的"},
-     *   summary="宝贝列表",
+     *   tags={"我的"},
+     *   summary="我发布的",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
      *     description="宝贝状态,传的值有: 全部=0 || 未上架=10 || 进行中=20 || 待揭晓=30 || 已揭晓=40, 这儿没有 待发货,代签收"
@@ -214,41 +214,14 @@ class ProductsController extends WebController
     }
 
     /**
-     * Name: actionMySale
-     * Desc:
-     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
-     * Date: 2017-07-15
-     * @SWG\Get(path="/products/my-sale",
-     *   tags={"我卖出的"},
-     *   summary="",
-     *   description="Author: lixinxin",
-     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
-     *     description="宝贝状态,传的值有: 全部=0 || 待发货=20 || 已发货=25 || 待评价=70 || 已完成=100 || 退款申请=60
-     *   ),
-     *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
-     *     description="数据游标"
-     *   ),
-     *   @SWG\Response(
-     *       response=200,description="
-     *          id=1
-     *          name=测试"
-     *   )
-     * )
-     */
-    public function actionMySale()
-    {
-
-    }
-
-    /**
      * Name: actionMyBuy
      * Desc:
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-12
      * @param $status
      * @SWG\Get(path="/products/my-buy",
-     *   tags={"我参与的"},
-     *   summary="",
+     *   tags={"我的"},
+     *   summary="我参与的",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="全部",
      *     description="宝贝状态,传的值有: 全部 || 正在进行 || 待揭晓 , 这儿没有 待发货,代签收"
@@ -281,7 +254,8 @@ class ProductsController extends WebController
      *     description="用户ky-token",
      *    ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *          product_id=1"
      *   )
      * )
      */
@@ -348,7 +322,10 @@ class ProductsController extends WebController
                 Video::setVideo($params);
             }
             $transaction->commit();
-            self::showMsg('宝贝发布成功！', 1);
+
+            self::showMsg([
+                'product_id' => $product->id
+            ], 1);
         } catch (Exception $e) {
             $transaction->rollBack();
             self::showMsg($e->getMessage(), -1);
@@ -587,6 +564,7 @@ class ProductsController extends WebController
      *   ),
      *   @SWG\Response(
      *       response=200,description="
+     *          order_award_count=参与人次
      *          number_a=12345689
      *          number_b=123456890
      *          product_title=iphone 6s 9成新 便宜出了 800包邮不议价,手快有手慢无
@@ -598,6 +576,7 @@ class ProductsController extends WebController
     {
         $product = $this->findModel(['id' => $id]);
         $r = [
+            'order_award_count' => $product->order_award_count ?: 0, // 已参与人次
             'number_a' => $product->getNumberAModel()->sum('created_at'),
             'number_b' => $product->random_code,
             'product_title' => $product->title,

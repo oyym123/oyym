@@ -62,13 +62,40 @@ class OrdersController extends WebController
     }
 
     /**
+     * Name: actionMySale
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-15
+     * @SWG\Get(path="/orders/my-sale",
+     *   tags={"我的"},
+     *   summary="我卖出的",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
+     *     description="宝贝状态,传的值有: 全部=0 || 待发货=20 || 已发货=25 || 待评价=70 || 已完成=100 || 退款申请=60
+     *   ),
+     *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
+     *     description="数据游标"
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          id=1
+     *          name=测试"
+     *   )
+     * )
+     */
+    public function actionMySale()
+    {
+
+    }
+
+    /**
      * Name: actionIndex
      * Desc:
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-11
-     * @SWG\Get(path="/order/buyer-products",
-     *   tags={"我参与的"},
-     *   summary="宝贝列表",
+     * @SWG\Get(path="/orders/buyer-products",
+     *   tags={"我的"},
+     *   summary="我买到的",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="全部",
      *     description="status的值分为: 全部 || 正在进行 || 待支付 || 待揭晓 || 已揭晓 || 待发货 || 待签收 || 待评价 || 已完成 || 退货申请"
@@ -241,7 +268,7 @@ class OrdersController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-07
      * @SWG\Get(path="/orders/confirm",
-     *   tags={"我参与的"},
+     *   tags={"我的"},
      *   summary="提交订单前的确认",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(
@@ -326,7 +353,7 @@ class OrdersController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-07
      * @SWG\Get(path="/orders/submit",
-     *   tags={"我参与的"},
+     *   tags={"我的"},
      *   summary="提交订单",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(

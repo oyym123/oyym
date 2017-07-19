@@ -25,7 +25,7 @@ class UsersController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
      * @SWG\Get(path="/users/follow-category",
-     *   tags={"用户"},
+     *   tags={"我的"},
      *   summary= "关注的分类",
      *   description="Author: lixinxin",
      *   @SWG\Response(
@@ -55,7 +55,7 @@ class UsersController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
      * @SWG\Get(path="/users/follow-category-or-cancel",
-     *   tags={"用户"},
+     *   tags={"我的"},
      *   summary= "关注或取消关注",
      *   description="Author: lixinxin",
      *   @SWG\Response(
@@ -75,7 +75,7 @@ class UsersController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
      * @SWG\Get(path="/users/sort-type",
-     *   tags={"用户"},
+     *   tags={"我的"},
      *   summary= "首页排序类型列表",
      *   description="Author: lixinxin",
      *   @SWG\Response(
@@ -125,7 +125,7 @@ class UsersController extends WebController
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
      * @SWG\Get(path="/users/category",
-     *   tags={"用户"},
+     *   tags={"我的"},
      *   summary= "获取宝贝分类",
      *   description="Author: lixinxin",
      *   @SWG\Response(
