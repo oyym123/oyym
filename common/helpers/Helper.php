@@ -31,6 +31,43 @@ class Helper extends BaseArrayHelper
     }
 
     /**
+     * Name: post2
+     * Desc: https请求post
+     * User: ouyangyumin <ouyangyumin@zgzzzs.com>
+     * Date: 2017-00-00
+     * @param $url
+     * @param $post_data
+     * @return mixed
+     */
+    public static function post2($url, $post_data, $header = [])
+    {
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        // post数据
+
+        curl_setopt($ch, CURLOPT_POST, 1);
+        // post的变量
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        //关闭https
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        $output = curl_exec($ch);
+
+        curl_close($ch);
+        //打印获得的数据
+
+        return $output;
+    }
+
+    /**
      * 发送短信验证码
      * Desc:
      * User: lixinxin <lixinxinlgm@163.com>

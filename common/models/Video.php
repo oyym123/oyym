@@ -92,8 +92,8 @@ class Video extends Base
             ->where(['type_id' => ArrayHelper::getValue($params, 'type_id'),
                 'type' => ArrayHelper::getValue($params, 'type'),
                 'status' => self::STATUS_ENABLE])->orderBy('sort desc')
-            ->offset(ArrayHelper::getValue($params, 'skip'))
-            ->limit(ArrayHelper::getValue($params, 'psize'))->all();
+            ->offset(ArrayHelper::getValue($params, 'offset'))
+            ->limit(ArrayHelper::getValue($params, 'limit'))->all();
         $data = [];
         foreach ($videos as $video) {
             if ($video->url) {

@@ -76,7 +76,7 @@ class CommentsController extends WebController
      *     in="formData",
      *     default="1",
      *     description="评论ID",
-     *     required=true,
+     *     required=false,
      *     type="integer",
      *   ),
      *   @SWG\Parameter(
@@ -169,6 +169,31 @@ class CommentsController extends WebController
         self::showMsg($data, $state);
     }
 
+
+    /**
+     * @SWG\Get(path="/comments/more-product",
+     *   tags={"评论"},
+     *   summary="更多评论",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Parameter(name="id", in="query", default="1", description="产品ID", required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Parameter(name="offset", in="query", default="0", description="加载更多参数", required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionMoreProduct()
+    {
+        $data = Comments::getproduct(Yii::$app->request->get('id'), $this->offset);
+        self::showMsg($data);
+    }
 
     /** 获取我回复帖子的id和内容 */
     public function actionReplyProduct()
