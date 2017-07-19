@@ -37,27 +37,33 @@ class Chat extends Base
     /** 获取header */
     public function getHeader()
     {
-        return ['Authorization' => 'Bearer' . $this->getToken()];
+        return ['Authorization' => 'Bearer ' . $this->getToken()];
     }
 
     /** 用户注册 */
     public function register()
     {
-        $password = uniqid();
-
-        $user = User::findOne(['id' => Yii::$app->user->id]);
-        $user->hx_password = $password;
+        $user = User::findOne(['id' => 2]);
+        $user->hx_password = uniqid();
         if ($user->save()) {
             $data = [
-                'username' => $user->id,
-                'password' => $password,
-                'nickname' => $user->info ? $user->info->name : ''
+                'username' => User::hxUserName($user->id),
+                'password' => $user->hx_password,
+                'nickname' => $user->info ? $user->info->name : md5(time())
             ];
             $res = Helper::post2(Yii::$app->params['hx_api_url'] . 'users', json_encode($data), $this->getHeader());
             return $result = json_decode($res, true);
         }
-
-
     }
+
+    /** 获取单个IM用户 */
+    public function getOneIM()
+    {
+        //  return $this->getHeader();
+        $userName = User::hxUserName(2);
+        $res = Helper::get(Yii::$app->params['hx_api_url'] . 'users/' . $userName, $this->getHeader());
+        return $result = json_decode($res, true);
+    }
+
 
 }

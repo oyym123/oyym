@@ -232,10 +232,9 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /** 处理用户ID，用于环信username */
-    public static function makeUserName($id)
+    public static function hxUserName($id)
     {
-
-
+        return ($id * 120) . 'ZCDB';
     }
 
     public function getStatus()

@@ -17,7 +17,7 @@ class ChatController extends WebController
     public function actionGetToken()
     {
         $chat = new Chat();
-        var_dump($chat->register());
+        self::showMsg($chat->getOneIM());
     }
 
 }
