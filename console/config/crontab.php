@@ -16,6 +16,8 @@
 ;common = C:\xampp\htdocs\zcdb\yii product/crontab
 ;log_dir = D:\log.txt
 
+
+// 更新时间进度
 [progress]
 run_time = 59 * * * * *
 cd_dir = C:\xampp\htdocs\zcdb\console\

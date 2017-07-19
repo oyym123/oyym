@@ -193,77 +193,6 @@
                 }
             }
         },
-        "/demo/t": {
-            "get": {
-                "tags": [
-                    "demo"
-                ],
-                "summary": "http://www.bejson.com/jsonviewernew/",
-                "description": "Author: OYYM",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "query",
-                        "description": "",
-                        "required": true,
-                        "type": "integer",
-                        "default": "1"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation"
-                    }
-                }
-            }
-        },
-        "/demo/test": {
-            "post": {
-                "tags": [
-                    "demo"
-                ],
-                "description": "Author: OYYM",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "formData",
-                        "description": "",
-                        "required": true,
-                        "type": "integer",
-                        "default": 1
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation"
-                    }
-                }
-            }
-        },
-        "/demo/trim-double-quotes": {
-            "post": {
-                "tags": [
-                    "demo"
-                ],
-                "summary": "json\u5355\u5f15\u53f7\u53d8\u53cc\u5f15\u53f7",
-                "description": "Author: OYYM",
-                "parameters": [
-                    {
-                        "name": "json",
-                        "in": "formData",
-                        "description": "\u5355\u5f15\u53f7\u53d8\u53cc\u5f15\u53f7",
-                        "required": true,
-                        "type": "string",
-                        "default": ""
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation"
-                    }
-                }
-            }
-        },
         "/file-token/index?debug=1": {
             "get": {
                 "tags": [
@@ -502,12 +431,12 @@
                 }
             }
         },
-        "/order/buyer-products": {
+        "/orders/buyer-products": {
             "get": {
                 "tags": [
-                    "\u6211\u53c2\u4e0e\u7684"
+                    "\u6211\u7684"
                 ],
-                "summary": "\u5b9d\u8d1d\u5217\u8868",
+                "summary": "\u6211\u4e70\u5230\u7684",
                 "description": "Author: lixinxin",
                 "parameters": [
                     {
@@ -529,7 +458,7 @@
         "/orders/confirm": {
             "get": {
                 "tags": [
-                    "\u6211\u53c2\u4e0e\u7684"
+                    "\u6211\u7684"
                 ],
                 "summary": "\u63d0\u4ea4\u8ba2\u5355\u524d\u7684\u786e\u8ba4",
                 "description": "Author: lixinxin",
@@ -553,7 +482,7 @@
         "/orders/submit": {
             "get": {
                 "tags": [
-                    "\u6211\u53c2\u4e0e\u7684"
+                    "\u6211\u7684"
                 ],
                 "summary": "\u63d0\u4ea4\u8ba2\u5355",
                 "description": "Author: lixinxin",
@@ -665,7 +594,7 @@
         "/pay/success": {
             "get": {
                 "tags": [
-                    "demo"
+                    "\u8ba2\u5355"
                 ],
                 "summary": "",
                 "description": "Author: lixinxin",
@@ -774,9 +703,9 @@
         "/products/my-products": {
             "get": {
                 "tags": [
-                    "\u6211\u53d1\u5e03\u7684"
+                    "\u6211\u7684"
                 ],
-                "summary": "\u5b9d\u8d1d\u5217\u8868",
+                "summary": "\u6211\u53d1\u5e03\u7684",
                 "description": "Author: lixinxin",
                 "parameters": [
                     {
@@ -814,9 +743,9 @@
         "/products/my-buy": {
             "get": {
                 "tags": [
-                    "\u6211\u53c2\u4e0e\u7684"
+                    "\u6211\u7684"
                 ],
-                "summary": "",
+                "summary": "\u6211\u53c2\u4e0e\u7684",
                 "description": "Author: lixinxin",
                 "parameters": [
                     {
@@ -862,7 +791,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation"
+                        "description": "\r\n     *          product_id=1"
                     }
                 }
             }
@@ -966,7 +895,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "\r\n     *          number_a=12345689\r\n     *          number_b=123456890\r\n     *          product_title=iphone 6s 9\u6210\u65b0 \u4fbf\u5b9c\u51fa\u4e86 800\u5305\u90ae\u4e0d\u8bae\u4ef7,\u624b\u5feb\u6709\u624b\u6162\u65e0\r\n     *          luck_number=\u5e78\u8fd0\u53f7\u7801"
+                        "description": "\r\n     *          order_award_count=\u53c2\u4e0e\u4eba\u6b21\r\n     *          number_a=12345689\r\n     *          number_b=123456890\r\n     *          product_title=iphone 6s 9\u6210\u65b0 \u4fbf\u5b9c\u51fa\u4e86 800\u5305\u90ae\u4e0d\u8bae\u4ef7,\u624b\u5feb\u6709\u624b\u6162\u65e0\r\n     *          luck_number=\u5e78\u8fd0\u53f7\u7801"
                     }
                 }
             }
@@ -1190,7 +1119,7 @@
         "/users/follow-category": {
             "get": {
                 "tags": [
-                    "\u7528\u6237"
+                    "\u6211\u7684"
                 ],
                 "summary": "\u5173\u6ce8\u7684\u5206\u7c7b",
                 "description": "Author: lixinxin",
@@ -1204,7 +1133,7 @@
         "/users/follow-category-or-cancel": {
             "get": {
                 "tags": [
-                    "\u7528\u6237"
+                    "\u6211\u7684"
                 ],
                 "summary": "\u5173\u6ce8\u6216\u53d6\u6d88\u5173\u6ce8",
                 "description": "Author: lixinxin",
@@ -1218,7 +1147,7 @@
         "/users/sort-type": {
             "get": {
                 "tags": [
-                    "\u7528\u6237"
+                    "\u6211\u7684"
                 ],
                 "summary": "\u9996\u9875\u6392\u5e8f\u7c7b\u578b\u5217\u8868",
                 "description": "Author: lixinxin",
@@ -1232,7 +1161,7 @@
         "/users/category": {
             "get": {
                 "tags": [
-                    "\u7528\u6237"
+                    "\u6211\u7684"
                 ],
                 "summary": "\u83b7\u53d6\u5b9d\u8d1d\u5206\u7c7b",
                 "description": "Author: lixinxin",
