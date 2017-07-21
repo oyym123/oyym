@@ -100,18 +100,17 @@ class Comments extends Base
             ->where(["type_id" => ArrayHelper::getValue($params, 'product_id')])
             ->andWhere(["type" => ArrayHelper::getValue($params, 'type')])->andWhere(['parent_id' => 0]);
         $query->orderBy('sort desc, created_at desc');
-        $query->offset(ArrayHelper::getValue($params, 'skip'));
-        $query->limit(ArrayHelper::getValue($params, 'psize'));
+        $query->offset(ArrayHelper::getValue($params, 'offset'));
+        $query->limit(ArrayHelper::getValue($params, 10));
         return $query->all();
     }
 
     /** 获取话题评论 */
-    public static function getProduct($product_id, $skip, $psize)
+    public static function getProduct($product_id, $offset)
     {
         $model = new Comments();
         $product = self::findProductModel($product_id);
-        $params['skip'] = $skip;
-        $params['psize'] = $psize;
+        $params['offset'] = $offset;
         $params['product_id'] = $product_id;
         $params['type'] = Comments::TYPE_PRODUCT;
         $comments = $model->commentProductSearch($params);
@@ -160,7 +159,10 @@ class Comments extends Base
                 'id' => $item->id,
                 'user_photo' => $comment->userInfo ? $comment->userInfo->photoUrl($comment->user_id) : '',
                 'user_name' => $item->user ? $item->user->getName() : '',
-                'contents' => $item->contents
+                'contents' => $item->contents,
+                'date' => Helper::tranTime($item->created_at),
+                'like_count' => $item->like_count ?: 0,
+                'like_flag' => $item->getIsLike(),
             ];
         }
         $datas['list'][] = [

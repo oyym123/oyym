@@ -78,7 +78,7 @@ class QiniuHelper extends BaseArrayHelper
     /**视频截图操作*/
     public static function screenShot($url, $second)
     {
-        $link = self::downloadUrl(Yii::$app->params['qiniu_url_videos'], $url . '?vframe/jpg/offset/' . $second);
+        $link = self::downloadVideoUrl(Yii::$app->params['qiniu_url_videos'], $url . '?vframe/jpg/offset/' . $second.'&imageView2/2/h/200');
         return $link;
         // echo '<img src='.$link.'>';
     }
@@ -86,7 +86,7 @@ class QiniuHelper extends BaseArrayHelper
     /** 获取视频元信息(视频时长) */
     public static function videoTime($url)
     {
-        $link = self::downloadUrl(Yii::$app->params['qiniu_url_videos'], $url . '?avinfo');
+        $link = self::downloadVideoUrl(Yii::$app->params['qiniu_url_videos'], $url . '?avinfo');
         $jsonStr2 = Helper::Post($link, 1);
         $arr = json_decode($jsonStr2, true);
         $time = ArrayHelper::getValue($arr, "streams.0.duration");

@@ -27,7 +27,7 @@ class LikeController extends WebController
      *     name="type",
      *     in="query",
      *     default="1",
-     *     description="点赞的类型，1=产品",
+     *     description="点赞的类型，1=产品,2=评论",
      *     required=true,
      *     type="integer",
      *   ),

@@ -17,6 +17,7 @@ use yii\web\IdentityInterface;
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $email
+ * @property string $hx_password
  * @property string $auth_key
  * @property integer $status
  * @property integer $created_at
@@ -228,6 +229,12 @@ class User extends ActiveRecord implements IdentityInterface
             $userName = Helper::formatMobile($this->username);
             return $userName;
         }
+    }
+
+    /** 处理用户ID，用于环信username */
+    public static function hxUserName($id)
+    {
+        return ($id * 120) . 'ZCDB';
     }
 
     public function getStatus()
