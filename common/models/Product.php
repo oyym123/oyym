@@ -218,12 +218,17 @@ class Product extends Base
     }
 
     /** 产品搜索 */
-    public function apiSearch($key)
+    public function apiSearch($params, $offset, $limit)
     {
-        $sql = "select * from `product` where `status` IN (20, 30)" . self::searchType($key);
-        $sql9 = "select p.*,count(DISTINCT p.id) as counts from product as p ,order_award_code as o where p.id = o.product_id and p.id > 0 ORDER BY counts desc";
-        $sql3 = "select p.*,if(p.model=1,(count(o.id)/p.total),(now()-p.start_time)/(p.end_time-p.start_time)) as result from product as p ,order_award_code as o where p.id = o.product_id ORDER BY  `result` desc";
+        $where = "";
+        if (!empty($params['keywords'])) {
+            $where .= " and (title like '%{$params['keywords']}%' or contents like '%{$params['keywords']}%') ";
+        }
+        $sql = "select * from `product` where `status` IN (20, 30)" . $where . self::searchType($params['sort_type']);
+
         $query = Product::findBySql($sql);
+        $sql .= " limit $limit";
+        $sql .= " offset $offset";
         return [
             Product::findBySql($sql)->all(),
             $query->count(),
@@ -236,21 +241,73 @@ class Product extends Base
     {
         switch ($key) {
             case 'tuijian':
-                return $sql = "andWhere(['type_id' => 'id'])";
+                return $sql = " ORDER BY  'sort' desc";
             case 'jindu':
-                return $sql = "sort()";
+                return $sql = " ORDER BY  'progress' desc";
             case 'danjia':
                 return $sql = " ORDER BY  'unit_price' asc";
             case 'zongjia':
-                return $sql = "sort('total asc')";
+                return $sql = " ORDER BY  '(total*unit_price)' desc";
             case 'yikoujia':
                 return $sql = " ORDER BY  'a_price' asc";
             case 'shijian':
-                return $sql = "sort('start_time desc,end_time asc')";
+                return $sql = " ORDER BY  'start_time' desc ";
             case 'zuixin':
-                return $sql = "andWhere(['>' , 'start_time', now()+864000])->sort('start_time desc , created_at desc')";
+                return $sql = " ORDER BY  'end_time' asc";
         }
     }
+
+
+    /** 搜索产品 */
+    public function keyWordsSearch($params, $limit)
+    {
+
+        $queryParams = [];
+        foreach ($params as $key => $val) {
+            if (in_array($key, Tag::$typeField)) {
+                $queryParams[$key] = explode(',', $val);
+            }
+        }
+
+        $sql = 'select p.*,pt.tid from `product_tag` pt ';
+        $where = "1";
+
+        foreach ($queryParams as $key => $val) {
+            $val = implode(',', array_filter($val));
+            if ($val) {
+//                if ($key == 'xingshi') {
+//                    $where .= " and p.type in ($val)";
+//                } else {
+                $tname = "pt_{$key}";
+                $sql .= "inner join product_tag $tname on $tname.pid = pt.pid ";
+                $where .= " and $tname.tid in ($val)";
+//                }
+            }
+        }
+
+        if (isset($params['freeProduct'])) {
+            $where .= " and p.price = '0.00' ";
+        }
+
+        if (!empty($params['keywords'])) {
+            $where .= " and (p.title like '%{$params['keywords']}%' or contents like '%{$params['keywords']}%') ";
+        }
+
+        $sql .= "right join product p on p.id = pt.pid ";
+        $sql .= "where $where and p.status='" . self::STATUS_ENABLE . "' ";
+        $sql .= "group by pt.pid ";
+        $sql .= "order by p.sort desc, p.created_at desc ";
+
+        $query = Product::findBySql($sql);
+
+        $sql .= "limit $limit";
+
+        return [
+            Product::findBySql($sql)->all(),
+            $query->count(),
+        ];
+    }
+
 
     /**
      * @inheritdoc

@@ -1,6 +1,86 @@
 {
     "swagger": "2.0",
     "paths": {
+        "/attention/create": {
+            "get": {
+                "tags": [
+                    "\u5173\u6ce8"
+                ],
+                "summary": "\u5173\u6ce8",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "\u5173\u6ce8\u7684\u7c7b\u578b\uff0c1=\u4ea7\u54c1",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u8be5\u7c7b\u578b\u5bf9\u5e94\u7684id",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/attention/cancel": {
+            "get": {
+                "tags": [
+                    "\u5173\u6ce8"
+                ],
+                "summary": "\u53d6\u6d88\u5173\u6ce8",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "\u5173\u6ce8\u7684\u7c7b\u578b\uff0c1=\u4ea7\u54c1",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u8be5\u7c7b\u578b\u5bf9\u5e94\u7684id",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
         "/collection/create": {
             "get": {
                 "tags": [

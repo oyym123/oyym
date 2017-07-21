@@ -37,13 +37,14 @@ class Chat extends Base
     /** 获取header */
     public function getHeader()
     {
-        return ['Authorization' => 'Bearer ' . $this->getToken()];
+        $data[] = 'Authorization:Bearer ' . $this->getToken();
+        return $data;
     }
 
     /** 用户注册 */
     public function register()
     {
-        $user = User::findOne(['id' => 2]);
+        $user = User::findOne(['id' => Yii::$app->user->id]);
         $user->hx_password = uniqid();
         if ($user->save()) {
             $data = [
@@ -51,7 +52,7 @@ class Chat extends Base
                 'password' => $user->hx_password,
                 'nickname' => $user->info ? $user->info->name : md5(time())
             ];
-            $res = Helper::post2(Yii::$app->params['hx_api_url'] . 'users', json_encode($data), $this->getHeader());
+            $res = Helper::request(Yii::$app->params['hx_api_url'] . 'users', 'POST', json_encode($data), $this->getHeader());
             return $result = json_decode($res, true);
         }
     }
@@ -59,9 +60,28 @@ class Chat extends Base
     /** 获取单个IM用户 */
     public function getOneIM()
     {
-        //  return $this->getHeader();
         $userName = User::hxUserName(2);
-        $res = Helper::get(Yii::$app->params['hx_api_url'] . 'users/' . $userName, $this->getHeader());
+        $res = Helper::request(Yii::$app->params['hx_api_url'] . 'users/' . $userName, 'GET', [], $this->getHeader());
+        return $result = json_decode($res, true);
+    }
+
+    /** 修改用户昵称 */
+    public function changeNickName()
+    {
+        $user = User::findOne(['id' => Yii::$app->user->id]);
+        $userName = User::hxUserName($user->id);
+        $data = [
+            'nickname' => $user->info ? $user->info->name : md5(time())
+        ];
+        $res = Helper::request(Yii::$app->params['hx_api_url'] . 'users/' . $userName, 'PUT', $data, $this->getHeader());
+        return $result = json_decode($res, true);
+    }
+
+    /** 获取数据(默认没有body) */
+    public static function request($url, $type)
+    {
+        $chat = new Chat();
+        $res = Helper::request($url, $type, [], $chat->getHeader());
         return $result = json_decode($res, true);
     }
 

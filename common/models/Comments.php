@@ -139,10 +139,8 @@ class Comments extends Base
             ];
         }
         $datas['user_count'] = $product->comments;
-
         return $datas;
     }
-
 
     /** 获取话题评论 */
     public static function product($id)

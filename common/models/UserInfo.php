@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use yii\base\Exception;
 use common\helpers\QiniuHelper;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -15,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property string $profit
  * @property integer $like_count
  * @property integer $created_at
+ * @property integer $attentions
  * @property integer $updated_at
  * @property integer $sold_products
  */
@@ -59,6 +61,16 @@ class UserInfo extends Base
         return $image ? QiniuHelper::downloadImageUrl(Yii::$app->params['qiniu_url_images'], $image->url) : Yii::$app->params['defaultPhoto'];
     }
 
+    /** 用户关注数量保存 */
+    public static function attention($id, $count)
+    {
+        $model = UserInfo::findModel($id);
+        $model->attentions = $count;
+        if (!$model->save()) {
+            throw new Exception('关注失败!');
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -76,5 +88,14 @@ class UserInfo extends Base
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
         ];
+    }
+
+    public static function findModel($id)
+    {
+        if (($model = UserInfo::findOne(['user_id' => $id]))) {
+            return $model;
+        } else {
+            throw new Exception('用户不存在!');
+        }
     }
 }

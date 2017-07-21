@@ -99,15 +99,16 @@ class ProductsController extends WebController
     public function actionIndex()
     {
         $product = new Product();
-        $skip = intval(Yii::$app->request->get('skip', 0));
-        $psize = intval(Yii::$app->request->get('psize', 10));
-        $params['sort_type'] = Yii::$app->request->get('sort_type', 'danjia');
+        $params = [
+            'sort_type' => Yii::$app->request->get('sort_type', 'danjia'),
+            'keywords' => Yii::$app->request->get('keywords', ''),
+        ];
         $layoutType = 0;
-        if ($params['sort_type'] = 'danjia') {
+        if ($params['sort_type'] == 'danjia') {
             $layoutType = 1;
         }
         $data = [];
-        list($products, $data['count']) = $product->apiSearch($params, "$skip, $psize");
+        list($products, $data['count']) = $product->apiSearch($params, $this->offset, 10);
         foreach ($products as $product) {
             $data['products_list'][] = [
                 'id' => $product->id,
@@ -136,6 +137,7 @@ class ProductsController extends WebController
         }
         $this->showMsg($data);
     }
+
 
     /**
      * Name: actionMyProducts
@@ -449,7 +451,7 @@ class ProductsController extends WebController
             'collection_flag' => $item->getIsCollection(),
             //'can_buy' => $item->isCanBuy(),
             'comment_count' => $item->comments,
-            'comment_list' => Comments::getProduct($item->id, 0, 5),
+            'comment_list' => Comments::getProduct($item->id, 0),
             'sale_user' => [
                 'img' => $item->userInfo ? $item->userInfo->photoUrl($item->created_by) : Yii::$app->params['defaultPhoto'],
                 'name' => $item->user ? $item->user->getName() : '',
