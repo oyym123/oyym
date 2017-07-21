@@ -33,7 +33,7 @@ class OrdersController extends WebController
     public function init()
     {
         parent::init();
-        if (empty($this->userId)) {
+        if (empty($this->userId) || empty(Yii::$app->user->identity)) {
             self::needLogin();
         }
     }
@@ -257,7 +257,6 @@ class OrdersController extends WebController
     /** 验证提交的数据 */
     public function checkProduct()
     {
-        print_r(json_decode(Yii::$app->request->post('products')));exit;
         $products = json_decode(Yii::$app->request->post('products'), true);
 
         if (empty($products)) {
@@ -269,10 +268,10 @@ class OrdersController extends WebController
         foreach ($products as $product) {
             if (!empty($product['id'])) {
                 $productModel = Product::find()->where(['id' => $product['id']])->one();
-                if ($productModel && $productModel->isCanBuy()) {
+                if ($productModel && $productModel->canBuy()) {
                     // 判断是否可以购买
                     $r[] = [
-                        'product' => $productModel,
+                        'model' => $productModel,
                         'count' => $product['count'],
                         'buy_type' => $product['buy_type'], // 购买方式 unit_price=众筹参与,a_price=一口价
                     ];
@@ -292,18 +291,16 @@ class OrdersController extends WebController
      * Desc: 提交订单前的确认
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-07
-     * @SWG\Get(path="/orders/confirm",
+     * @SWG\Post(path="/orders/confirm",
      *   tags={"订单"},
      *   summary="提交订单前的确认",
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(
-     *     name="products",
-     *     in="query",
-     *     default="[{'id':'1','count':'1','buy_type':'1'}]",
+     *   @SWG\Parameter(name="products", in="formData", required=false, type="string", default="[{'id':1,'count':1,'buy_type':1}]",
      *     description="提交订单前的确认 buy_type:1=一口价2=单价",
-     *     required=false,
-     *     type="string",
      *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
      *   @SWG\Response(
      *       response=200,description="successful operation",
      *   )
@@ -311,27 +308,25 @@ class OrdersController extends WebController
      */
     public function actionConfirm()
     {
-        // 检查宝贝
-        $products = $this->checkProduct();
-
         $order = new Order();
 
-        Yii::$app->user->identity = $order->userEntity = $this->getApiUser();
+        // 检查宝贝
+        $order->products = $this->checkProduct();
 
-        $order->confirmPrice($products);
+        $order->confirmPrice();
 
         $dataProducts = [];
-        foreach ($products as $key => $item) {
-            list($err, $msg) = $item['product']->canbuy();
+        foreach ($order->products as $key => $item) {
+            list($err, $msg) = $item['model']->canBuy();
             if ($err) {
                 self::showMsg($msg, -1);
             }
 
             $dataProducts[] = [
-                'id' => $item['product']->id,
-                'title' => $item['product']->title,
-                'img' => $item['product']->headImg(),
-                'price' => '￥' . $item['product']->$item['buy_type'],
+                'id' => $item['model']->id,
+                'title' => $item['model']->title,
+                'img' => $item['model']->headImg(),
+                'price' => '￥' . $item['model']->getPrice($item['buy_type']),
                 'count' => $item['count']
             ];
         }
@@ -342,16 +337,11 @@ class OrdersController extends WebController
 
         $data = [
             'title' => '确认订单',
-            'user_name' => substr_replace(ArrayHelper::getValue($order->userEntity, 'username'), '****', 3, 4),
+            'user_name' => substr_replace(ArrayHelper::getValue(Yii::$app->user->identity, 'username'), '****', 3, 4),
             'pay_amount' => '￥' . floatval($order->payAmount),
             'product_amount' => '￥' . floatval($order->productsAmount),
-            'amount' => $order->amountDesc ?: ($this->isAndroid() ? [
-                [
-                    'name' => '',
-                    'price' => '',
-                ]
-            ] : null),
-            'products' => $products,
+            'amount' => $order->amountDesc,
+            'products' => $dataProducts,
             'address' => [
                 'username' => '',
                 'mobile' => '',
@@ -381,7 +371,7 @@ class OrdersController extends WebController
      *   tags={"订单"},
      *   summary="提交订单",
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(name="products", in="formData", required=true, type="string", default="[{'id':'1','count':'1','buy_type':'1'}]",
+     *   @SWG\Parameter(name="products", in="formData", required=true, type="string", default="[{'id':1,'count':1,'buy_type':1}]",
      *     description="购买的宝贝明细 buy_type:1=一口价2=单价",
      *   ),
      *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
@@ -395,27 +385,27 @@ class OrdersController extends WebController
     public function actionSubmit()
     {
         // 检查宝贝
-        $products = $this->checkProduct();
-
         $order = new Order();
+
+        $order->products = $this->checkProduct();
 
         Yii::$app->user->identity = $order->userEntity = $this->getApiUser();
 
 //        $order->setPayType(Yii::$app->request->post('pay_type'));
 
-        $order->confirmPrice($products);
+        $order->confirmPrice();
 
         $dataProducts = [];
-        foreach ($products as $key => $item) {
-            if ($item['product']->isCanbuy() == false) {
+        foreach ($order->products as $key => $item) {
+            if ($item['model']->canbuy() == false) {
                 self::showMsg('活动已结束, 不允许购买', -1);
             }
 
             $dataProducts[] = [
-                'id' => $item['product']->id,
-                'title' => $item['product']->title,
-                'img' => $item['product']->headImg(),
-                'price' => '￥' . $item['product']->$item['buy_type'],
+                'id' => $item['model']->id,
+                'title' => $item['model']->title,
+                'img' => $item['model']->headImg(),
+                'price' => '￥' . $item['model']->getPrice($item['buy_type']),
                 'count' => $item['count']
             ];
         }
@@ -444,32 +434,16 @@ class OrdersController extends WebController
             self::showMsg($e->getMessage(), -1);
         }
 
-        $pay = [
+        $r = [
             'sn' => $newOrder->sn,
             'default_pay_type' => '支付宝支付',
 //            'pay_amount' => '￥' . floatval($order->pay_amount),
-//            'product_amount' => '￥' . floatval($order->product_amount),
-            'pay_types' => $order->getPayTypes(Yii::$app->request->post('pay_ids', '["支付宝支付","银行柜台转账"]')),
-            'amount' => [
-                [
-                    'name' => '商品合计',
-                    'price' => '￥' . floatval($order->product_amount),
-                ],
-            ],
+//            'product_amount' => '￥' . floatval($order->productsAmount),
+            'pay_types' => $order->getPayTypes(Yii::$app->request->post('pay_ids', '["支付宝支付","微信支付"]')),
+            'amount' => $this->amountDesc
         ];
 
-        if ($this->discountAmount > 0) {
-            $pay['amount'][] = [
-                'name' => '红包抵扣',
-                'price' => '-￥' . floatval($this->discountAmount),
-            ];
-        }
-        $pay['amount'][] = [
-            'name' => '支付金额',
-            'price' => '￥' . floatval($order->pay_amount),
-        ];
-
-        self::showMsg($pay);
+        self::showMsg($r);
     }
 
     /** 订单支付成功 */

@@ -346,6 +346,23 @@ class Product extends Base
         ];
     }
 
+    /** 根据购买方式 返回不同的价格 */
+    public function getPrice($buyType)
+    {
+        if ($buyType == OrderProduct::A_PRICE) {
+            return $this->a_price;
+        } else if ($buyType == OrderProduct::UNIT_PRICE) {
+            return $this->unit_price;
+        } else {
+            return $this->a_price;
+        }
+    }
+
+    public function getTag()
+    {
+        return $this->hasMany(ProductTag::className(), ['pid' => 'id']);
+    }
+
     /**
      * 判断商品是否可以购买
      */
@@ -899,7 +916,8 @@ class Product extends Base
     }
 
     /** 数量模式下, 计算新的进度值, 值为0到100 */
-    public function getNewProgress($NewOrderAwardCount) {
+    public function getNewProgress($NewOrderAwardCount)
+    {
         return min(100, number_format($NewOrderAwardCount / $this->total, 2, '.', '') * 100);
     }
 }

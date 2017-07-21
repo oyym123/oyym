@@ -19,6 +19,34 @@ use Yii;
  */
 class UserCoupon extends Base
 {
+    public $canUseCoupon = []; // 用户可以使用的优惠券
+    const STATUS_UNUSED = 10; // 已激活
+    const STATUS_USED = 20; // 已使用
+
+    /** 优惠券状态 */
+    public static function usedStatus() {
+        return [
+            self::STATUS_UNUSED => '已激活',
+            self::STATUS_USED => '已使用',
+        ];
+    }
+
+    /** 优惠券样式 */
+    public static function usedStatusColor() {
+        return [
+            self::STATUS_UNUSED => 'red', // 红色
+            self::STATUS_USED => 'gray', // 灰色
+        ];
+    }
+
+    public function getUsedStatus() {
+        return ArrayHelper::getValue(self::usedStatus(), $this->status);
+    }
+
+    public function getUsedStatusColor() {
+        return ArrayHelper::getValue(self::usedStatusColor(), $this->status);
+    }
+
     /**
      * @inheritdoc
      */

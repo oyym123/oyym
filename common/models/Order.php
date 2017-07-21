@@ -3,7 +3,9 @@
 namespace common\models;
 
 use Yii;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 
 /**
@@ -27,8 +29,10 @@ class Order extends Base
     public $productTags = []; // 订单商品的所有标签
     public $buyCount = []; // 购买总数
     public $productAttribute = []; // 产品sku
+    public $products = []; // 产品
     public $productsAmount = 0.00; // 订单商品总金额
     public $discountAmount = 0.00; // 折扣总金额
+    public $freight = 0.00; // 运费
     public $amountDesc = []; // 折扣明细,包括运费等
     public $payAmount = 0.00; // 折扣总金额
     public $coupons = []; // 优惠券
@@ -81,7 +85,7 @@ class Order extends Base
     {
         return [
 //            [['ip'], 'default', 'value' => ''],
-            [['buyer_id', 'seller_id', 'sn', 'pay_type', 'status', 'created_at', 'updated_at', 'ip'], 'required'],
+            [['buyer_id', 'seller_id', 'sn', 'status', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
             [['sn', 'ip'], 'string', 'max' => 100],
@@ -115,21 +119,26 @@ class Order extends Base
      * Desc: 计算需支付的金额
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-07
-     * @param $products
      */
-    public function confirmPrice($products)
+    public function confirmPrice()
     {
-        foreach ($products as $key => $product) {
-            if (in_array($product['buy_type'], [OrderProduct::A_PRICE, OrderProduct::UNIT_PRICE])) { // 一口价 和 单价
-                $this->productsAmount += $product['product']->$product['buy_type'] * $product['count'];
-            }
+        foreach ($this->products as $key => $product) {
+            $this->productsAmount += $product['model']->getPrice($product['buy_type']) * $product['count'];
         }
+
+        $this->freight = $this->products[0]['model']->freight;
 
         $this->confirmUserCoupon();
 
-        $this->amountDesc[] = [
-            'name' => '运费',
-            'price' => '+ ￥0.00',
+        $this->amountDesc = [
+            [
+                'name' => '商品合计',
+                'price' => '+ ￥' . floatval($this->productsAmount),
+            ],
+            [
+                'name' => '运费',
+                'price' => '+ ￥' . $this->products[0]['model']->freight,
+            ],
         ];
 
         foreach ($this->coupons as $coupon) {
@@ -143,8 +152,20 @@ class Order extends Base
             $this->discountAmount += $coupon->price;
         }
 
+        if ($this->discountAmount > 0) {
+            $this->amountDesc[] = [
+                'name' => '红包抵扣',
+                'price' => '- ￥' . floatval($this->discountAmount),
+            ];
+        }
+
         $this->payAmount = floatval(number_format($this->productsAmount > $this->discountAmount
-            ? $this->productsAmount - $this->discountAmount : $this->discountAmount, 2, '.', ''));
+            ? $this->productsAmount + $this->freight - $this->discountAmount : $this->discountAmount, 2, '.', ''));
+
+        $this->amountDesc[] = [
+            'name' => '支付金额',
+            'price' => '￥' . $this->payAmount,
+        ];
     }
 
     public $canUseCouponTags = []; // 用户可以使用的优惠券(可以用的优惠券Tags)
@@ -152,7 +173,7 @@ class Order extends Base
     /** 获取用户可用优惠券 */
     public function confirmUserCoupon()
     {
-        $userCoupons = UserCoupon::find()->where(['user_id' => $this->userEntity->id, 'status' => UserCoupon::STATUS_UNUSED])->all();
+        $userCoupons = UserCoupon::find()->where(['user_id' => Yii::$app->user->identity->id, 'status' => UserCoupon::STATUS_UNUSED])->all();
 
         $getCanUseCouponIds = ArrayHelper::getColumn($userCoupons, 'coupon_id');
 
@@ -183,26 +204,80 @@ class Order extends Base
         }
     }
 
-    /** 创建订单商品 */
-    public function saveProducts($newOrder)
+    /** 判断商品使用这些优惠券 可以折扣的费用 */
+    public function getProductCoupon()
     {
-        foreach ($this->productAttribute as $productAttributeId => $productAttribute) {
-            if ($productAttribute->product) {
-                $orderProduct = new OrderProduct();
-                $orderProduct->order_id = $newOrder->id;
-                $orderProduct->title = $productAttribute->product->title;
-                $orderProduct->pid = $productAttribute->product->id;
-                $orderProduct->count = $this->buyCount[$productAttributeId]['count'];
-                $orderProduct->price = $productAttribute->price;
-                $orderProduct->discount_price = 0.00;
-                $orderProduct->coupon_id = 0;
-                $orderProduct->product_attribute_info = $productAttribute->getProductAttributeInfo();
+        $productTags = $productTagCoupons = [];
 
-                if (!$orderProduct->save()) {
-                    throw new Exception('创建订单商品失败');
+        if ($this->products) {
+            foreach ($this->products as $key => $product) {
+                if ($product->tag) {
+//                    print_r(ArrayHelper::getColumn($product->tag, 'tid'));
+                    $productTags = array_merge($this->productTags, ArrayHelper::getColumn($product->tag, 'tid'));
                 }
             }
         }
+
+        if ($productTags) {
+            $productTagCoupons = TagCoupon::find()->where(['tid' => $productTags])->all();
+
+            $productTagCoupons = ArrayHelper::map($productTagCoupons, 'id', 'tid', 'coupon_id');
+        }
+
+        return $productTagCoupons;
+    }
+
+    /** 创建订单商品 */
+    public function saveProducts($newOrder)
+    {
+        foreach ($newOrder->products as $key => $product) {
+            $orderProduct = new OrderProduct();
+            $orderProduct->order_id = $newOrder->id;
+            $orderProduct->title = $product['model']->title;
+            $orderProduct->pid = $product['model']->id;
+            $orderProduct->count = $product['count'];
+            $orderProduct->price = $product['model']->price;
+            $orderProduct->discount_price = 0.00;
+            $orderProduct->coupon_id = 0;
+
+            if (!$orderProduct->save()) {
+                throw new Exception('创建订单商品失败');
+            }
+        }
+    }
+
+    /** 随机生产sn */
+    public function createOrderSn()
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $x = date('Ymd') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
+            if (Order::find()->where(['sn' => $x])->count()) {
+                continue;
+            }
+            return $x;
+        }
+        return '';
+    }
+
+    /** 创建订单 */
+    public function create()
+    {
+        $this->ip = Yii::$app->request->userIP;
+        $this->sn = $this->createOrderSn();
+        $this->buyer_id = Yii::$app->user->userEntity->id;
+        $this->seller_id = $this->products[0]['model']->created_by;
+        $this->status = self::STATUS_WAIT_PAY;
+        $this->pay_amount = $this->payAmount;
+        $this->product_amount = $this->productsAmount;
+        $this->discount_amount = $this->discountAmount;
+        $this->pay_type = 0;
+
+        if (!$this->save()) {
+//            print_r($this->getErrors());exit;
+            throw new Exception('创建订单失败');
+        }
+
+        return $this;
     }
 
     /** 生成摇奖号码 次方法仅支持一个订单一个宝贝的情况*/
