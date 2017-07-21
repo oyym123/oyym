@@ -84,7 +84,7 @@ class Order extends Base
     public function rules()
     {
         return [
-//            [['ip'], 'default', 'value' => ''],
+            [['freight'], 'default', 'value' => '0'],
             [['buyer_id', 'seller_id', 'sn', 'status', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
@@ -132,11 +132,11 @@ class Order extends Base
 
         $this->amountDesc = [
             [
-                'name' => '商品合计',
+                'title' => '商品合计',
                 'price' => '+ ￥' . floatval($this->productsAmount),
             ],
             [
-                'name' => '运费',
+                'title' => '运费',
                 'price' => '+ ￥' . $this->products[0]['model']->freight,
             ],
         ];
@@ -145,7 +145,7 @@ class Order extends Base
 
             // 优惠券
             $this->amountDesc[] = [
-                'name' => $coupon->title,
+                'title' => $coupon->title,
                 'price' => '- ￥' . $coupon->price,
             ];
 
@@ -154,7 +154,7 @@ class Order extends Base
 
         if ($this->discountAmount > 0) {
             $this->amountDesc[] = [
-                'name' => '红包抵扣',
+                'title' => '红包抵扣',
                 'price' => '- ￥' . floatval($this->discountAmount),
             ];
         }
@@ -163,7 +163,7 @@ class Order extends Base
             ? $this->productsAmount + $this->freight - $this->discountAmount : $this->discountAmount, 2, '.', ''));
 
         $this->amountDesc[] = [
-            'name' => '支付金额',
+            'title' => '支付金额',
             'price' => '￥' . $this->payAmount,
         ];
     }
@@ -264,12 +264,13 @@ class Order extends Base
     {
         $this->ip = Yii::$app->request->userIP;
         $this->sn = $this->createOrderSn();
-        $this->buyer_id = Yii::$app->user->userEntity->id;
+        $this->buyer_id = Yii::$app->user->identity->id;
         $this->seller_id = $this->products[0]['model']->created_by;
         $this->status = self::STATUS_WAIT_PAY;
         $this->pay_amount = $this->payAmount;
         $this->product_amount = $this->productsAmount;
         $this->discount_amount = $this->discountAmount;
+        $this->freight = $this->freight;
         $this->pay_type = 0;
 
         if (!$this->save()) {
@@ -572,6 +573,40 @@ class Order extends Base
         }
 
         throw new Exception('微信支付暂时不可用');
+    }
+
+    /** 收银台接口所需数据 */
+    public function checkout()
+    {
+        $r = [
+            'sn' => $this->sn,
+            'default_pay_type' => '支付宝支付',
+            'pay_types' => $this->getPayTypes(Yii::$app->request->post('pay_ids', '["支付宝支付","微信支付"]')),
+            'amount' => [
+                [
+                    'title' => '商品合计',
+                    'price' => '+ ￥' . floatval($this->product_amount),
+                ],
+                [
+                    'title' => '运费',
+                    'price' => '+ ￥' . floatval($this->freight),
+                ],
+            ],
+        ];
+
+        if ($this->discountAmount > 0) {
+            $r['amount'][] = [
+                'title' => '红包抵扣',
+                'price' => '- ￥' . floatval($this->discount_amount),
+            ];
+        }
+
+        $r['amount'][] = [
+            'title' => '支付金额',
+            'price' => '￥' . floatval($this->pay_amount),
+        ];
+
+        return $r;
     }
 
     /** 取买家信息 */

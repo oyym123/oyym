@@ -12,7 +12,7 @@
                     {
                         "name": "type",
                         "in": "query",
-                        "description": "\u5173\u6ce8\u7684\u7c7b\u578b\uff0c1=\u4ea7\u54c1",
+                        "description": "\u5173\u6ce8\u7684\u7c7b\u578b\uff0c1=\u7528\u6237",
                         "required": true,
                         "type": "integer",
                         "default": "1"
@@ -52,7 +52,7 @@
                     {
                         "name": "type",
                         "in": "query",
-                        "description": "\u5173\u6ce8\u7684\u7c7b\u578b\uff0c1=\u4ea7\u54c1",
+                        "description": "\u5173\u6ce8\u7684\u7c7b\u578b\uff0c1=\u7528\u6237",
                         "required": true,
                         "type": "integer",
                         "default": "1"
@@ -610,7 +610,111 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation"
+                        "description": "\n     *          sn=\u8ba2\u5355\u53f7\n     *          default_pay_type=\u9ed8\u8ba4\u652f\u4ed8\u65b9\u5f0f \u652f\u4ed8\u5b9d\u652f\u4ed8\n     *          pay_types=\u9ed8\u8ba4\u652f\u4ed8\u65b9\u5f0f \u652f\u4ed8\u5b9d\u652f\u4ed8, \u6570\u7ec4\u52a0\u5b57\u5178\n     *              [\n     *                  show=\u662f\u5426\u542f\u7528,1=\u542f\u7528,0=\u4e0d\u542f\u7528\n     *                  detail=\u652f\u4ed8\u65b9\u5f0f\u4ecb\u7ecd,\u4f8b\u5982: \u63a8\u8350\u5f00\u901a\u5fae\u4fe1\u652f\u4ed8\u7684\u7528\u6237\n     *                  type=\u652f\u4ed8\u65b9\u5f0f\u4e2d\u6587\u540d\u79f0,\u4f8b\u5982:\u652f\u4ed8\u5b9d\n     *                  img=\u652f\u4ed8\u65b9\u5f0ficon\u56fe\u6807\n     *              ]\n     *          amount=\u91d1\u989d\u660e\u7ec6,\u6570\u7ec4\u52a0\u5b57\u5178\n     *              [\n     *                  title=\u5546\u54c1\u5408\u8ba1\n     *                  price=+ \uffe510.22\n     *              ]\n     *\n     *     "
+                    }
+                }
+            }
+        },
+        "/orders/get-pay-params": {
+            "get": {
+                "tags": [
+                    "\u8ba2\u5355"
+                ],
+                "summary": "\u83b7\u53d6\u652f\u4ed8\u53c2\u6570",
+                "description": "Author: lixinxin \u8fd9\u4e2a\u662f\u5728\u6536\u94f6\u53f0\u63a5\u53e3\u4e4b\u540e\u8c03\u7528,\u5ba2\u6237\u7aef\u83b7\u53d6\u5230\u652f\u4ed8\u53c2\u6570\u540e,\u518d\u8bf7\u6c42\u652f\u4ed8\u5b9d\u6216\u5fae\u4fe1\u5ba2\u6237\u7aef",
+                "parameters": [
+                    {
+                        "name": "sn",
+                        "in": "query",
+                        "description": "\u8ba2\u5355\u53f7",
+                        "required": true,
+                        "type": "string",
+                        "default": "20170101"
+                    },
+                    {
+                        "name": "pay_type",
+                        "in": "query",
+                        "description": "\u652f\u4ed8\u65b9\u5f0f",
+                        "required": true,
+                        "type": "string",
+                        "default": "\u652f\u4ed8\u5b9d\u652f\u4ed8"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\n     *          alipay\n     *          wx_sign\n     *          wx_timestamp\n     *          wx_partner_id\n     *          wx_package\n     *          wx_nonce_str\n     *          yl_tn\n     *          wx_prepay_id\n     *     "
+                    }
+                }
+            }
+        },
+        "/orders/checkout": {
+            "get": {
+                "tags": [
+                    "\u8ba2\u5355"
+                ],
+                "summary": "\u6536\u94f6\u53f0\u63a5\u53e3",
+                "description": "Author: lixinxin \u5728\u8fd9\u4e2a\u63a5\u53e3\u83b7\u53d6\u53ef\u4ee5\u9009\u62e9\u7684\u652f\u4ed8\u65b9\u5f0f, \u9009\u53d6\u4e4b\u540e\u7d27\u63a5\u7740\u8c03\u7528orders/getPayParams \u63a5\u53e3\u83b7\u53d6\u9009\u62e9\u7684\u652f\u4ed8\u65b9\u5f0f\u7684\u52a0\u5bc6\u6570\u636e",
+                "parameters": [
+                    {
+                        "name": "sn",
+                        "in": "query",
+                        "description": "\u8ba2\u5355\u53f7",
+                        "required": true,
+                        "type": "string",
+                        "default": "201708029320"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\n     *          sn=\u8ba2\u5355\u53f7\n     *          default_pay_type=\u9ed8\u8ba4\u652f\u4ed8\u65b9\u5f0f \u652f\u4ed8\u5b9d\u652f\u4ed8\n     *          pay_types=\u9ed8\u8ba4\u652f\u4ed8\u65b9\u5f0f \u652f\u4ed8\u5b9d\u652f\u4ed8, \u6570\u7ec4\u52a0\u5b57\u5178\n     *              [\n     *                  show=\u662f\u5426\u542f\u7528,1=\u542f\u7528,0=\u4e0d\u542f\u7528\n     *                  detail=\u652f\u4ed8\u65b9\u5f0f\u4ecb\u7ecd,\u4f8b\u5982: \u63a8\u8350\u5f00\u901a\u5fae\u4fe1\u652f\u4ed8\u7684\u7528\u6237\n     *                  type=\u652f\u4ed8\u65b9\u5f0f\u4e2d\u6587\u540d\u79f0,\u4f8b\u5982:\u652f\u4ed8\u5b9d\n     *                  img=\u652f\u4ed8\u65b9\u5f0ficon\u56fe\u6807\n     *              ]\n     *          amount=\u91d1\u989d\u660e\u7ec6,\u6570\u7ec4\u52a0\u5b57\u5178\n     *              [\n     *                  title=\u5546\u54c1\u5408\u8ba1\n     *                  price=+ \uffe510.22\n     *              ]\n     *      "
+                    }
+                }
+            }
+        },
+        "/demo/demo": {
+            "get": {
+                "tags": [
+                    "\u8ba2\u5355"
+                ],
+                "summary": "\u8ba2\u5355\u652f\u4ed8\u6210\u529f, \u5ba2\u6237\u7aef\u56de\u8c03\u63a5\u53e3",
+                "description": "\u82e5\u7528\u6237\u53d6\u6d88\u652f\u4ed8\u6216\u652f\u4ed8\u5931\u8d25,\u5219\u8df3\u8f6c\u5230\u6211\u53c2\u4e0e\u7684\u5217\u8868\u9875\u9762",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\n     *          id=1\n     *          name=\u6d4b\u8bd5"
                     }
                 }
             }
@@ -654,62 +758,6 @@
                         "required": true,
                         "type": "string",
                         "default": "201707101223"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation"
-                    }
-                }
-            }
-        },
-        "/orders/get-pay-params": {
-            "get": {
-                "tags": [
-                    "\u8ba2\u5355"
-                ],
-                "summary": "\u83b7\u53d6\u652f\u4ed8\u53c2\u6570",
-                "description": "Author: lixinxin \u8fd9\u4e2a\u662f\u5728\u6536\u94f6\u53f0\u63a5\u53e3\u4e4b\u540e\u8c03\u7528,\u5ba2\u6237\u7aef\u83b7\u53d6\u5230\u652f\u4ed8\u53c2\u6570\u540e,\u518d\u8bf7\u6c42\u652f\u4ed8\u5b9d\u6216\u5fae\u4fe1\u5ba2\u6237\u7aef",
-                "parameters": [
-                    {
-                        "name": "sn",
-                        "in": "query",
-                        "description": "\u8ba2\u5355\u53f7",
-                        "required": true,
-                        "type": "string",
-                        "default": "20170101"
-                    },
-                    {
-                        "name": "pay_type",
-                        "in": "query",
-                        "description": "\u652f\u4ed8\u65b9\u5f0f",
-                        "required": true,
-                        "type": "string",
-                        "default": "\u652f\u4ed8\u5b9d\u652f\u4ed8"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation"
-                    }
-                }
-            }
-        },
-        "/orders/checkout": {
-            "get": {
-                "tags": [
-                    "\u8ba2\u5355"
-                ],
-                "summary": "\u6536\u94f6\u53f0\u63a5\u53e3",
-                "description": "Author: lixinxin \u5728\u8fd9\u4e2a\u63a5\u53e3\u83b7\u53d6\u53ef\u4ee5\u9009\u62e9\u7684\u652f\u4ed8\u65b9\u5f0f, \u9009\u53d6\u4e4b\u540e\u7d27\u63a5\u7740\u8c03\u7528orders/getPayParams \u63a5\u53e3\u83b7\u53d6\u9009\u62e9\u7684\u652f\u4ed8\u65b9\u5f0f\u7684\u52a0\u5bc6\u6570\u636e",
-                "parameters": [
-                    {
-                        "name": "sn",
-                        "in": "query",
-                        "description": "\u8ba2\u5355\u53f7",
-                        "required": true,
-                        "type": "string",
-                        "default": "201708029320"
                     }
                 ],
                 "responses": {

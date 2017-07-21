@@ -378,7 +378,23 @@ class OrdersController extends WebController
      *     description="用户ky-token",
      *    ),
      *   @SWG\Response(
-     *       response=200,description="successful operation",
+     *       response=200,description="
+     *          sn=订单号
+     *          default_pay_type=默认支付方式 支付宝支付
+     *          pay_types=默认支付方式 支付宝支付, 数组加字典
+     *              [
+     *                  show=是否启用,1=启用,0=不启用
+     *                  detail=支付方式介绍,例如: 推荐开通微信支付的用户
+     *                  type=支付方式中文名称,例如:支付宝
+     *                  img=支付方式icon图标
+     *              ]
+     *          amount=金额明细,数组加字典
+     *              [
+     *                  title=商品合计
+     *                  price=+ ￥10.22
+     *              ]
+     *
+     *     ",
      *   )
      * )
      */
@@ -422,31 +438,129 @@ class OrdersController extends WebController
             $order->saveProducts($newOrder);
             $order->saveCoupon($newOrder);
 
-            // 获取支付参数
-//            $pay = array_merge($this->pay, $newOrder->getPayParams());
-//            $pay['sn'] = $newOrder->sn;
-
             $transaction->commit();
         } catch (Exception $e) {
             $transaction->rollBack();
-//            print_r($e->getMessage());
-//            exit;
             self::showMsg($e->getMessage(), -1);
         }
 
-        $r = [
-            'sn' => $newOrder->sn,
-            'default_pay_type' => '支付宝支付',
-//            'pay_amount' => '￥' . floatval($order->pay_amount),
-//            'product_amount' => '￥' . floatval($order->productsAmount),
-            'pay_types' => $order->getPayTypes(Yii::$app->request->post('pay_ids', '["支付宝支付","微信支付"]')),
-            'amount' => $this->amountDesc
-        ];
+        self::showMsg($newOrder->checkout());
+    }
 
-        self::showMsg($r);
+
+    /**
+     * Name: actionGetPayParams
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-08
+     * @SWG\Get(path="/orders/get-pay-params",
+     *   tags={"订单"},
+     *   summary="获取支付参数",
+     *   description="Author: lixinxin 这个是在收银台接口之后调用,客户端获取到支付参数后,再请求支付宝或微信客户端",
+     *   @SWG\Parameter(name="sn", in="query", required=true, type="string",
+     *     default="20170101",
+     *     description="订单号",
+     *   ),
+     *   @SWG\Parameter(name="pay_type", in="query", required=true, type="string",
+     *     default="支付宝支付",
+     *     description="支付方式",
+     *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          alipay
+     *          wx_sign
+     *          wx_timestamp
+     *          wx_partner_id
+     *          wx_package
+     *          wx_nonce_str
+     *          yl_tn
+     *          wx_prepay_id
+     *     "
+     *   )
+     * )
+     */
+
+    public function actionGetPayParams()
+    {
+        $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'user_id' => $this->userId]);
+
+        $payType = Yii::$app->request->get('pay_type');
+
+        $this->pay = array_merge($this->pay, $order->getPayParams($payType));
+
+        self::showMsg($this->pay);
+    }
+
+    /**
+     * Name: actionCheckout
+     * Desc: 收银台页面
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-08
+     * @SWG\Get(path="/orders/checkout",
+     *   tags={"订单"},
+     *   summary="收银台接口",
+     *   description="Author: lixinxin 在这个接口获取可以选择的支付方式, 选取之后紧接着调用orders/getPayParams 接口获取选择的支付方式的加密数据",
+     *   @SWG\Parameter(name="sn", in="query", required=true, type="string", default="201708029320",
+     *     description="订单号",
+     *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          sn=订单号
+     *          default_pay_type=默认支付方式 支付宝支付
+     *          pay_types=默认支付方式 支付宝支付, 数组加字典
+     *              [
+     *                  show=是否启用,1=启用,0=不启用
+     *                  detail=支付方式介绍,例如: 推荐开通微信支付的用户
+     *                  type=支付方式中文名称,例如:支付宝
+     *                  img=支付方式icon图标
+     *              ]
+     *          amount=金额明细,数组加字典
+     *              [
+     *                  title=商品合计
+     *                  price=+ ￥10.22
+     *              ]
+     *      "
+     *   )
+     * )
+     */
+    public function actionCheckout()
+    {
+        $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'user_id' => $this->userId]);
+
+        $data = $order->checkout();
+
+        self::showMsg($data);
     }
 
     /** 订单支付成功 */
+    /**
+     * Name: actionPaymentSuccess
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-00-00
+     * @SWG\Get(path="/demo/demo",
+     *   tags={"订单"},
+     *   summary="订单支付成功, 客户端回调接口",
+     *   description="若用户取消支付或支付失败,则跳转到我参与的列表页面",
+     *   @SWG\Parameter(name="id", in="query", required=true, type="integer", default="1",
+     *     description=""
+     *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          id=1
+     *          name=测试"
+     *   )
+     * )
+     */
     public function actionPaymentSuccess()
     {
         $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'user_id' => $this->userId]);
@@ -776,101 +890,6 @@ class OrdersController extends WebController
             self::showMsg($e->getMessage(), -1);
         }
     }
-
-    /**
-     * Name: actionGetPayParams
-     * Desc:
-     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
-     * Date: 2017-07-08
-     * @SWG\Get(path="/orders/get-pay-params",
-     *   tags={"订单"},
-     *   summary="获取支付参数",
-     *   description="Author: lixinxin 这个是在收银台接口之后调用,客户端获取到支付参数后,再请求支付宝或微信客户端",
-     *   @SWG\Parameter(
-     *     name="sn",
-     *     in="query",
-     *     default="20170101",
-     *     description="订单号",
-     *     required=true,
-     *     type="string",
-     *   ),
-     *   @SWG\Parameter(
-     *     name="pay_type",
-     *     in="query",
-     *     default="支付宝支付",
-     *     description="支付方式",
-     *     required=true,
-     *     type="string",
-     *   ),
-     *   @SWG\Response(
-     *       response=200,description="successful operation"
-     *   )
-     * )
-     */
-    public function actionGetPayParams()
-    {
-        $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'user_id' => $this->userId]);
-
-        $payType = Yii::$app->request->get('pay_type');
-
-        $this->pay = array_merge($this->pay, $order->getPayParams($payType));
-
-        self::showMsg($this->pay);
-    }
-
-    /**
-     * Name: actionCheckout
-     * Desc: 收银台页面
-     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
-     * Date: 2017-07-08
-     * @SWG\Get(path="/orders/checkout",
-     *   tags={"订单"},
-     *   summary="收银台接口",
-     *   description="Author: lixinxin 在这个接口获取可以选择的支付方式, 选取之后紧接着调用orders/getPayParams 接口获取选择的支付方式的加密数据",
-     *   @SWG\Parameter(
-     *     name="sn",
-     *     in="query",
-     *     default="201708029320",
-     *     description="订单号",
-     *     required=true,
-     *     type="string",
-     *   ),
-     *   @SWG\Response(
-     *       response=200,description="successful operation"
-     *   )
-     * )
-     */
-    public function actionCheckout()
-    {
-        $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'user_id' => $this->userId]);
-
-        $data = [
-            'sn' => $order->sn,
-            'default_pay_type' => '支付宝支付',
-            'pay_types' => $order->getPayTypes(Yii::$app->request->post('pay_ids', '["支付宝支付","微信支付"]')),
-            'amount' => [
-                [
-                    'name' => '商品合计',
-                    'price' => '￥' . floatval($order->product_amount),
-                ],
-            ],
-        ];
-
-        if ($this->discountAmount > 0) {
-            $data['amount'][] = [
-                'name' => '红包抵扣',
-                'price' => '-￥' . floatval($this->discountAmount),
-            ];
-        }
-
-        $data['amount'][] = [
-            'name' => '支付金额',
-            'price' => '￥' . floatval($order->pay_amount),
-        ];
-
-        self::showMsg($data);
-    }
-
 
     /** 取订单实体 */
     protected function findOrderModel($params)
