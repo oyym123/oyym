@@ -84,7 +84,7 @@ class Base extends \yii\db\ActiveRecord
     /**
      * Name: replaceContentsImage
      * Desc: 替换图片路径
-     * User: lixinxin <lixinxin@zgzzzs.com>
+     * User: lixinxin <ulee@fangdazhongxin.com>
      * Date: 2017-03-10
      */
     public function replaceContentsImage()

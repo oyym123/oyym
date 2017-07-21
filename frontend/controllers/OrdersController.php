@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @link http://www.51zzzs.cn/
- * @copyright 2016 中国自主招生网
- * @author lixinxin@zgzzzs.com
+ * @link http://www.fangdazhongxin.com/
+ * @copyright 2016 众筹夺宝
+ * @author ulee@fangdazhongxin.com
  */
 
 namespace frontend\controllers;
@@ -302,7 +302,29 @@ class OrdersController extends WebController
      *     description="用户ky-token",
      *    ),
      *   @SWG\Response(
-     *       response=200,description="successful operation",
+     *       response=200,description="
+     *          title = 确认订单
+     *          pay_amount = 实付款
+     *          amount = 数组加字典
+     *              [
+     *                  title => 运费,
+     *                  price => + ￥1212.12,
+     *              [
+     *          products = 宝贝列表
+     *              [
+     *                  id = 宝贝id
+     *                  title = 宝贝标题
+     *                  img = 宝贝头图
+     *                  price = 宝贝价格
+     *                  count = 购买数量
+     *              ]
+     *          address = 默认默认地址, 字典
+     *              id = 1
+     *              username = 收货人姓名
+     *              img = 宝贝头图
+     *              mobile = 收货人手机号码
+     *              detail = 收货地址
+     *     ",
      *   )
      * )
      */
@@ -337,12 +359,13 @@ class OrdersController extends WebController
 
         $data = [
             'title' => '确认订单',
-            'user_name' => substr_replace(ArrayHelper::getValue(Yii::$app->user->identity, 'username'), '****', 3, 4),
+//            'user_name' => substr_replace(ArrayHelper::getValue(Yii::$app->user->identity, 'username'), '****', 3, 4),
             'pay_amount' => '￥' . floatval($order->payAmount),
-            'product_amount' => '￥' . floatval($order->productsAmount),
+//            'product_amount' => '￥' . floatval($order->productsAmount),
             'amount' => $order->amountDesc,
             'products' => $dataProducts,
             'address' => [
+                'id' => 0,
                 'username' => '',
                 'mobile' => '',
                 'detail' => ''
@@ -353,6 +376,7 @@ class OrdersController extends WebController
         $userAddress = UserAddress::getDefaultAddress();
         if ($userAddress) {
             $data['address'] = [
+                'id' => $userAddress->id,
                 'username' => $userAddress->user_name,
                 'mobile' => $userAddress->telephone,
                 'detail' => UserAddress::mergeAddress($userAddress)

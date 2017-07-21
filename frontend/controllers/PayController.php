@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @link http://www.51zzzs.cn/
- * @copyright 2016 中国自主招生网
- * @author lixinxin@zgzzzs.com
+ * @link http://www.fangdazhongxin.com/
+ * @copyright 2016 众筹夺宝
+ * @author ulee@fangdazhongxin.com
  */
 namespace frontend\controllers;
 

@@ -270,7 +270,7 @@ class WebController extends Controller
     /**
      * Name: isWaitCheckInIos
      * Desc: 正在审核的ios版本
-     * User: lixinxin <lixinxin@zgzzzs.com>
+     * User: lixinxin <ulee@fangdazhongxin.com>
      * Date: 2017-02-14
      * @return bool
      */
