@@ -80,6 +80,12 @@ class Product extends Base
         Product::MODEL_TIME => '时间模式',
     ];
 
+    /** 返回宝贝模式 */
+    public function modelTypeText()
+    {
+        return ArrayHelper::getValue(self::$modelType, $this->model, '');
+    }
+
     /**
      * @inheritdoc
      */
@@ -459,65 +465,65 @@ class Product extends Base
     /** 卖家-我发布的/卖出的宝贝列表 样式布局 */
     public function sellerProductLayout()
     {
-        $r = '买家_正在进行';
+        $r = '正在进行';
         if ($this->status == Product::STATUS_NOT_SALE) {
-            $r = '买家_未上架';
+            $r = '未上架';
         } elseif ($this->status == Product::STATUS_IN_PROGRESS) {
-            $r = '买家_正在进行';
+            $r = '正在进行';
         } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
-            $r = '买家_待揭晓';
+            $r = '待揭晓';
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
             // 已揭晓
             if ($luckOrder = $this->order) {
                 if ($luckOrder->status == Order::STATUS_WAIT_SHIP) {
-                    $r = '卖家_待发货';
+                    $r = '待发货';
                 } elseif ($luckOrder->status == Order::STATUS_SHIPPED) {
-                    $r = '卖家_已发货';
+                    $r = '已发货';
                 } elseif ($luckOrder->status == Order::STATUS_CONFIRM_RECEIVING) {
                     // 已签收 如果双方评价, 则状态为 已完成
                     if (in_array($luckOrder->evaluation_status, [0, 1])) {
-                        $r = '卖家_待评价';
+                        $r = '待评价';
                     }
                 } elseif ($luckOrder->status == Order::STATUS_COMPLETE) {
                     // 双方都评价后进入该状态
-                    $r = '卖家_已完成';
+                    $r = '已完成';
                 }
             }
         }
 
-        return $r;
+        return $this->modelTypeText() . '_卖家_' . $r;
     }
 
     /** 买家-我参与的/买到的宝贝列表 样式布局 */
     public function buyerProductLayout()
     {
-        $r = '买家_正在进行';
+        $r = '正在进行';
         if ($this->status == Product::STATUS_IN_PROGRESS) {
-            $r = '买家_正在进行';
+            $r = '正在进行';
         } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
-            $r = '买家_待揭晓';
+            $r = '待揭晓';
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
             // 已揭晓
             if ($this->order && $this->order->buyer_id == Yii::$app->user->identity->id) {
                 if ($this->order->status == Order::STATUS_WAIT_SHIP) {
-                    $r = '买家_待发货';
+                    $r = '待发货';
                 } elseif ($this->order->status == Order::STATUS_SHIPPED) {
-                    $r = '买家_已发货';
+                    $r = '已发货';
                 } elseif ($this->order->status == Order::STATUS_CONFIRM_RECEIVING) {
                     // 已签收
-                    if (in_array($this->order->evaluation_status, [0, 1])) {
-                        $r = '卖家_待评价';
+                    if (in_array($this->order->evaluation_status, [0, 2])) {
+                        $r = '待评价';
                     }
                 } elseif ($this->order->status == Order::STATUS_COMPLETE) {
                     // 双方都评价后进入该状态
-                    $r = '卖家_已完成';
+                    $r = '已完成';
                 }
             } else {
-                $r = '买家_已揭晓'; // 未中奖用户
+                $r = '已揭晓'; // 未中奖用户
             }
         }
 
-        return $r;
+        return $this->modelTypeText() . '_买家_' . $r;;
     }
 
     /** 卖家-我发布的/我卖出的 宝贝列表 控制链接跳转 */
@@ -583,12 +589,13 @@ class Product extends Base
         return $r;
     }
 
-    /** 卖家宝贝列表 字段 */
+    /** 卖家发布的宝贝列表 字段 */
     public function sellerProductListField($items)
     {
         $r = [];
         foreach ($items as $key => $item) {
             $r[] = [
+                /*
                 'layout' => function ($item) {
                     $r = '数量模式_未上架';
                     if ($item->model == Product::MODEL_NUMBER) { // 数量模式
@@ -614,7 +621,7 @@ class Product extends Base
                     }
 
                     return $r;
-                },
+                },*/
                 'product_id' => $item->id,
                 'order_id' => $item->order ? $item->order->id : 0,
                 'title' => $item->title,
@@ -636,11 +643,18 @@ class Product extends Base
     }
 
     /** 卖家-所有发布的的宝贝 */
-    public function myProducts($params)
+    public function sellerProducts($params)
     {
         $query = Product::find()->where([
             'created_by' => $params['created_by'],
-            'deleted_at' => 0
+            'deleted_at' => 0,
+//            'status' => [
+//                self::STATUS_NOT_SALE, // 未上架
+//                self::STATUS_IN_PROGRESS, // 进行中
+//                self::STATUS_WAIT_PUBLISH, // 待揭晓
+//                self::STATUS_PUBLISHED, // 已揭晓
+//                self::STATUS_CANCELED, // 已取消
+//            ]
         ]);
 
         if ($params['status']) {
@@ -787,6 +801,49 @@ class Product extends Base
     public function getNumberAModel()
     {
         return OrderAwardCode::find()->where(['product_id' => $this->id, 'deleted_at' => 0]);
+    }
+
+    /** 判断宝贝是否已有订单产生 */
+    public function hasOrder()
+    {
+        return $this->order_award_count > 0;
+    }
+
+    /** 上架 */
+    public function upSell()
+    {
+        if ($this->status != Product::STATUS_NOT_SALE) {
+            return [-1, '必须下架中的宝贝才可以上架'];
+        }
+
+        $this->status = Product::STATUS_IN_PROGRESS;
+        if ($this->save()) {
+            return [0, '宝贝已上架'];
+        }
+
+//         print_r($this->getErrors());
+        return [0, '宝贝上架失败'];
+    }
+
+    /** 下架 */
+    public function downSell()
+    {
+        if ($this->hasOrder()) {
+            return [-1, '已有用户参与, 不允许下架'];
+        }
+
+        $this->status = Product::STATUS_NOT_SALE;
+        if ($this->save()) {
+            return [0, '宝贝已下架'];
+        }
+
+//         print_r($this->getErrors());
+        return [0, '宝贝下架失败'];
+    }
+
+    /** 数量模式下, 计算新的进度值, 值为0到100 */
+    public function getNewProgress($NewOrderAwardCount) {
+        return min(100, number_format($NewOrderAwardCount / $this->total, 2, '.', '') * 100);
     }
 }
 

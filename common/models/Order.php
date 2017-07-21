@@ -44,8 +44,8 @@ class Order extends Base
     const STATUS_WAIT_REFUND = 65; // 待退款 (揭晓后, 给没中奖的客户退款,卖家同意退款)
     const STATUS_REFUNDED = 68; // 已退款 (退款成功)
     const STATUS_WAIT_COMMENT = 70; // 待评价
-    const STATUS_SELLER_COMMENTED = 71; // 卖家已评价
-    const STATUS_BUYER_COMMENTED = 72; // 买家已评价
+//    const STATUS_SELLER_COMMENTED = 71; // 卖家已评价
+//    const STATUS_BUYER_COMMENTED = 72; // 买家已评价
 //    const STATUS_ALL_COMMENTED = 73; // 买卖双方已评价
     const STATUS_COMPLETE = 100; // 已完成 买卖双方已评价后状态变为已完成
 
@@ -211,11 +211,11 @@ class Order extends Base
         $r = [0, ''];
 
         if ($this->orderProduct && $this->orderProduct->buy_type == OrderProduct::UNIT_PRICE) {
-            $transaction = Yii::$app->db->beginTransaction();
             // 购买方式是参与众筹,在支付成功后,生成摇奖编码
             $maxAwardCode = $this->orderProduct->product->getMaxAwardCode(); // 最大编码
             $newAwardCode = $this->orderProduct->product->getMaxAwardCode() + $this->orderProduct->count; // 新增后的最大
             for ($newAwardCode; $newAwardCode > $maxAwardCode; $newAwardCode--) {
+                // 生成摇奖编号
                 $awardCodeModel = new OrderAwardCode();
                 $awardCodeModel->setAttributes([
                     'order_id' => $this->id,
@@ -226,12 +226,30 @@ class Order extends Base
                     'buyer_id' => $this->buyer_id,
                 ]);
                 if (!$awardCodeModel->save()) {
-                    $transaction->rollBack();
                     return [400, '保存摇奖号码失败'];
                 }
             }
 
-            $transaction->commit();
+            if ($this->orderProduct->product && $this->orderProduct->product->model == Product::MODEL_NUMBER) {
+                // 数量模式的参与方式需要 更新宝贝数据,包括参与人数
+                if ($this->orderProduct->buy_type == OrderProduct::UNIT_PRICE) {
+                    // 单价购买意味着是 众筹模式
+                    $this->orderProduct->product->order_award_count += 1;
+
+                    if ($this->orderProduct->product->order_award_count >= $this->orderProduct->product->order_award_count // 已参与人数达到需要参与人数
+                        && $this->orderProduct->product->model == Product::MODEL_NUMBER // 数量模式
+                    ) {
+                        $this->orderProduct->product->progress = $this->orderProduct->product->getNewProgress($this->orderProduct->product->order_award_count);
+                        $this->orderProduct->product->status = Product::STATUS_WAIT_PUBLISH; // 待揭晓
+                        $this->orderProduct->product->count_down = time() + 86400; // 揭晓倒计时截止时间戳
+                    }
+                    if (!$this->orderProduct->product->save()) {
+                        return [400, '更新宝贝参与记录失败'];
+                    }
+                } else {
+                    // 一口价 购买
+                }
+            }
         }
 
         return $r;
@@ -504,14 +522,6 @@ class Order extends Base
     {
         return $this->orderProduct->buy_type == OrderProduct::A_PRICE;
     }
-
-//self::STATUS_WAIT_PAY => '待付款',
-//self::STATUS_WAIT_PAY_CONFIRM => '转账待审核',
-//self::STATUS_PAYED => '交易成功',
-//self::STATUS_COMPLETED => '完成',
-//self::STATUS_CANCEL => '交易关闭',
-//self::STATUS_DELETED => '已删除',
-
 
     /** 卖家-待发货的订单 */
     public function sellerWaitShipping()

@@ -391,21 +391,37 @@
                 }
             }
         },
-        "/orders/buyer-products": {
+        "/orders/buyer-product-list": {
             "get": {
                 "tags": [
                     "\u6211\u7684"
                 ],
-                "summary": "\u6211\u4e70\u5230\u7684",
+                "summary": "\u6211\u5356\u51fa\u7684",
                 "description": "Author: lixinxin",
                 "parameters": [
                     {
                         "name": "status",
                         "in": "query",
-                        "description": "status\u7684\u503c\u5206\u4e3a: \u5168\u90e8 || \u6b63\u5728\u8fdb\u884c || \u5f85\u652f\u4ed8 || \u5f85\u63ed\u6653 || \u5df2\u63ed\u6653 || \u5f85\u53d1\u8d27 || \u5f85\u7b7e\u6536 || \u5f85\u8bc4\u4ef7 || \u5df2\u5b8c\u6210 || \u9000\u8d27\u7533\u8bf7",
+                        "description": "status\u7684\u503c\u5206\u4e3a: \u5168\u90e8=0 || \u5f85\u53d1\u8d27=20 || \u5df2\u53d1\u8d27=25 || \u5f85\u8bc4\u4ef7=70 || \u5df2\u5b8c\u6210=100 || \u9000\u8d27\u7533\u8bf7=60",
                         "required": true,
                         "type": "integer",
                         "default": "\u5168\u90e8"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "\u6570\u636e\u6e38\u6807",
+                        "required": true,
+                        "type": "integer",
+                        "default": "0"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
                     }
                 ],
                 "responses": {
@@ -418,7 +434,7 @@
         "/orders/confirm": {
             "get": {
                 "tags": [
-                    "\u6211\u7684"
+                    "\u8ba2\u5355"
                 ],
                 "summary": "\u63d0\u4ea4\u8ba2\u5355\u524d\u7684\u786e\u8ba4",
                 "description": "Author: lixinxin",
@@ -440,16 +456,16 @@
             }
         },
         "/orders/submit": {
-            "get": {
+            "post": {
                 "tags": [
-                    "\u6211\u7684"
+                    "\u8ba2\u5355"
                 ],
                 "summary": "\u63d0\u4ea4\u8ba2\u5355",
                 "description": "Author: lixinxin",
                 "parameters": [
                     {
                         "name": "products",
-                        "in": "query",
+                        "in": "formData",
                         "description": "\u8d2d\u4e70\u7684\u5b9d\u8d1d\u660e\u7ec6 buy_type:1=\u4e00\u53e3\u4ef72=\u5355\u4ef7",
                         "required": false,
                         "type": "string",
@@ -457,11 +473,19 @@
                     },
                     {
                         "name": "pay_type",
-                        "in": "query",
+                        "in": "formData",
                         "description": "\u4f7f\u7528\u7684\u652f\u4ed8\u65b9\u5f0f",
                         "required": false,
                         "type": "string",
                         "default": "alipay"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
                     }
                 ],
                 "responses": {
@@ -471,12 +495,36 @@
                 }
             }
         },
-        "/orders/view": {
+        "/orders/seller-view": {
             "get": {
                 "tags": [
                     "\u8ba2\u5355"
                 ],
-                "summary": "",
+                "summary": "\u5356\u5bb6-\u6211\u5356\u51fa\u7684\u8ba2\u5355\u8be6\u60c5",
+                "description": "Author: lixinxin",
+                "parameters": [
+                    {
+                        "name": "sn",
+                        "in": "query",
+                        "description": "",
+                        "required": true,
+                        "type": "string",
+                        "default": "201707101223"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/orders/buyer-view": {
+            "get": {
+                "tags": [
+                    "\u8ba2\u5355"
+                ],
+                "summary": "\u4e70\u5bb6-\u6211\u4e70\u5230\u7684\u8ba2\u5355\u8be6\u60c5",
                 "description": "Author: lixinxin",
                 "parameters": [
                     {
@@ -556,7 +604,7 @@
                 "tags": [
                     "\u8ba2\u5355"
                 ],
-                "summary": "",
+                "summary": "\u652f\u4ed8\u6210\u529f\u540e\u56de\u8c03\u63a5\u53e3-\u7528\u4e8e\u5c55\u793a\u4e70\u5230\u7684\u6447\u5956\u7f16\u53f7\u7b49\u4fe1\u606f",
                 "description": "Author: lixinxin",
                 "parameters": [
                     {
@@ -570,7 +618,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "[{'msg':'\u4f60\u6210\u529f\u53c2\u4e0e\u4e861\u4ef6\u5b9d\u8d1d\u5171\u8ba12\u4eba\u6b21,\u6d3b\u52a8\u7f16\u53f7\u5982\u4e0b', 'award_code':{'123','234'}}]"
+                        "description": "\n     *          layout=\u4f17\u7b79\u593a\u5b9d || \u4e00\u53e3\u4ef7, \u7528\u6765\u5c55\u793a\u4e0d\u540c\u7684\u5e03\u5c40\u9875\u9762\n     *          msg=\u4f60\u6210\u529f\u53c2\u4e0e\u4e861\u4ef6\u5b9d\u8d1d\u5171\u8ba12\u4eba\u6b21,\u6d3b\u52a8\u7f16\u53f7\u5982\u4e0b,\n     *          product_title=iphone 6s \u5b8c\u7f8e\u8d8a\u72f1\u7248\n     *          award_code=\u6570\u7ec4\n     *              123\n     *              123\n     *     "
                     }
                 }
             }
@@ -660,7 +708,7 @@
                 }
             }
         },
-        "/products/my-products": {
+        "/products/seller-product-list": {
             "get": {
                 "tags": [
                     "\u6211\u7684"
@@ -695,12 +743,12 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "\n     *          product_count=\u5b9d\u8d1d\u603b\u6570\n     *          product_list=\u5b9d\u8d1d\u5217\u8868\n     *              layout=\u5e03\u5c40\u7c7b\u578b[\u6570\u91cf\u6a21\u5f0f_\u672a\u4e0a\u67b6 || \u6570\u91cf\u6a21\u5f0f_\u8fdb\u884c\u4e2d || \u6570\u91cf\u6a21\u5f0f_\u5f85\u63ed\u6653 || \u6570\u91cf\u6a21\u5f0f_\u5df2\u63ed\u6653 || \u65f6\u95f4\u6a21\u5f0f_\u672a\u4e0a\u67b6 || \u65f6\u95f4\u6a21\u5f0f_\u8fdb\u884c\u4e2d || \u65f6\u95f4\u6a21\u5f0f_\u5f85\u63ed\u6653 || \u65f6\u95f4\u6a21\u5f0f_\u5df2\u63ed\u6653]\n     *              product_id=\u5b9d\u8d1did\n     *              order_id=\u8ba2\u5355id\n     *              title=\u6807\u9898\n     *              img=\u5b9d\u8d1d\u5934\u56fe\n     *              total=\u603b\u9700\u4eba\u6b21\n     *              residual_total=\u5269\u4f59\u4eba\u6b21\n     *              residual_time=\u7ed3\u675f\u65f6\u95f4\n     *              progress=\u8fdb\u5ea6\n     *              publish_countdown=\u63ed\u6653\u5012\u8ba1\u65f6\n     *              a_price=\u4e00\u53e3\u4ef7\n     *              unit_price=\u5355\u4ef7\n     *              status=\u72b6\u6001 [\u4e0b\u67b6 || \u8fdb\u884c\u4e2d || \u5f85\u63ed\u6653 || \u5df2\u63ed\u6653]\n     *              actions=\u6570\u7ec4\u4e0b\u662f\u5b57\u5178\n     *                  [\n     *                      title=\u4e0a\u67b6\n     *                      url=up_sell\n     *                  ],\n     *                  [\n     *                      title=\u4e0b\u67b6\n     *                      url=down_sell\n     *                  ],\n     *                  [\n     *                      title=\u7f16\u8f91\n     *                      url=edit\n     *                  ],\n     *                  [\n     *                      title=\u5220\u9664\n     *                      url=edit\n     *                  ]\n     *              url=\u94fe\u63a5\u5730\u5740[\u8df3\u8f6c\u5230\u5b9d\u8d1d\u8be6\u60c5\u9875=product, \u8df3\u8f6c\u5230\u8ba2\u5355\u8be6\u60c5\u9875=order]\n     *              order_award_count=\u5df2\u53c2\u4e0e\u4eba\u6b21"
+                        "description": "\n     *          product_count=\u5b9d\u8d1d\u603b\u6570\n     *          product_list=\u5b9d\u8d1d\u5217\u8868\n     *              layout=\u5e03\u5c40\u7c7b\u578b[\u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u672a\u4e0a\u67b6 || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u8fdb\u884c\u4e2d || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u5f85\u63ed\u6653 || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u5df2\u63ed\u6653 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u672a\u4e0a\u67b6 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u8fdb\u884c\u4e2d || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u5f85\u63ed\u6653 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u5df2\u63ed\u6653]\n     *              product_id=\u5b9d\u8d1did\n     *              order_id=\u8ba2\u5355id\n     *              title=\u6807\u9898\n     *              img=\u5b9d\u8d1d\u5934\u56fe\n     *              total=\u603b\u9700\u4eba\u6b21\n     *              residual_total=\u5269\u4f59\u4eba\u6b21\n     *              residual_time=\u7ed3\u675f\u65f6\u95f4\n     *              progress=\u8fdb\u5ea6\n     *              publish_countdown=\u63ed\u6653\u5012\u8ba1\u65f6\n     *              a_price=\u4e00\u53e3\u4ef7\n     *              unit_price=\u5355\u4ef7\n     *              status=\u72b6\u6001 [\u4e0b\u67b6 || \u8fdb\u884c\u4e2d || \u5f85\u63ed\u6653 || \u5df2\u63ed\u6653]\n     *              actions=\u6570\u7ec4\u4e0b\u662f\u5b57\u5178\n     *                  [\n     *                      title=\u4e0a\u67b6\n     *                      url=up_sell\n     *                  ],\n     *                  [\n     *                      title=\u4e0b\u67b6\n     *                      url=down_sell\n     *                  ],\n     *                  [\n     *                      title=\u7f16\u8f91\n     *                      url=edit\n     *                  ],\n     *                  [\n     *                      title=\u5220\u9664\n     *                      url=edit\n     *                  ]\n     *              url=\u94fe\u63a5\u5730\u5740[\u8df3\u8f6c\u5230\u5b9d\u8d1d\u8be6\u60c5\u9875=product, \u8df3\u8f6c\u5230\u8ba2\u5355\u8be6\u60c5\u9875=order]\n     *              order_award_count=\u5df2\u53c2\u4e0e\u4eba\u6b21"
                     }
                 }
             }
         },
-        "/products/my-buy": {
+        "/products/buyer-product-list": {
             "get": {
                 "tags": [
                     "\u6211\u7684"
@@ -715,6 +763,22 @@
                         "required": true,
                         "type": "integer",
                         "default": "\u5168\u90e8"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "\u6570\u636e\u6e38\u6807",
+                        "required": true,
+                        "type": "integer",
+                        "default": "0"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
                     }
                 ],
                 "responses": {
@@ -856,6 +920,38 @@
                 "responses": {
                     "200": {
                         "description": "\n     *          order_award_count=\u53c2\u4e0e\u4eba\u6b21\n     *          number_a=12345689\n     *          number_b=123456890\n     *          product_title=iphone 6s 9\u6210\u65b0 \u4fbf\u5b9c\u51fa\u4e86 800\u5305\u90ae\u4e0d\u8bae\u4ef7,\u624b\u5feb\u6709\u624b\u6162\u65e0\n     *          luck_number=\u5e78\u8fd0\u53f7\u7801"
+                    }
+                }
+            }
+        },
+        "/products/up-sell": {
+            "get": {
+                "tags": [
+                    "\u4ea7\u54c1"
+                ],
+                "summary": "\u4e0a\u67b6",
+                "description": "Author: lixinxin",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u5b9d\u8d1did",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\n     *          code=0\n     *          msg=\u4e0a\u67b6\u6210\u529f"
                     }
                 }
             }

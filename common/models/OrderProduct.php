@@ -48,6 +48,31 @@ class OrderProduct extends Base
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => Yii::t('app', 'ID'),
+            'order_id' => Yii::t('app', '订单号'),
+            'pid' => Yii::t('app', '宝贝id'),
+            'buyer_id' => Yii::t('app', '买家id'),
+            'seller_id' => Yii::t('app', '卖家id'),
+            'random_code' => Yii::t('app', '随机码'),
+            'title' => Yii::t('app', '宝贝标题'),
+            'count' => Yii::t('app', '购买数量'),
+            'price' => Yii::t('app', '购买价格'),
+            'discount_price' => Yii::t('app', '折扣价格'),
+            'coupon_id' => Yii::t('app', '优惠券id'),
+            'buy_type' => Yii::t('app', '购买类型:1=一口价2=单价'),
+            'model_type' => Yii::t('app', 'json序列化其他信息'),
+            'created_at' => Yii::t('app', '创建时间'),
+            'updated_at' => Yii::t('app', '更新时间'),
+        ];
+    }
+
+
     /** 获取卖家用户信息 */
     public function getSeller()
     {
@@ -72,28 +97,9 @@ class OrderProduct extends Base
         return $this->hasMany(OrderAwardCode::className(), ['order_product_id' => 'id']);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => Yii::t('app', 'ID'),
-            'order_id' => Yii::t('app', '订单号'),
-            'pid' => Yii::t('app', '宝贝id'),
-            'buyer_id' => Yii::t('app', '买家id'),
-            'seller_id' => Yii::t('app', '卖家id'),
-            'random_code' => Yii::t('app', '随机码'),
-            'title' => Yii::t('app', '宝贝标题'),
-            'count' => Yii::t('app', '购买数量'),
-            'price' => Yii::t('app', '购买价格'),
-            'discount_price' => Yii::t('app', '折扣价格'),
-            'coupon_id' => Yii::t('app', '优惠券id'),
-            'buy_type' => Yii::t('app', '购买类型:1=一口价2=单价'),
-            'model_type' => Yii::t('app', 'json序列化其他信息'),
-            'created_at' => Yii::t('app', '创建时间'),
-            'updated_at' => Yii::t('app', '更新时间'),
-        ];
+    /** 取宝贝 */
+    public function getProduct(){
+        return $this->hasOne(Product::className(), ['id' => 'pid']);
     }
 
 }

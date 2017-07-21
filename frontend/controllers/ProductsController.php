@@ -30,7 +30,7 @@ class ProductsController extends WebController
     {
         parent::init();
         if (empty($this->userId) && in_array(str_replace('products/', '', Yii::$app->requestedRoute), [
-                'create', 'lottery', 'my-products'
+                'create', 'lottery', 'seller-product-list'
             ])
         ) {
             self::needLogin();
@@ -138,11 +138,11 @@ class ProductsController extends WebController
     }
 
     /**
-     * Name: actionMyProducts
+     * Name: actionSellerProductList
      * Desc:
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-12
-     * @SWG\Get(path="/products/my-products",
+     * @SWG\Get(path="/products/seller-product-list",
      *   tags={"我的"},
      *   summary="我发布的",
      *   description="Author: lixinxin",
@@ -159,7 +159,7 @@ class ProductsController extends WebController
      *       response=200,description="
      *          product_count=宝贝总数
      *          product_list=宝贝列表
-     *              layout=布局类型[数量模式_未上架 || 数量模式_进行中 || 数量模式_待揭晓 || 数量模式_已揭晓 || 时间模式_未上架 || 时间模式_进行中 || 时间模式_待揭晓 || 时间模式_已揭晓]
+     *              layout=布局类型[数量模式_卖家_未上架 || 数量模式_卖家_进行中 || 数量模式_卖家_待揭晓 || 数量模式_卖家_已揭晓 || 时间模式_卖家_未上架 || 时间模式_卖家_进行中 || 时间模式_卖家_待揭晓 || 时间模式_卖家_已揭晓]
      *              product_id=宝贝id
      *              order_id=订单id
      *              title=标题
@@ -195,10 +195,10 @@ class ProductsController extends WebController
      * )
      */
 
-    public function actionMyProducts($status)
+    public function actionSellerProductList($status)
     {
         $productModel = new Product();
-        list($sellerAllProducts, $count) = $productModel->myProducts([
+        list($sellerAllProducts, $count) = $productModel->sellerProducts([
             'created_by' => Yii::$app->user->identity->id,
             'status' => $status,
             'created_by' => $this->userId,
@@ -214,24 +214,30 @@ class ProductsController extends WebController
     }
 
     /**
-     * Name: actionMyBuy
+     * Name: actionBuyerProductList
      * Desc:
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-12
      * @param $status
-     * @SWG\Get(path="/products/my-buy",
+     * @SWG\Get(path="/products/buyer-product-list",
      *   tags={"我的"},
      *   summary="我参与的",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="全部",
      *     description="宝贝状态,传的值有: 全部 || 正在进行 || 待揭晓 , 这儿没有 待发货,代签收"
      *   ),
+     *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
+     *     description="数据游标"
+     *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
      * )
      */
-    public function actionMyBuy($status)
+    public function actionBuyerProductList($status)
     {
 
     }
@@ -584,5 +590,63 @@ class ProductsController extends WebController
         ];
 
         self::showMsg($r);
+    }
+
+    /**
+     * Name: actionUpSell
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-19
+     * @SWG\Get(path="/products/up-sell",
+     *   tags={"产品"},
+     *   summary="上架",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="id", in="query", required=true, type="integer", default="1",
+     *     description="宝贝id"
+     *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          code=0
+     *          msg=上架成功"
+     *   )
+     * )
+     */
+    public function actionUpSell($id)
+    {
+        $product = $this->findModel(['id' => $id]);
+        list($code, $msg) = $product->upSell();
+        self::showMsg($msg, $code);
+    }
+
+    /**
+     * Name: actionDownSell
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-19
+     * @SWG\Get(path="/products/up-sell",
+     *   tags={"产品"},
+     *   summary="下架",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="id", in="query", required=true, type="integer", default="1",
+     *     description="宝贝id"
+     *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          code=0
+     *          msg=下架成功"
+     *   )
+     * )
+     */
+    public function actionDownSell($id)
+    {
+        $product = $this->findModel(['id' => $id]);
+        list($code, $msg) = $product->downSell();
+        self::showMsg($msg, $code);
     }
 }
