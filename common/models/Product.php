@@ -761,7 +761,34 @@ class Product extends Base
     // ---------------------------------------卖家/买家分割线-------------------------------------- //
 
     /** 买家-所有参与的宝贝 */
-    public function buyerAll()
+    public function buyerProduct($params)
+    {
+        $query = Order::find()->where([
+            'buyer_id' => Yii::$app->user->identity->id,
+            'deleted_at' => 0,
+//            'status' => [
+//                Order::STATUS_WAIT_PAY, // 待付款
+//                Order::STATUS_PAYED, // 已付款
+//                Order::STATUS_REFUNDED, // 退款成功
+//            ]
+        ]);
+
+        if ($params['status'] == Order::STATUS_WAIT_PAY) {
+            // 待付款
+            $query->andWhere(['status' => $params['status']]);
+        }
+
+        if ($params['status']) {
+            $query->andWhere(['status' => $params['status']]);
+        }
+
+        $query->offset($params['offset'])->limit($this->psize);
+
+        return [$this->sellerProductListField($query->all()), $query->count()];
+    }
+
+    /** 买家-所有参与的 */
+    public function buyerAllProduct()
     {
 
     }

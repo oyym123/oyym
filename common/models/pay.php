@@ -25,7 +25,7 @@ class pay extends Base
      */
     public static function tableName()
     {
-        return '{{%order_pay}}';
+        return '{{%pay}}';
     }
 
     /**

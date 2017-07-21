@@ -6,6 +6,8 @@ use Yii;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use common\helpers\Weixin;
+use app\helpers\Helper;
 
 
 /**
@@ -414,11 +416,11 @@ class Order extends Base
     {
         $payType = $payType ?: $this->pay_type;
         switch ($payType) {
-            case 1 :  // 支付宝
+            case '支付宝支付' :
                 return $this->_alipay();
                 break;
 
-            case 2: // 微信
+            case '微信支付':
                 return $this->_weixinPay();
                 break;
         }
@@ -431,7 +433,7 @@ class Order extends Base
         require_once(Yii::getAlias('@app') . "/sdk/alipay/lib/alipay_core.function.php");
         require_once(Yii::getAlias('@app') . "/sdk/alipay/lib/alipay_rsa.function.php");
 
-        $productTitle = $this->product ? ArrayHelper::getValue($this->product, "0.title") : '';
+        $productTitle = $this->orderProduct ? ArrayHelper::getValue($this->orderProduct, "title") : '';
 
         $apiParams = [
             'service' => 'mobile.securitypay.pay',
@@ -463,7 +465,7 @@ class Order extends Base
     /** 获取微信支付参数 */
     public function _weixinPay()
     {
-        $productTitle = $this->product ? ArrayHelper::getValue($this->product, "0.title") : '';
+        $productTitle = $this->orderProduct ? ArrayHelper::getValue($this->orderProduct, "title") : '';
 
         if ($this->pay) {
             $signParams = [
@@ -494,7 +496,7 @@ class Order extends Base
             'body' => $productTitle,
             'out_trade_no' => $this->sn,
             'total_fee' => $this->pay_amount * 100,
-            'spbill_create_ip' => Helper::getIP(),
+            'spbill_create_ip' => Yii::$app->request->userIP,
             'notify_url' => Url::to('/weixinpayCallback.php', true),
             'trade_type' => 'APP',
         ];
@@ -537,9 +539,9 @@ class Order extends Base
             }
 
             /** 保存微信支付日志 */
-            $pay = new OrderPay();
-            $pay->sn = $this->sn;
-            $pay->order_id = $this->id;
+            $pay = new Pay();
+//            $pay->sn = $this->sn;
+//            $pay->order_id = $this->id;
             $pay->pay_type = $this->pay_type;
             $pay->out_trade_no = $data['prepay_id'];
             $pay->out_trade_status = '等待付款';
@@ -607,6 +609,12 @@ class Order extends Base
         ];
 
         return $r;
+    }
+
+    /** 获取支付结果 */
+    public function getPay()
+    {
+        return $this->hasOne(Pay::className(), ['type_id' => 'id']);
     }
 
     /** 取买家信息 */

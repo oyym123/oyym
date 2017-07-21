@@ -517,13 +517,17 @@ class OrdersController extends WebController
 
     public function actionGetPayParams()
     {
-        $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'user_id' => $this->userId]);
+        $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'buyer_id' => $this->userId]);
 
         $payType = Yii::$app->request->get('pay_type');
+        try {
+            $this->pay = array_merge($this->pay, $order->getPayParams($payType));
+            self::showMsg($this->pay);
+        } catch (Exception $e) {
+            self::showMsg($e->getMessage(), -1);
+        }
 
-        $this->pay = array_merge($this->pay, $order->getPayParams($payType));
 
-        self::showMsg($this->pay);
     }
 
     /**

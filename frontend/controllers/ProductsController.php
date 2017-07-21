@@ -30,7 +30,7 @@ class ProductsController extends WebController
     {
         parent::init();
         if (empty($this->userId) && in_array(str_replace('products/', '', Yii::$app->requestedRoute), [
-                'create', 'lottery', 'seller-product-list'
+                'create', 'lottery', 'seller-product-list', 'buyer-product-list'
             ])
         ) {
             self::needLogin();
@@ -226,7 +226,7 @@ class ProductsController extends WebController
      *   summary="我参与的",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="全部",
-     *     description="宝贝状态,传的值有: 全部 || 正在进行 || 待揭晓 , 这儿没有 待发货,代签收"
+     *     description="宝贝状态,传的值有: 全部 || 正在进行 || 待揭晓 || 已揭晓, 这儿没有 待发货,代签收"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
      *     description="数据游标"
@@ -235,13 +235,60 @@ class ProductsController extends WebController
      *     description="用户ky-token",
      *    ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *          product_count=宝贝总数
+     *          product_list=宝贝列表
+     *              layout=布局类型[数量模式_买家_进行中 || 数量模式_买家_待揭晓 || 数量模式_买家_已揭晓 || 时间模式_买家_进行中 || 时间模式_买家_待揭晓 || 时间模式_买家_已揭晓]
+     *              product_id=宝贝id
+     *              order_id=订单id
+     *              title=标题
+     *              img=宝贝头图
+     *              total=总需人次
+     *              residual_total=剩余人次
+     *              residual_time=结束时间
+     *              progress=进度
+     *              publish_countdown=揭晓倒计时
+     *              a_price=一口价
+     *              unit_price=单价
+     *              status=状态 [下架 || 进行中 || 待揭晓 || 已揭晓]
+     *              actions=数组下是字典
+     *                  [
+     *                      title=上架
+     *                      url=up_sell
+     *                  ],
+     *                  [
+     *                      title=下架
+     *                      url=down_sell
+     *                  ],
+     *                  [
+     *                      title=编辑
+     *                      url=edit
+     *                  ],
+     *                  [
+     *                      title=删除
+     *                      url=edit
+     *                  ]
+     *              url=链接地址[跳转到宝贝详情页=product, 跳转到订单详情页=order]
+     *              order_award_count=已参与人次"
      *   )
      * )
      */
     public function actionBuyerProductList($status)
     {
+        $productModel = new Product();
+        list($sellerAllProducts, $count) = $productModel->buyerProducts([
+            'created_by' => Yii::$app->user->identity->id,
+            'status' => $status,
+            'created_by' => $this->userId,
+            'offset' => Yii::$app->request->get('offset', 0)
+        ]);
 
+        $data = [
+            'product_count' => $count,
+            'product_list' => $sellerAllProducts
+        ];
+
+        self::showMsg($data);
     }
 
     /**
