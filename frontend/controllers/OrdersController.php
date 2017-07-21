@@ -169,7 +169,7 @@ class OrdersController extends WebController
                     'id' => $product->pid, // 商品id
                     'img' => ProductImage::getOne(ProductImage::USE_FOR_LIST, $product->pid, false),
                     'title' => $product->title,
-                    'price' => '￥' . floatval($product->price),
+                    'price' => '¥' . floatval($product->price),
                     'count' => $product->count,
                     'count_flag' => $countFlag,
                     'comment_flag' => $commentFlag,
@@ -193,12 +193,12 @@ class OrdersController extends WebController
                 'sn' => $item->sn,
                 'flag_comment' => $flag,//外部判断是否能进行评价
                 'can_delete' => $item->isCanDelete() ? 1 : 0,
-                'freight' => '￥' . $freightCount,
+                'freight' => '¥' . $freightCount,
                 'product_count_flag' => $productCountFlag ? 1 : 0,
                 'status_id' => $item->status,
                 'status' => $item->getStatus(),
                 'created_at' => date('Y-m-d H:i:s', $item->created_at),
-                'pay_amount' => '￥' . floatval($item->pay_amount),
+                'pay_amount' => '¥' . floatval($item->pay_amount),
                 'products' => $p
             ];
         }
@@ -220,7 +220,7 @@ class OrdersController extends WebController
                 'title' => $op->title,
                 'img' => $op->product ? $op->product->headImg() : '',
                 'product_attribute_info' => '',
-                'price' => '￥' . floatval($op->price),
+                'price' => '¥' . floatval($op->price),
                 'count' => $op->count
             ];
         }
@@ -228,14 +228,14 @@ class OrdersController extends WebController
         if ($order->userCoupon && $order->userCoupon->coupon) {
             $order->amountDesc[] = [
                 'name' => $order->userCoupon->coupon->title,
-                'price' => '- ￥' . $order->userCoupon->coupon->price,
+                'price' => '- ¥' . $order->userCoupon->coupon->price,
             ];
         }
         $data = [
             'title' => '支付',
             'user_name' => substr_replace(ArrayHelper::getValue($order->userEntity, 'username'), '****', 3, 4),
-            'pay_amount' => '￥' . floatval($order->pay_amount),
-            'product_amount' => '￥' . floatval($order->product_amount),
+            'pay_amount' => '¥' . floatval($order->pay_amount),
+            'product_amount' => '¥' . floatval($order->product_amount),
             'default_pay_type' => '支付宝支付',
             'pay_types' => $order->getPayTypes(Yii::$app->request->post('pay_ids', '["支付宝支付","微信支付"]')),
             'pay_status' => $order->status,
@@ -308,7 +308,7 @@ class OrdersController extends WebController
      *          amount = 数组加字典
      *              [
      *                  title => 运费,
-     *                  price => + ￥1212.12,
+     *                  price => + ¥1212.12,
      *              [
      *          products = 宝贝列表
      *              [
@@ -348,7 +348,7 @@ class OrdersController extends WebController
                 'id' => $item['model']->id,
                 'title' => $item['model']->title,
                 'img' => $item['model']->headImg(),
-                'price' => '￥' . $item['model']->getPrice($item['buy_type']),
+                'price' => '¥' . $item['model']->getPrice($item['buy_type']),
                 'count' => $item['count']
             ];
         }
@@ -360,26 +360,32 @@ class OrdersController extends WebController
         $data = [
             'title' => '确认订单',
 //            'user_name' => substr_replace(ArrayHelper::getValue(Yii::$app->user->identity, 'username'), '****', 3, 4),
-            'pay_amount' => '￥' . floatval($order->payAmount),
-//            'product_amount' => '￥' . floatval($order->productsAmount),
+            'pay_amount' => '¥' . floatval($order->payAmount),
+//            'product_amount' => '¥' . floatval($order->productsAmount),
             'amount' => $order->amountDesc,
             'products' => $dataProducts,
             'address' => [
                 'id' => 0,
-                'username' => '',
-                'mobile' => '',
-                'detail' => ''
+                'user_name' => '',
+                'postal' => '',
+                'str_address' => '',
+                'detail_address' => '',
+                'telephone' => '',
+                'default_address' => ''
             ]
         ];
 
         // 取默认收货人地址
-        $userAddress = UserAddress::getDefaultAddress();
-        if ($userAddress) {
+        if ($address = UserAddress::getDefaultAddress()) {
             $data['address'] = [
-                'id' => $userAddress->id,
-                'username' => $userAddress->user_name,
-                'mobile' => $userAddress->telephone,
-                'detail' => UserAddress::mergeAddress($userAddress)
+                'id' => $address->id,
+                'user_name' => $address->user_name,
+                'postal' => $address->postal,
+                'str_address' => $address->str_address,
+                'detail_address' => $address->detail_address,
+                'telephone' => $address->telephone,
+                'default_address' => $address->default_address
+
             ];
         }
 
@@ -415,7 +421,7 @@ class OrdersController extends WebController
      *          amount=金额明细,数组加字典
      *              [
      *                  title=商品合计
-     *                  price=+ ￥10.22
+     *                  price=+ ¥10.22
      *              ]
      *
      *     ",
@@ -445,7 +451,7 @@ class OrdersController extends WebController
                 'id' => $item['model']->id,
                 'title' => $item['model']->title,
                 'img' => $item['model']->headImg(),
-                'price' => '￥' . $item['model']->getPrice($item['buy_type']),
+                'price' => '¥' . $item['model']->getPrice($item['buy_type']),
                 'count' => $item['count']
             ];
         }
@@ -547,7 +553,7 @@ class OrdersController extends WebController
      *          amount=金额明细,数组加字典
      *              [
      *                  title=商品合计
-     *                  price=+ ￥10.22
+     *                  price=+ ¥10.22
      *              ]
      *      "
      *   )
@@ -597,7 +603,7 @@ class OrdersController extends WebController
         $data = [
             'layout' => $order->isAPriceOrder() ? 1 : 2,
             'msg' => '您成功参与了1件宝贝共计2人次,摇奖编号如下:',
-            'pay_amount' => '￥' . floatval($order->pay_amount),
+            'pay_amount' => '¥' . floatval($order->pay_amount),
         ];
 
         self::showMsg($data);
@@ -650,7 +656,7 @@ class OrdersController extends WebController
                 'title' => $op->title,
                 'img' => ProductImage::getOne(ProductImage::USE_FOR_LIST, $op->pid, false),
                 'product_attribute_info' => ($x = json_decode($op->product_attribute_info)) ? $x->name : '',
-                'price' => '￥' . $op->price,
+                'price' => '¥' . $op->price,
                 'count' => $op->count,
                 'count_flag' => $countFlag,
                 'comment_flag' => $commentFlag
@@ -674,7 +680,7 @@ class OrdersController extends WebController
         if ($order->userCoupon && $order->userCoupon->coupon) {
             $order->amountDesc[] = [
                 'name' => $order->userCoupon->coupon->title,
-                'price' => '- ￥' . $order->userCoupon->coupon->price,
+                'price' => '- ¥' . $order->userCoupon->coupon->price,
             ];
         }
 
@@ -714,12 +720,12 @@ class OrdersController extends WebController
             ] : null),
 //                [
 //                    'name' => '-折扣',
-//                    'price' => '￥10',
+//                    'price' => '¥10',
 //                ],
             'actions' => $order->actions($this->isAndroid(), $flag),
             'pay_type' => $order->getPayType(),
-            'product_amount' => '￥' . floatval($order->product_amount),
-            'pay_amount' => '￥' . floatval($order->pay_amount),
+            'product_amount' => '¥' . floatval($order->product_amount),
+            'pay_amount' => '¥' . floatval($order->pay_amount),
         ];
 
         self::showMsg($data);
@@ -772,7 +778,7 @@ class OrdersController extends WebController
                 'title' => $op->title,
                 'img' => ProductImage::getOne(ProductImage::USE_FOR_LIST, $op->pid, false),
                 'product_attribute_info' => ($x = json_decode($op->product_attribute_info)) ? $x->name : '',
-                'price' => '￥' . $op->price,
+                'price' => '¥' . $op->price,
                 'count' => $op->count,
                 'count_flag' => $countFlag,
                 'comment_flag' => $commentFlag
@@ -796,7 +802,7 @@ class OrdersController extends WebController
         if ($order->userCoupon && $order->userCoupon->coupon) {
             $order->amountDesc[] = [
                 'name' => $order->userCoupon->coupon->title,
-                'price' => '- ￥' . $order->userCoupon->coupon->price,
+                'price' => '- ¥' . $order->userCoupon->coupon->price,
             ];
         }
 
@@ -836,12 +842,12 @@ class OrdersController extends WebController
             ] : null),
 //                [
 //                    'name' => '-折扣',
-//                    'price' => '￥10',
+//                    'price' => '¥10',
 //                ],
             'actions' => $order->actions($this->isAndroid(), $flag),
             'pay_type' => $order->getPayType(),
-            'product_amount' => '￥' . floatval($order->product_amount),
-            'pay_amount' => '￥' . floatval($order->pay_amount),
+            'product_amount' => '¥' . floatval($order->product_amount),
+            'pay_amount' => '¥' . floatval($order->pay_amount),
         ];
 
         self::showMsg($data);

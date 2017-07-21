@@ -133,11 +133,11 @@ class Order extends Base
         $this->amountDesc = [
             [
                 'title' => '商品合计',
-                'price' => '+ ￥' . floatval($this->productsAmount),
+                'price' => '+ ¥' . floatval($this->productsAmount),
             ],
             [
                 'title' => '运费',
-                'price' => '+ ￥' . $this->products[0]['model']->freight,
+                'price' => '+ ¥' . $this->products[0]['model']->freight,
             ],
         ];
 
@@ -146,7 +146,7 @@ class Order extends Base
             // 优惠券
             $this->amountDesc[] = [
                 'title' => $coupon->title,
-                'price' => '- ￥' . $coupon->price,
+                'price' => '- ¥' . $coupon->price,
             ];
 
             $this->discountAmount += $coupon->price;
@@ -155,7 +155,7 @@ class Order extends Base
         if ($this->discountAmount > 0) {
             $this->amountDesc[] = [
                 'title' => '红包抵扣',
-                'price' => '- ￥' . floatval($this->discountAmount),
+                'price' => '- ¥' . floatval($this->discountAmount),
             ];
         }
 
@@ -164,7 +164,7 @@ class Order extends Base
 
         $this->amountDesc[] = [
             'title' => '支付金额',
-            'price' => '￥' . $this->payAmount,
+            'price' => '¥' . $this->payAmount,
         ];
     }
 
@@ -585,11 +585,11 @@ class Order extends Base
             'amount' => [
                 [
                     'title' => '商品合计',
-                    'price' => '+ ￥' . floatval($this->product_amount),
+                    'price' => '+ ¥' . floatval($this->product_amount),
                 ],
                 [
                     'title' => '运费',
-                    'price' => '+ ￥' . floatval($this->freight),
+                    'price' => '+ ¥' . floatval($this->freight),
                 ],
             ],
         ];
@@ -597,13 +597,13 @@ class Order extends Base
         if ($this->discountAmount > 0) {
             $r['amount'][] = [
                 'title' => '红包抵扣',
-                'price' => '- ￥' . floatval($this->discount_amount),
+                'price' => '- ¥' . floatval($this->discount_amount),
             ];
         }
 
         $r['amount'][] = [
             'title' => '支付金额',
-            'price' => '￥' . floatval($this->pay_amount),
+            'price' => '¥' . floatval($this->pay_amount),
         ];
 
         return $r;
