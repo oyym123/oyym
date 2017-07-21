@@ -10,7 +10,9 @@ namespace frontend\controllers;
 use app\helpers\Helper;
 use app\helpers\Weixin;
 use common\models\Order;
+use common\models\OrderProduct;
 use common\models\Pay;
+use common\models\Product;
 use common\models\UserBought;
 use frontend\components\WebController;
 use Yii;
@@ -110,7 +112,8 @@ class PayController extends WebController
                         throw new Exception('修改订单支付状态失败');
                     }
 
-                    if (!empty($order->product)) {
+                    if (!empty($order->orderProduct)) {
+                        /*
                         foreach ($order->product as $item) {
                             $userBouht = new UserBought();
                             $userBouht->pid = $item->pid; // 商品id
@@ -124,6 +127,19 @@ class PayController extends WebController
                             if ($err) {
                                 Yii::info($code, 'pay');
                             }
+                        }*/
+                        list ($code, $msg) = $order->createAwardCode();
+
+                        if ($code) {
+                            Yii::info($msg, 'pay');
+                            throw new Exception($msg);
+                        }
+
+                        $userBouht = new UserBought();
+                        $userBouht->pid = $order->orderProduct->pid; // 商品id
+                        $userBouht->user_id = $order->user_id;
+                        if (!$userBouht->save()) {
+                            throw new Exception('保存用户购买记录失败');
                         }
                     }
 
@@ -212,7 +228,7 @@ class PayController extends WebController
                 throw new Exception(current($order->pay->getFirstErrors()));
             }
 
-            if (!empty($order->product)) {
+            if (!empty($order->orderProduct)) {/*
                 foreach ($order->product as $item) {
                     $userBouht = new UserBought();
                     $userBouht->pid = $item->pid; // 商品id
@@ -220,6 +236,20 @@ class PayController extends WebController
                     if (!$userBouht->save()) {
                         throw new Exception('保存用户购买记录失败');
                     }
+                }*/
+
+                list ($code, $msg) = $order->createAwardCode();
+
+                if ($code) {
+                    Yii::info($msg, 'pay');
+                    throw new Exception($msg);
+                }
+
+                $userBouht = new UserBought();
+                $userBouht->pid = $order->orderProduct->pid; // 商品id
+                $userBouht->user_id = $order->user_id;
+                if (!$userBouht->save()) {
+                    throw new Exception('保存用户购买记录失败');
                 }
             }
 
@@ -368,14 +398,20 @@ class PayController extends WebController
      * Date: 2017-00-00
      * @SWG\Get(path="/pay/success",
      *   tags={"订单"},
-     *   summary="",
+     *   summary="支付成功后回调接口-用于展示买到的摇奖编号等信息",
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(
-     *     name="sn", in="query", required=true, type="integer", default="1",
+     *   @SWG\Parameter(name="sn", in="query", required=true, type="integer", default="1",
      *     description="订单号"
      *   ),
      *   @SWG\Response(
-     *       response=200,description="[{'msg':'你成功参与了1件宝贝共计2人次,活动编号如下', 'award_code':{'123','234'}}]"
+     *       response=200,description="
+     *          layout=众筹夺宝 || 一口价, 用来展示不同的布局页面
+     *          msg=你成功参与了1件宝贝共计2人次,活动编号如下,
+     *          product_title=iphone 6s 完美越狱版
+     *          award_code=数组
+     *              123
+     *              123
+     *     "
      *   )
      * )
      */
@@ -385,8 +421,10 @@ class PayController extends WebController
         $codes = $order->getAwardCodes();
 
         $data = [
+            'layout' => $order->isAPriceOrder() ? '一口价' : '众筹夺宝',
             'msg' => '你成功参与了1件宝贝共计2人次,活动编号如下',
-            'codes' => ''
+            'product_title' => $order->orderProduct ? $order->orderProduct->title : '',
+            'codes' => $codes
         ];
         foreach ($codes as $code) {
             $data['codes'][] = $code;

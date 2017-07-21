@@ -32,7 +32,7 @@ class Account extends Base
     public function rules()
     {
         return [
-            [['order_id', 'pay_id', 'type', 'user_id', 'created_at', 'updated_at'], 'integer'],
+            [['order_id', 'pay_id', 'remittance_id', 'type', 'user_id', 'created_at', 'updated_at'], 'integer'],
             [['amount'], 'number'],
         ];
     }
@@ -45,7 +45,8 @@ class Account extends Base
         return [
             'id' => Yii::t('app', 'ID'),
             'order_id' => Yii::t('app', '订单id'),
-            'pay_id' => Yii::t('app', '订单id'),
+            'pay_id' => Yii::t('app', '支付表id'),
+            'remittance_id' => Yii::t('app', '汇款表id'),
             'type' => Yii::t('app', '1=支付2=收入3=退款'),
             'amount' => Yii::t('app', '金额'),
             'user_id' => Yii::t('app', '用户id'),
