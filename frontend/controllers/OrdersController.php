@@ -320,10 +320,12 @@ class OrdersController extends WebController
      *              ]
      *          address = 默认默认地址, 字典
      *              id = 1
-     *              username = 收货人姓名
-     *              img = 宝贝头图
-     *              mobile = 收货人手机号码
-     *              detail = 收货地址
+     *              user_name = 收货人姓名
+     *              postal = 邮编
+     *              telephone = 手机号码
+     *              str_address = 收货地址1
+     *              detail_address = 收货地址2
+     *              default_address = 是否为默认地址
      *     ",
      *   )
      * )
