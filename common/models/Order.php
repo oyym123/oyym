@@ -540,8 +540,8 @@ class Order extends Base
 
             /** 保存微信支付日志 */
             $pay = new Pay();
-//            $pay->sn = $this->sn;
-//            $pay->order_id = $this->id;
+            $pay->sn = $this->sn;
+            $pay->order_id = $this->id;
             $pay->pay_type = $this->pay_type;
             $pay->out_trade_no = $data['prepay_id'];
             $pay->out_trade_status = '等待付款';
@@ -614,7 +614,7 @@ class Order extends Base
     /** 获取支付结果 */
     public function getPay()
     {
-        return $this->hasOne(Pay::className(), ['type_id' => 'id']);
+        return $this->hasOne(Pay::className(), ['order_id' => 'id']);
     }
 
     /** 取买家信息 */

@@ -34,7 +34,7 @@ class pay extends Base
     public function rules()
     {
         return [
-            [['status', 'out_trade_no', 'out_trade_status', 'log'], 'default', 'value' => ''],
+            [['status', 'out_trade_no', 'out_trade_status', 'log', 'order_id', 'sn'], 'default', 'value' => ''],
             [['paid_at'], 'default', 'value' => 0],
             [['order_id', 'sn', 'pay_type', 'status'], 'required'],
             [['order_id', 'pay_type', 'created_at', 'updated_at'], 'integer'],
