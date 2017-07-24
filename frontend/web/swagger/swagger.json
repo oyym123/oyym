@@ -81,6 +81,20 @@
                 }
             }
         },
+        "/city": {
+            "get": {
+                "tags": [
+                    "\u7701\u5e02"
+                ],
+                "summary": "\u4e00\u6b21\u6027\u83b7\u53d6\u6240\u6709\u7701\u5e02\u548c\u5730\u533a",
+                "description": "Author: lixinxin",
+                "responses": {
+                    "200": {
+                        "description": "\n     *          \u8be6\u7ec6\u53c2\u6570\u89c1\u8fd4\u56de\u7ed3\u679c"
+                    }
+                }
+            }
+        },
         "/collection/create": {
             "get": {
                 "tags": [
