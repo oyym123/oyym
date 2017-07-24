@@ -226,7 +226,7 @@ class ProductsController extends WebController
      *   summary="我参与的",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="全部",
-     *     description="宝贝状态,传的值有: 全部 || 正在进行 || 待揭晓 || 已揭晓, 这儿没有 待发货,代签收"
+     *     description="宝贝状态,传的值有: 全部=0 || 进行中=20 || 待揭晓=30 || 已揭晓=40, 这儿没有 待发货,代签收"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
      *     description="数据游标"
@@ -276,12 +276,15 @@ class ProductsController extends WebController
     public function actionBuyerProductList($status)
     {
         $productModel = new Product();
-        list($sellerAllProducts, $count) = $productModel->buyerProducts([
-            'created_by' => Yii::$app->user->identity->id,
-            'status' => $status,
-            'created_by' => $this->userId,
-            'offset' => Yii::$app->request->get('offset', 0)
-        ]);
+        if (empty($status)) { // 全部
+            list($sellerAllProducts, $count) = $productModel->buyerProducts([
+                'order_status' => $status,
+                'created_by' => $this->userId,
+                'offset' => Yii::$app->request->get('offset', 0)
+            ]);
+        } elseif ($status == '') {
+
+        }
 
         $data = [
             'product_count' => $count,
@@ -414,7 +417,7 @@ class ProductsController extends WebController
      *          a_price=宝贝一口价
      *          total=需要参与人次
      *          order_award_count=已参与人次
-     *          remaining=剩余人数,在数量模式时使用
+     *          residual_total=剩余人数,在数量模式时使用
      *          start_time=宝贝开始时间
      *          end_time=宝贝结束时间
      *          announced_mode=揭晓模式(卖家用户的待揭晓页面，显示“我来揭晓”, 买家用户的待揭晓页面，显示“请等待系统揭晓”)
@@ -454,7 +457,7 @@ class ProductsController extends WebController
     public function actionView()
     {
         $item = $this->findModel(['id' => Yii::$app->request->get('id')]);
-        $participants = $item->getJoinCount(); //已参加人数
+//        $participants = $item->getJoinCount(); //已参加人数
         $data = [
             'id' => $item->id,
             'images' => $item->getImages(),
@@ -472,7 +475,8 @@ class ProductsController extends WebController
             'freight' => $item->freight,
             'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
             'total' => $item->total, // 需要参与人次
-            'remaining' => $item->total - $participants, // 剩余人次
+//            'remaining' => $item->total - $participants, // 剩余人次
+            'residual_total' => $item->getJoinCount(), // 剩余多少人次
             'start_time' => date('Y-m-d H:i', $item->start_time), // 开始时间
             'end_time' => date('Y-m-d H:i', $item->end_time), // 结束时间
             'announced_mode' => $item->viewAnnouncedType(), // 揭晓模式(卖家用户的待揭晓页面，显示“我来揭晓”, 买家用户的待揭晓页面，显示“请等待系统揭晓”)

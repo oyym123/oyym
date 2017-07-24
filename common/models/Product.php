@@ -477,7 +477,8 @@ class Product extends Base
     /** 获取参加者人数 */
     public function getJoinCount()
     {
-        return OrderAwardCode::getJoinCount($this->id);
+        return max(0, $this->total - $this->order_award_count);
+//        return OrderAwardCode::getJoinCount($this->id);
     }
 
     /** 获取该宝贝中奖订单 */
@@ -703,7 +704,7 @@ class Product extends Base
                 'status' => $item->getStatusText(),
                 'total' => $item->total, // 总需要多少人次
                 'order_award_count' => $item->order_award_count, // 已参与人次
-                'residual_total' => max(0, $item->total - $item->order_award_count), // 剩余多少人次
+                'residual_total' => $item->getJoinCount(), // 剩余多少人次
                 'progress' => $item->progress,
                 'publish_countdown' => '',// 揭晓倒计时
                 'a_price' => $item->a_price,// 一口价
