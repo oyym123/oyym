@@ -17,10 +17,20 @@
 ;log_dir = D:\log.txt
 
 
-// 更新时间进度
 [progress]
 run_time = 59 * * * * *
 cd_dir = C:\xampp\htdocs\zcdb\console\
 common = C:\xampp\htdocs\zcdb\yii product/progress
 log_dir = D:\log.txt
 
+[product_count_down]
+run_time = */10 * * * * *
+cd_dir = C:\xampp\htdocs\zcdb\console\
+common = ..\yii crontab/crontab 1
+log_dir = D:\log.txt
+
+[start_product_count_down]
+run_time = */1 * * * * *
+cd_dir = C:\xampp\htdocs\zcdb\console\
+common = ..\yii crontab/start-crontab 1
+log_dir = D:\log.txt

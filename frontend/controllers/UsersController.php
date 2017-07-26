@@ -147,5 +147,21 @@ class UsersController extends WebController
         ]);
     }
 
+    public function actionTest()
+    {
+        $var1 = Yii::$app->redis->del("mioji2");
+        // echo Yii::$app->redis->decrby('jkjk',2);
+           //Yii::$app->redis->zadd('mioji2','z999f','ls','12321');
+           Yii::$app->redis->zadd('mioji2',1,'rr',2,'ttt',6,000);
+        //
 
+        //$var3 = Yii::$app->redis->lrange("vari",0,99);
+        $num=Yii::$app->redis->zcard('mioji2');
+       $var81 = Yii::$app->redis->zrange('mioji2',0,$num);
+       foreach ($var81 as $i){
+           echo $i;
+
+       }
+
+    }
 }

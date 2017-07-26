@@ -264,57 +264,6 @@ class Product extends Base
     }
 
 
-    /** 搜索产品 */
-    public function keyWordsSearch($params, $limit)
-    {
-
-        $queryParams = [];
-        foreach ($params as $key => $val) {
-            if (in_array($key, Tag::$typeField)) {
-                $queryParams[$key] = explode(',', $val);
-            }
-        }
-
-        $sql = 'select p.*,pt.tid from `product_tag` pt ';
-        $where = "1";
-
-        foreach ($queryParams as $key => $val) {
-            $val = implode(',', array_filter($val));
-            if ($val) {
-//                if ($key == 'xingshi') {
-//                    $where .= " and p.type in ($val)";
-//                } else {
-                $tname = "pt_{$key}";
-                $sql .= "inner join product_tag $tname on $tname.pid = pt.pid ";
-                $where .= " and $tname.tid in ($val)";
-//                }
-            }
-        }
-
-        if (isset($params['freeProduct'])) {
-            $where .= " and p.price = '0.00' ";
-        }
-
-        if (!empty($params['keywords'])) {
-            $where .= " and (p.title like '%{$params['keywords']}%' or contents like '%{$params['keywords']}%') ";
-        }
-
-        $sql .= "right join product p on p.id = pt.pid ";
-        $sql .= "where $where and p.status='" . self::STATUS_ENABLE . "' ";
-        $sql .= "group by pt.pid ";
-        $sql .= "order by p.sort desc, p.created_at desc ";
-
-        $query = Product::findBySql($sql);
-
-        $sql .= "limit $limit";
-
-        return [
-            Product::findBySql($sql)->all(),
-            $query->count(),
-        ];
-    }
-
-
     /**
      * @inheritdoc
      */
@@ -899,7 +848,8 @@ class Product extends Base
     }
 
     /** 数量模式下, 计算新的进度值, 值为0到100 */
-    public function getNewProgress($NewOrderAwardCount) {
+    public function getNewProgress($NewOrderAwardCount)
+    {
         return min(100, number_format($NewOrderAwardCount / $this->total, 2, '.', '') * 100);
     }
 }
