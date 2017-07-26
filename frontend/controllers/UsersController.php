@@ -47,10 +47,17 @@ class UsersController extends WebController
      * Desc: 关注或取消关注
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-01
-     * @SWG\Get(path="/users/follow-category-or-cancel",
+     * @SWG\Post(path="/users/follow-category-or-cancel",
      *   tags={"我的"},
      *   summary= "关注或取消关注",
      *   description="Author: lixinxin",
+     *  @SWG\Parameter(
+     *     name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Parameter(name="type_ids", in="formData", required=true, type="string", default="[1,2,3,4]",
+     *     description="json数组格式的宝贝id"
+     *   ),
      *   @SWG\Response(
      *       response=200, description="successful operation"
      *   )
@@ -60,7 +67,7 @@ class UsersController extends WebController
     {
         $attention = new Attention();
         $param['type'] = Attention::PRODUCT_TYPE;
-        $typeIds = json_decode(Yii::$app->request->post('type_id'), true);
+        $typeIds = json_decode(Yii::$app->request->post('type_ids'), true);
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $attention->cancelProductType();
