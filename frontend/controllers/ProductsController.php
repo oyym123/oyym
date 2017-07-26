@@ -200,7 +200,7 @@ class ProductsController extends WebController
     public function actionSellerProductList($status)
     {
         $productModel = new Product();
-        list($sellerAllProducts, $count) = $productModel->sellerProducts([
+        list($products, $count) = $productModel->sellerProducts([
             'created_by' => Yii::$app->user->identity->id,
             'status' => $status,
             'created_by' => $this->userId,
@@ -209,7 +209,7 @@ class ProductsController extends WebController
 
         $data = [
             'product_count' => $count,
-            'product_list' => $sellerAllProducts
+            'product_list' => $products
         ];
 
         self::showMsg($data);
@@ -282,18 +282,27 @@ class ProductsController extends WebController
         ];
 
         if (empty($status)) { // 全部
-            list($sellerAllProducts, $count) = $productModel->buyerAllProduct();
-        } elseif ($status == Product::STATUS_IN_PROGRESS) {
-            // 进行中
-            $productModel->params += [
-                'status' => Product::STATUS_IN_PROGRESS,
-            ];
-            list($sellerAllProducts, $count) = $productModel->buyerInProgress();
+            list($products, $count) = $productModel->buyerAllProduct();
+        } else {
+            $productModel->params['status'] = $status;
+            if ($status == Product::STATUS_IN_PROGRESS) {
+                // 进行中
+                list($products, $count) = $productModel->buyerInProgress();
+            } elseif ($status == Product::STATUS_WAIT_PUBLISH) {
+                // 待揭晓
+                list($products, $count) = $productModel->buyerWaitPublished();
+            } elseif ($status == Product::STATUS_PUBLISHED) {
+                // 已揭晓
+                list($products, $count) = $productModel->buyerPublished();
+            } else {
+                // 已揭晓
+                list($products, $count) = $productModel->buyerProductSearchByStatus();
+            }
         }
 
         $data = [
             'product_count' => $count,
-            'product_list' => $sellerAllProducts
+            'product_list' => $products
         ];
 
         self::showMsg($data);
