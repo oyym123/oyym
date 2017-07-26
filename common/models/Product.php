@@ -112,11 +112,11 @@ class Product extends Base
     public function viewLayoutType()
     {
         if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && empty($this->a_price)) {
-            return 1; //正在进行的页面，数量模式 没有一口价
+            return 1; //进行中的页面，数量模式 没有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price > 0) {
-            return 2; //正在进行的页面，数量模式 有一口价
+            return 2; //进行中的页面，数量模式 有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
-            return 3; //正在进行的页面，时间模式
+            return 3; //进行中的页面，时间模式
         } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
             return 4; //卖家用户的待揭晓页面，显示“我来揭晓” ，买家用户的待揭晓页面，显示“请等待系统揭晓”
         } elseif ($this->status = self::STATUS_PUBLISHED) {
@@ -130,11 +130,11 @@ class Product extends Base
     public function listLayoutType()
     {
         if ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && empty($this->a_price)) {
-            return 1; //正在进行的页面，数量模式 没有一口价
+            return 1; //进行中的页面，数量模式 没有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_NUMBER && $this->a_price > 0) {
-            return 2; //正在进行的页面，数量模式 有一口价
+            return 2; //进行中的页面，数量模式 有一口价
         } elseif ($this->status == Product::STATUS_IN_PROGRESS && $this->model == Product::MODEL_TIME) {
-            return 3; //正在进行的页面，时间模式
+            return 3; //进行中的页面，时间模式
         } else {
             return 1;//显示空页面
         }
@@ -155,10 +155,7 @@ class Product extends Base
     /** 获取揭晓倒计时 */
     public function getPublishCountdown()
     {
-        if ($this->count_down) {
-            return time() - $this->count_down;
-        }
-        return 365 * 24 * 3600;
+        return max(0, $this->count_down - time());
     }
 
     /** 产品收藏数量保存 */
@@ -494,11 +491,11 @@ class Product extends Base
     /** 卖家-我发布的/卖出的宝贝列表 样式布局 */
     public function sellerProductLayout()
     {
-        $r = '正在进行';
+        $r = '进行中';
         if ($this->status == Product::STATUS_NOT_SALE) {
             $r = '未上架';
         } elseif ($this->status == Product::STATUS_IN_PROGRESS) {
-            $r = '正在进行';
+            $r = '进行中';
         } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
             $r = '待揭晓';
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
@@ -526,9 +523,9 @@ class Product extends Base
     /** 买家-我参与的/买到的宝贝列表 样式布局 */
     public function buyerProductLayout()
     {
-        $r = '正在进行';
+        $r = '进行中';
         if ($this->status == Product::STATUS_IN_PROGRESS) {
-            $r = '正在进行';
+            $r = '进行中';
         } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
             $r = '待揭晓';
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
@@ -619,40 +616,13 @@ class Product extends Base
     }
 
     /** 卖家发布的宝贝列表 字段 */
-    public function sellerProductListField($items)
+    public function sellerProductListField($products)
     {
         $r = [];
-        foreach ($items as $key => $item) {
+        foreach ($products as $key => $item) {
             $r[] = [
-                /*
-                'layout' => function ($item) {
-                    $r = '数量模式_未上架';
-                    if ($item->model == Product::MODEL_NUMBER) { // 数量模式
-                        if ($item->status == Product::STATUS_NOT_SALE) { // 未上架
-                            return '数量模式_未上架';
-                        } elseif ($item->status == Product::STATUS_IN_PROGRESS) { // 进行中
-                            return '数量模式_进行中';
-                        } elseif ($item->status == Product::STATUS_WAIT_PUBLISH) { // 待揭晓
-                            return '数量模式_待揭晓';
-                        } elseif ($item->status == Product::STATUS_PUBLISHED) { // 已揭晓
-                            return '数量模式_已揭晓';
-                        }
-                    } else { // 时间模式
-                        if ($item->status == Product::STATUS_NOT_SALE) { // 未上架
-                            return '时间模式_未上架';
-                        } elseif ($item->status == Product::STATUS_IN_PROGRESS) { // 进行中
-                            return '时间模式_进行中';
-                        } elseif ($item->status == Product::STATUS_WAIT_PUBLISH) { // 待揭晓
-                            return '时间模式_待揭晓';
-                        } elseif ($item->status == Product::STATUS_PUBLISHED) { // 已揭晓
-                            return '时间模式_已揭晓';
-                        }
-                    }
-
-                    return $r;
-                },*/
+                'created_at' => $item->order->createdAt(),
                 'product_id' => $item->id,
-                'order_id' => $item->order ? $item->order->id : 0,
                 'title' => $item->title,
                 'layout' => $item->sellerProductLayout(),
                 'status' => $item->getStatusText(),
@@ -660,12 +630,40 @@ class Product extends Base
                 'order_award_count' => $item->order_award_count, // 已参与人次
                 'residual_total' => $item->getJoinCount(), // 剩余多少人次
                 'progress' => $item->progress,
-                'publish_countdown' => '',// 揭晓倒计时
+                'publish_countdown' => $item->getPublishCountdown(),// 揭晓倒计时
                 'a_price' => $item->a_price,// 一口价
                 'unit_price' => $item->unit_price,// 单价
                 'url' => $item->sellerProductUrlRoute(), // 卖家宝贝路由
                 'actions' => $item->sellerProductActions(), // 卖家宝贝动作
             ];
+        }
+
+        return $r;
+    }
+
+    /** 买家参与的宝贝列表 字段 */
+    public function buyerProductListField($orderProducts)
+    {
+        $r = [];
+        foreach ($orderProducts as $key => $item) {
+            if ($item->product && $item->order) {
+                $r[] = [
+                    'created_at' => $item->order->createdAt(),
+                    'product_id' => $item->product->id,
+                    'title' => $item->product->title,
+                    'layout' => $item->product->buyerProductLayout(),
+                    'status' => $item->product->getStatusText(),
+                    'total' => $item->product->total, // 总需要多少人次
+                    'order_award_count' => $item->product->order_award_count, // 已参与人次
+                    'residual_total' => $item->product->getJoinCount(), // 剩余多少人次
+                    'progress' => $item->product->progress,
+                    'publish_countdown' => $item->product->getPublishCountdown(),// 揭晓倒计时
+                    'a_price' => $item->product->a_price,// 一口价
+                    'unit_price' => $item->product->unit_price,// 单价
+                    'url' => $item->product->buyerProductUrlRoute(), // 买家宝贝路由
+                    'actions' => $item->order->buyerProductActions(), // 买家宝贝动作
+                ];
+            }
         }
 
         return $r;
@@ -677,42 +675,9 @@ class Product extends Base
         $query = Product::find()->where([
             'created_by' => $params['created_by'],
             'deleted_at' => 0,
-//            'status' => [
-//                self::STATUS_NOT_SALE, // 未上架
-//                self::STATUS_IN_PROGRESS, // 进行中
-//                self::STATUS_WAIT_PUBLISH, // 待揭晓
-//                self::STATUS_PUBLISHED, // 已揭晓
-//                self::STATUS_CANCELED, // 已取消
-//            ]
         ]);
 
-        if ($params['status']) {
-            $query->andWhere(['status' => $params['status']]);
-        }
-
-        $query->offset($params['offset'])->limit($this->psize);
-
-        return [$this->sellerProductListField($query->all()), $query->count()];
-    }
-
-    /** 卖家-进行中的宝贝 */
-    public function sellerInProgress($params)
-    {
-        $query = Product::find()->where([
-            'created_by' => $params['created_by'],
-            'deleted_at' => 0,
-//            'status' => [
-//                self::STATUS_NOT_SALE, // 未上架
-//                self::STATUS_IN_PROGRESS, // 进行中
-//                self::STATUS_WAIT_PUBLISH, // 待揭晓
-//                self::STATUS_PUBLISHED, // 已揭晓
-//                self::STATUS_CANCELED, // 已取消
-//            ]
-        ]);
-
-        if ($params['status']) {
-            $query->andWhere(['status' => $params['status']]);
-        }
+        $query->andFilterWhere(['status' => $params['status']]);
 
         $query->offset($params['offset'])->limit($this->psize);
 
@@ -722,13 +687,11 @@ class Product extends Base
     /** 卖家-待揭晓的宝贝 */
     public function sellerWaitPublish()
     {
-
     }
 
     /** 卖家-已下架的宝贝 */
     public function cancel()
     {
-
     }
 
     // ---------------------------------------卖家/买家分割线-------------------------------------- //
@@ -736,58 +699,42 @@ class Product extends Base
     /** 买家-所有参与的宝贝 */
     public function buyerAllProduct()
     {
-        $query = Order::find()->where([
-            'buyer_id' => Yii::$app->user->identity->id,
-            'deleted_at' => 0,
-//            'status' => [
-//                Order::STATUS_WAIT_PAY, // 待付款
-//                Order::STATUS_PAYED, // 已付款
-//                Order::STATUS_REFUNDED, // 退款成功
-//            ]
+        $query = OrderProduct::find()->where([
+            'order_product.buyer_id' => Yii::$app->user->identity->id
         ]);
 
-        $query->andFilterWhere(['status' => ArrayHelper::getValue($this->params, 'status')]);
+        $query->leftJoin('product', 'product.id=order_product.pid');
+
+        $query->leftJoin('order', 'order.id=order_product.order_id');
+        $query->andWhere([
+            'order.deleted_at' => 0,
+        ]);
+
+        $query->andFilterWhere(['product.status' => ArrayHelper::getValue($this->params, 'status')]);
 
         $query->offset($this->params['offset'])->limit($this->psize);
 
-        return [$this->sellerProductListField($query->all()), $query->count()];
+        return [$this->buyerProductListField($query->all()), $query->count()];
     }
 
     /** 买家-进行中的宝贝 */
     public function buyerInProgress()
     {
-        $query = OrderProduct::find()->where([
-            'order_product.buyer_id' => Yii::$app->user->identity->id,
-            'order_product.deleted_at' => 0,
-        ]);
-
-        $query->leftJoin('product', ['product.id' => 'pid'], [
-            'product.status' => Product::STATUS_IN_PROGRESS
-        ]);
-
-        $query->leftJoin('order', ['order.id' => 'order_id']);
-
-        $query->offset($this->params['offset'])->limit($this->psize);
-
-        return [$this->sellerProductListField($query->all()), $query->count()];
     }
 
     /** 买家-待揭晓的宝贝 */
     public function buyerWaitPublished()
     {
-
     }
 
     /** 买家-已揭晓的宝贝 (可能中奖人不是自己) */
     public function buyerPublished()
     {
-
     }
 
     /** 用户对宝贝可以进行的操作,编辑删除等 */
     public function userActions()
     {
-
     }
 
     public static function findModel($id)

@@ -59,18 +59,18 @@ class Order extends Base
     const EVALUATION_STATUS_2 = 2; // 买家已评价
     const EVALUATION_STATUS_3 = 3; // 双方已评价
 
-    public static function orderStatus()
-    {
-        return [
-            self::STATUS_WAIT_PAY => '待付款',
-//            self::STATUS_WAIT_PAY_SUCCESS => '已付款',
-            self::STATUS_WAIT_SHIP => '待发货',
-            self::STATUS_CONFIRM_RECEIVING => '待签收',
-            self::STATUS_RETURN_APPLY => '退货申请',
-            self::STATUS_WAIT_COMMENT => '待评价',
-            self::STATUS_COMPLETE => '已完成',
-        ];
-    }
+    public static $status = [
+        self::STATUS_WAIT_PAY => '待付款',
+        self::STATUS_PAYED => '已付款',
+        self::STATUS_WAIT_SHIP => '待发货',
+        self::STATUS_SHIPPED => '已发货',
+//            self::STATUS_CONFIRM_RECEIVING => '待签收',
+        self::STATUS_CONFIRM_RECEIVING => '已签收',
+        self::STATUS_RETURN_APPLY => '退款申请',
+        self::STATUS_RETURN_AGREE => '同意退款',
+        self::STATUS_WAIT_COMMENT => '待评价',
+        self::STATUS_COMPLETE => '已完成',
+    ];
 
     /**
      * @inheritdoc
@@ -114,6 +114,12 @@ class Order extends Base
             'updated_at' => '修改时间',
             'evaluation_status' => '评价状态,卖家已评价=1,买家已评价=2,双方已评价=3',
         ];
+    }
+
+    /** 取订单状态 */
+    public function getStatusText()
+    {
+        return ArrayHelper::getValue(self::$status, $this->status, '');
     }
 
     /**
@@ -679,6 +685,53 @@ class Order extends Base
 
     // ---------------------------------------卖家/买家分割线-------------------------------------- //
 
+    /** 买家参与的宝贝列表 字段 */
+    public function buyerProductListField($order)
+    {
+        $r = [];
+        foreach ($order as $key => $item) {
+            if ($item->orderProduct && $item->orderProduct->product) {
+                $r[] = [
+                    'created_at' => $item->createdAt(),
+                    'order_id' => $item->id,
+                    'title' => $item->orderProduct->product->title,
+                    'layout' => $item->orderProduct->product->buyerProductLayout(),
+                    'status' => $item->getStatusText(),
+                    'total' => $item->orderProduct->product->total, // 总需要多少人次
+                    'order_award_count' => $item->orderProduct->product->order_award_count, // 已参与人次
+                    'residual_total' => $item->orderProduct->product->getJoinCount(), // 剩余多少人次
+                    'progress' => $item->orderProduct->product->progress,
+                    'publish_countdown' => $item->orderProduct->product->getPublishCountdown(),// 揭晓倒计时
+                    'a_price' => $item->orderProduct->product->a_price,// 一口价
+                    'unit_price' => $item->orderProduct->product->unit_price,// 单价
+                    'url' => $item->orderProduct->product->buyerProductUrlRoute(), // 买家宝贝路由
+                    'actions' => $item->buyerProductActions(), // 买家宝贝动作
+                ];
+            }
+        }
+
+        return $r;
+    }
+
+    /** 买家-所有买到的宝贝 */
+    public function buyerAllProduct()
+    {
+        $query = Order::find()->where([
+            'order.buyer_id' => Yii::$app->user->identity->id,
+        ]);
+
+        $query->joinWith('orderProduct');
+
+        $query->andWhere([
+            'order.deleted_at' => 0,
+        ]);
+
+        $query->andFilterWhere(['order.status' => ArrayHelper::getValue($this->params, 'status')]);
+
+        $query->offset($this->params['offset'])->limit($this->psize);
+
+        return [$this->buyerProductListField($query->all()), $query->count()];
+    }
 
     /** 待付款的订单 */
     public function waitPay()

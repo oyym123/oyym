@@ -121,87 +121,77 @@ class OrdersController extends WebController
      *     description="用户ky-token",
      *    ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *          product_count=宝贝总数
+     *          product_list=宝贝列表
+     *              layout=布局类型[
+     *                  数量模式_买家_待发货 || 数量模式_买家_待签收 || 数量模式_买家_待评价 || 数量模式_买家_已完成 || 数量模式_买家_退货申请
+     *                  时间模式_买家_待发货 || 时间模式_买家_待签收 || 时间模式_买家_待评价 || 时间模式_买家_已完成 || 时间模式_买家_退货申请
+     *              ]
+     *              product_id=宝贝id
+     *              order_sn=订单号
+     *              created_at=参与时间
+     *              title=标题
+     *              img=宝贝头图
+     *              total=总需人次
+     *              residual_total=剩余人次
+     *              residual_time=结束时间
+     *              progress=进度
+     *              publish_countdown=揭晓倒计时
+     *              a_price=一口价
+     *              unit_price=单价
+     *              status=状态 [下架 || 进行中 || 待揭晓 || 已揭晓]
+     *              actions=数组下是字典
+     *                  [
+     *                      title=上架
+     *                      url=up_sell
+     *                  ],
+     *                  [
+     *                      title=下架
+     *                      url=down_sell
+     *                  ],
+     *                  [
+     *                      title=编辑
+     *                      url=edit
+     *                  ],
+     *                  [
+     *                      title=删除
+     *                      url=edit
+     *                  ]
+     *              url=链接地址[跳转到宝贝详情页=product, 跳转到订单详情页=order]
+     *              order_award_count=已参与人次""
      *   )
      * )
      */
-    public function actionBuyerProductList()
+    public function actionBuyerProductList($status)
     {
-        $order = new Order();
-        $comment = new Comments();
-        $params = Yii::$app->request->get();
-        $params['skip'] = intval(Yii::$app->request->get('skip', 0));
-        $params['user_id'] = $this->userId;
+        $orderModel = new Order();
+        $orderModel->params = [
+            'created_by' => $this->userId,
+            'offset' => Yii::$app->request->get('offset', 0),
+            'status' => $status ?: [
+                Order::STATUS_WAIT_SHIP, // 待发货
+                Order::STATUS_SHIPPED, // 已发货
+                Order::STATUS_CONFIRM_RECEIVING, // 已签收
+                Order::STATUS_RETURN_APPLY, // 退款申请
+                Order::STATUS_RETURN_AGREE, // 卖家同意退款申请
+                Order::STATUS_REFUNDED, // 已退款
+                Order::STATUS_WAIT_COMMENT, // 待评价
+                Order::STATUS_COMPLETE, // 已完成
+            ]
+        ];
 
-        list($items, $count) = $order->apiSearch($params);
+        if (in_array($status, [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED])) {
+            //退款申请 卖家同意退款申请 已退款, 这三种状态要同时查询
+            $orderModel->params['status'] = [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED];
+        }
+
+        list($products, $count) = $orderModel->buyerAllProduct();
 
         $data = [
-            'title' => '我的订单',
-            'total' => $count,
-            'list' => []
+            'product_count' => $count,
+            'product_list' => $products
         ];
-        $flag = 1;
-        $freightCount = 0;
-        $productCountFlag = 0;
-        foreach ($items as $item) {
-            $products = $item->product;
-            $p = [];
-            foreach ($products as $product) {
-                $params = [
-                    'product_id' => $product->pid,
-                    'type' => Comments::TYPE_VIDEO,
-                    'user_id' => $this->userId,
-                    'order_id' => $product->order_id,
-                ];
-
-                if (!$comment->commentFlag($params) && $item->isCanComment()) {
-                    $commentFlag = 0;
-                    $flag = 0;
-                } else {
-                    $commentFlag = 1;
-                    $flag = 1;
-                }
-
-                $freightCount += ($product->product ? $product->product->freight : 0);
-                $countFlag = $product->product ? (($x = $product->product->productType) ? $x->use_count : 0) : 0;
-                $productCountFlag += $countFlag;
-                $p[] = [
-                    'id' => $product->pid, // 商品id
-                    'img' => ProductImage::getOne(ProductImage::USE_FOR_LIST, $product->pid, false),
-                    'title' => $product->title,
-                    'price' => '¥' . floatval($product->price),
-                    'count' => $product->count,
-                    'count_flag' => $countFlag,
-                    'comment_flag' => $commentFlag,
-                ];
-            }
-
-            if (empty($p) && $this->isAndroid()) {
-                // 为了Android不崩
-                $p[] = [
-                    'id' => '',
-                    'img' => '',
-                    'title' => '',
-                    'price' => '',
-                    'count' => '',
-                    'count_flag' => '',
-                    'comment_flag' => '',
-                ];
-            }
-            $data['list'][] = [
-                'id' => $item->id,
-                'sn' => $item->sn,
-                'flag_comment' => $flag,//外部判断是否能进行评价
-                'can_delete' => $item->isCanDelete() ? 1 : 0,
-                'freight' => '¥' . $freightCount,
-                'product_count_flag' => $productCountFlag ? 1 : 0,
-                'status_id' => $item->status,
-                'status' => $item->getStatus(),
-                'created_at' => date('Y-m-d H:i:s', $item->created_at),
-                'pay_amount' => '¥' . floatval($item->pay_amount),
-                'products' => $p
-            ];
-        }
 
         self::showMsg($data);
     }
@@ -885,7 +875,7 @@ class OrdersController extends WebController
             $orderLog = new OrderLog();
             $orderLog->userEntity = $this->getApiUser();
 
-            if (!$orderLog->createLog($order, '由 ' . Order::orderStatus()[$oldStatus] . ' 改为 ' . $order->getStatus())) {
+            if (!$orderLog->createLog($order, '由 ' . Order::$status[$oldStatus] . ' 改为 ' . $order->getStatus())) {
                 throw new Exception('记录订单日志失败:' . current($orderLog->getFirstErrors()));
             }
 
@@ -919,7 +909,7 @@ class OrdersController extends WebController
             $orderLog = new OrderLog();
             $orderLog->userEntity = $this->getApiUser();
 
-            if (!$orderLog->createLog($order, '由 ' . Order::orderStatus()[$oldStatus] . ' 改为 ' . $order->getStatus())) {
+            if (!$orderLog->createLog($order, '由 ' . Order::$status[$oldStatus] . ' 改为 ' . $order->getStatus())) {
                 throw new Exception('记录订单日志失败:' . current($orderLog->getFirstErrors()));
             }
 

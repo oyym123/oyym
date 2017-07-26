@@ -163,7 +163,6 @@ class ProductsController extends WebController
      *          product_list=宝贝列表
      *              layout=布局类型[数量模式_卖家_未上架 || 数量模式_卖家_进行中 || 数量模式_卖家_待揭晓 || 数量模式_卖家_已揭晓 || 时间模式_卖家_未上架 || 时间模式_卖家_进行中 || 时间模式_卖家_待揭晓 || 时间模式_卖家_已揭晓]
      *              product_id=宝贝id
-     *              order_id=订单id
      *              title=标题
      *              img=宝贝头图
      *              total=总需人次
@@ -202,7 +201,7 @@ class ProductsController extends WebController
         $productModel = new Product();
         list($products, $count) = $productModel->sellerProducts([
             'created_by' => Yii::$app->user->identity->id,
-            'status' => $status,
+            'status' => $status ?: null,
             'created_by' => $this->userId,
             'offset' => Yii::$app->request->get('offset', 0)
         ]);
@@ -240,7 +239,7 @@ class ProductsController extends WebController
      *          product_list=宝贝列表
      *              layout=布局类型[数量模式_买家_进行中 || 数量模式_买家_待揭晓 || 数量模式_买家_已揭晓 || 时间模式_买家_进行中 || 时间模式_买家_待揭晓 || 时间模式_买家_已揭晓]
      *              product_id=宝贝id
-     *              order_id=订单id
+     *              created_at=参与时间
      *              title=标题
      *              img=宝贝头图
      *              total=总需人次
@@ -278,9 +277,10 @@ class ProductsController extends WebController
         $productModel = new Product();
         $productModel->params = [
             'created_by' => $this->userId,
-            'offset' => Yii::$app->request->get('offset', 0)
+            'offset' => Yii::$app->request->get('offset', 0),
+            'status' => $status ?: null
         ];
-
+/*
         if (empty($status)) { // 全部
             list($products, $count) = $productModel->buyerAllProduct();
         } else {
@@ -299,6 +299,8 @@ class ProductsController extends WebController
                 list($products, $count) = $productModel->buyerProductSearchByStatus();
             }
         }
+*/
+        list($products, $count) = $productModel->buyerAllProduct();
 
         $data = [
             'product_count' => $count,
