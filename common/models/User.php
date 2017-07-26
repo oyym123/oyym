@@ -241,7 +241,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return ArrayHelper::getValue(static::status(), $this->status);
     }
-
+    
     public function setToken()
     {
         $this->token = md5($this->id . $this->username . $this->password_hash . time());

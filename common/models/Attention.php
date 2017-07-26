@@ -115,6 +115,16 @@ class Attention extends Base
         }
     }
 
+    public static function getAttention($params)
+    {
+        return Attention::find()->select('type_id')->where([
+            'user_id' => Yii::$app->user->id,
+            'type' => ArrayHelper::getValue($params, 'type'),
+            'status' => Attention::STATUS_ENABLE
+        ])->asArray()->all();
+    }
+
+
     /** 获取关注数量 */
     public static function attentionCount($type, $type_id)
     {

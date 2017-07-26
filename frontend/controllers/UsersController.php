@@ -3,6 +3,7 @@ namespace frontend\controllers;
 
 use common\models\Attention;
 use common\models\Base;
+use common\models\ProductType;
 use frontend\components\WebController;
 use Yii;
 use yii\base\Exception;
@@ -28,18 +29,26 @@ class UsersController extends WebController
      */
     public function actionFollowCategory()
     {
-        self::showMsg([
-            [
-                'id' => 1,
-                'title' => '电子产品',
-                'is_follow' => 1 // 已关注为1未关注为0
-            ],
-            [
-                'id' => 2,
-                'title' => '服装',
-                'is_follow' => 0
-            ]
-        ]);
+        $attention = Attention::getAttention(['type' => Attention::PRODUCT_TYPE]);
+        $attentionIds = array_column($attention, 'type_id');
+        $productTypes = ProductType::findAll(['level' => 1]);
+        $data = [];
+        foreach ($productTypes as $item) {
+            if (in_array($item->id, $attentionIds)) {
+                $data[] = [
+                    'id' => $item->id,
+                    'title' => $item->name,
+                    'is_follow' => 1
+                ];
+            } else {
+                $data[] = [
+                    'id' => $item->id,
+                    'title' => $item->name,
+                    'is_follow' => 0
+                ];
+            }
+        }
+        self::showMsg($data);
     }
 
     /**
