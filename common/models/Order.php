@@ -86,7 +86,7 @@ class Order extends Base
     public function rules()
     {
         return [
-            [['freight', 'deleted_at'], 'default', 'value' => '0'],
+            [['freight', 'deleted_at', 'address_id'], 'default', 'value' => '0'],
             [['buyer_id', 'seller_id', 'sn', 'status', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
@@ -708,5 +708,31 @@ class Order extends Base
     public function buyerCompleted()
     {
 
+    }
+
+    /** 买家-我参与的/我买到的 宝贝列表跳转地址 */
+    public function buyerProductActions()
+    {
+        $r = [];
+
+        if ($this->status == Order::STATUS_WAIT_PAY) {
+            $r[] = [
+                'title' => '去支付',
+                'url' => 'pay',
+            ];
+        }
+
+        return $r;
+    }
+
+    /** 设置 */
+    public function setAddress($addressId)
+    {
+        $address = UserAddress::findOne(['id' => $addressId]);
+        if (!$address || $address->user_id != Yii::$app->user->identity->id) {
+            throw new Exception('地址选择错误');
+        }
+
+        $this->address_id = $addressId;
     }
 }

@@ -111,7 +111,7 @@ class OrdersController extends WebController
      *   tags={"我的"},
      *   summary="我买到的",
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="全部",
+     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
      *     description="status的值分为: 全部=0 || 待发货=20 || 待签收=25 || 待评价=70 || 已完成=100 || 退货申请=60"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
@@ -406,6 +406,9 @@ class OrdersController extends WebController
      *   @SWG\Parameter(name="products", in="formData", required=true, type="string", default="[{'id':1,'count':1,'buy_type':1}]",
      *     description="购买的宝贝明细 buy_type:1=一口价2=单价",
      *   ),
+     *   @SWG\Parameter(name="address_id", in="formData", required=false, type="string", default="1",
+     *     description="收货人地址id 当购买的方式为一口价时 为必填",
+     *   ),
      *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
      *     description="用户ky-token",
      *    ),
@@ -465,6 +468,7 @@ class OrdersController extends WebController
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
+            $order->setAddress(Yii::$app->request->post('address_id'));
             $newOrder = $order->create();
 
             $order->saveProducts($newOrder);
