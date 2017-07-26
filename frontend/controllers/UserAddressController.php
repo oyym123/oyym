@@ -142,7 +142,7 @@ class UserAddressController extends WebController
      *     in="formData",
      *     default="333000",
      *     description="邮政编码",
-     *     required=true,
+     *     required=false,
      *     type="string",
      *   ),
      *   @SWG\Parameter(
@@ -281,7 +281,11 @@ class UserAddressController extends WebController
                 'str_address' => $address->str_address,
                 'detail_address' => $address->detail_address,
                 'telephone' => $address->telephone,
-                'default_address' => $address->default_address
+                'default_address' => $address->default_address,
+                'province_id' => $address->province_id,
+                'city_id' => $address->city_id,
+                'area_id' => $address->area_id,
+                'street_id' => $address->street_id,
             ];
         }
         self::showMsg($data);

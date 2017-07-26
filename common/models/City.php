@@ -59,5 +59,9 @@ class City extends Base
         return $province ? ArrayHelper::map(static::findAll(['upid' => $province]), 'id', 'name') : [];
     }
 
+    public function getChild() {
+        return $this->hasMany(City::className(), ['upid' => 'id']);
+    }
+
 
 }

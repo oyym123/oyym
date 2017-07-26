@@ -1,5 +1,5 @@
 <?php
-namespace app\helpers;
+namespace common\helpers;
 
 use Yii;
 use yii\helpers\BaseArrayHelper;

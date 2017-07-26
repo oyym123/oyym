@@ -43,7 +43,7 @@ class OrderProduct extends Base
     {
         return [
             [['order_id', 'pid', 'buyer_id', 'seller_id', 'count', 'coupon_id', 'buy_type', 'model_type', 'created_at', 'updated_at'], 'integer'],
-            [['price', 'discount_price', 'random_code'], 'number'],
+            [['price', 'discount_price'], 'number'],
             [['title'], 'string', 'max' => 200],
         ];
     }
@@ -59,7 +59,6 @@ class OrderProduct extends Base
             'pid' => Yii::t('app', '宝贝id'),
             'buyer_id' => Yii::t('app', '买家id'),
             'seller_id' => Yii::t('app', '卖家id'),
-            'random_code' => Yii::t('app', '随机码'),
             'title' => Yii::t('app', '宝贝标题'),
             'count' => Yii::t('app', '购买数量'),
             'price' => Yii::t('app', '购买价格'),

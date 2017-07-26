@@ -21,6 +21,7 @@ class Base extends \yii\db\ActiveRecord
     public $limit = 10; // 分页
     public $userEntity = null; // 用户实体
     public $psize = 20;
+    public $params = [];
 
     Use BaseData;
 
@@ -84,7 +85,7 @@ class Base extends \yii\db\ActiveRecord
     /**
      * Name: replaceContentsImage
      * Desc: 替换图片路径
-     * User: lixinxin <lixinxin@zgzzzs.com>
+     * User: lixinxin <ulee@fangdazhongxin.com>
      * Date: 2017-03-10
      */
     public function replaceContentsImage()

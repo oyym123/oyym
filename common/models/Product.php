@@ -295,6 +295,23 @@ class Product extends Base
         ];
     }
 
+    /** 根据购买方式 返回不同的价格 */
+    public function getPrice($buyType)
+    {
+        if ($buyType == OrderProduct::A_PRICE) {
+            return $this->a_price;
+        } else if ($buyType == OrderProduct::UNIT_PRICE) {
+            return $this->unit_price;
+        } else {
+            return $this->a_price;
+        }
+    }
+
+    public function getTag()
+    {
+        return $this->hasMany(ProductTag::className(), ['pid' => 'id']);
+    }
+
     /**
      * 判断商品是否可以购买
      */
@@ -409,7 +426,8 @@ class Product extends Base
     /** 获取参加者人数 */
     public function getJoinCount()
     {
-        return OrderAwardCode::getJoinCount($this->id);
+        return max(0, $this->total - $this->order_award_count);
+//        return OrderAwardCode::getJoinCount($this->id);
     }
 
     /** 获取该宝贝中奖订单 */
@@ -635,7 +653,7 @@ class Product extends Base
                 'status' => $item->getStatusText(),
                 'total' => $item->total, // 总需要多少人次
                 'order_award_count' => $item->order_award_count, // 已参与人次
-                'residual_total' => max(0, $item->total - $item->order_award_count), // 剩余多少人次
+                'residual_total' => $item->getJoinCount(), // 剩余多少人次
                 'progress' => $item->progress,
                 'publish_countdown' => '',// 揭晓倒计时
                 'a_price' => $item->a_price,// 一口价
@@ -673,9 +691,27 @@ class Product extends Base
     }
 
     /** 卖家-进行中的宝贝 */
-    public function sellerInProgress()
+    public function sellerInProgress($params)
     {
+        $query = Product::find()->where([
+            'created_by' => $params['created_by'],
+            'deleted_at' => 0,
+//            'status' => [
+//                self::STATUS_NOT_SALE, // 未上架
+//                self::STATUS_IN_PROGRESS, // 进行中
+//                self::STATUS_WAIT_PUBLISH, // 待揭晓
+//                self::STATUS_PUBLISHED, // 已揭晓
+//                self::STATUS_CANCELED, // 已取消
+//            ]
+        ]);
 
+        if ($params['status']) {
+            $query->andWhere(['status' => $params['status']]);
+        }
+
+        $query->offset($params['offset'])->limit($this->psize);
+
+        return [$this->sellerProductListField($query->all()), $query->count()];
     }
 
     /** 卖家-待揭晓的宝贝 */
@@ -693,15 +729,42 @@ class Product extends Base
     // ---------------------------------------卖家/买家分割线-------------------------------------- //
 
     /** 买家-所有参与的宝贝 */
-    public function buyerAll()
+    public function buyerAllProduct()
     {
+        $query = Order::find()->where([
+            'buyer_id' => Yii::$app->user->identity->id,
+            'deleted_at' => 0,
+//            'status' => [
+//                Order::STATUS_WAIT_PAY, // 待付款
+//                Order::STATUS_PAYED, // 已付款
+//                Order::STATUS_REFUNDED, // 退款成功
+//            ]
+        ]);
 
+        $query->andFilterWhere(['status' => ArrayHelper::getValue($this->params, 'status')]);
+
+        $query->offset($this->params['offset'])->limit($this->psize);
+
+        return [$this->sellerProductListField($query->all()), $query->count()];
     }
 
     /** 买家-进行中的宝贝 */
     public function buyerInProgress()
     {
+        $query = OrderProduct::find()->where([
+            'order_product.buyer_id' => Yii::$app->user->identity->id,
+            'order_product.deleted_at' => 0,
+        ]);
 
+        $query->leftJoin('product', ['product.id' => 'pid'], [
+            'product.status' => Product::STATUS_IN_PROGRESS
+        ]);
+
+        $query->leftJoin('order', ['order.id' => 'order_id']);
+
+        $query->offset($this->params['offset'])->limit($this->psize);
+
+        return [$this->sellerProductListField($query->all()), $query->count()];
     }
 
     /** 买家-待揭晓的宝贝 */

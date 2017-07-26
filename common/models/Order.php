@@ -3,7 +3,11 @@
 namespace common\models;
 
 use Yii;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
+use common\helpers\Weixin;
+use app\helpers\Helper;
 
 
 /**
@@ -27,8 +31,10 @@ class Order extends Base
     public $productTags = []; // 订单商品的所有标签
     public $buyCount = []; // 购买总数
     public $productAttribute = []; // 产品sku
+    public $products = []; // 产品
     public $productsAmount = 0.00; // 订单商品总金额
     public $discountAmount = 0.00; // 折扣总金额
+    public $freight = 0.00; // 运费
     public $amountDesc = []; // 折扣明细,包括运费等
     public $payAmount = 0.00; // 折扣总金额
     public $coupons = []; // 优惠券
@@ -80,8 +86,8 @@ class Order extends Base
     public function rules()
     {
         return [
-//            [['ip'], 'default', 'value' => ''],
-            [['buyer_id', 'seller_id', 'sn', 'pay_type', 'status', 'created_at', 'updated_at', 'ip'], 'required'],
+            [['freight', 'deleted_at'], 'default', 'value' => '0'],
+            [['buyer_id', 'seller_id', 'sn', 'status', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
             [['sn', 'ip'], 'string', 'max' => 100],
@@ -115,36 +121,53 @@ class Order extends Base
      * Desc: 计算需支付的金额
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-07
-     * @param $products
      */
-    public function confirmPrice($products)
+    public function confirmPrice()
     {
-        foreach ($products as $key => $product) {
-            if (in_array($product['buy_type'], [OrderProduct::A_PRICE, OrderProduct::UNIT_PRICE])) { // 一口价 和 单价
-                $this->productsAmount += $product['product']->$product['buy_type'] * $product['count'];
-            }
+        foreach ($this->products as $key => $product) {
+            $this->productsAmount += $product['model']->getPrice($product['buy_type']) * $product['count'];
         }
+
+        $this->freight = $this->products[0]['model']->freight;
 
         $this->confirmUserCoupon();
 
-        $this->amountDesc[] = [
-            'name' => '运费',
-            'price' => '+ ￥0.00',
+        $this->amountDesc = [
+            [
+                'title' => '商品合计',
+                'price' => '+ ¥' . floatval($this->productsAmount),
+            ],
+            [
+                'title' => '运费',
+                'price' => '+ ¥' . $this->products[0]['model']->freight,
+            ],
         ];
 
         foreach ($this->coupons as $coupon) {
 
             // 优惠券
             $this->amountDesc[] = [
-                'name' => $coupon->title,
-                'price' => '- ￥' . $coupon->price,
+                'title' => $coupon->title,
+                'price' => '- ¥' . $coupon->price,
             ];
 
             $this->discountAmount += $coupon->price;
         }
 
+        if ($this->discountAmount > 0) {
+            $this->amountDesc[] = [
+                'title' => '红包抵扣',
+                'price' => '- ¥' . floatval($this->discountAmount),
+            ];
+        }
+
         $this->payAmount = floatval(number_format($this->productsAmount > $this->discountAmount
-            ? $this->productsAmount - $this->discountAmount : $this->discountAmount, 2, '.', ''));
+            ? $this->productsAmount + $this->freight - $this->discountAmount : $this->discountAmount, 2, '.', ''));
+
+        $this->amountDesc[] = [
+            'title' => '支付金额',
+            'price' => '¥' . $this->payAmount,
+        ];
     }
 
     public $canUseCouponTags = []; // 用户可以使用的优惠券(可以用的优惠券Tags)
@@ -152,7 +175,7 @@ class Order extends Base
     /** 获取用户可用优惠券 */
     public function confirmUserCoupon()
     {
-        $userCoupons = UserCoupon::find()->where(['user_id' => $this->userEntity->id, 'status' => UserCoupon::STATUS_UNUSED])->all();
+        $userCoupons = UserCoupon::find()->where(['user_id' => Yii::$app->user->identity->id, 'status' => UserCoupon::STATUS_UNUSED])->all();
 
         $getCanUseCouponIds = ArrayHelper::getColumn($userCoupons, 'coupon_id');
 
@@ -183,26 +206,81 @@ class Order extends Base
         }
     }
 
-    /** 创建订单商品 */
-    public function saveProducts($newOrder)
+    /** 判断商品使用这些优惠券 可以折扣的费用 */
+    public function getProductCoupon()
     {
-        foreach ($this->productAttribute as $productAttributeId => $productAttribute) {
-            if ($productAttribute->product) {
-                $orderProduct = new OrderProduct();
-                $orderProduct->order_id = $newOrder->id;
-                $orderProduct->title = $productAttribute->product->title;
-                $orderProduct->pid = $productAttribute->product->id;
-                $orderProduct->count = $this->buyCount[$productAttributeId]['count'];
-                $orderProduct->price = $productAttribute->price;
-                $orderProduct->discount_price = 0.00;
-                $orderProduct->coupon_id = 0;
-                $orderProduct->product_attribute_info = $productAttribute->getProductAttributeInfo();
+        $productTags = $productTagCoupons = [];
 
-                if (!$orderProduct->save()) {
-                    throw new Exception('创建订单商品失败');
+        if ($this->products) {
+            foreach ($this->products as $key => $product) {
+                if ($product->tag) {
+//                    print_r(ArrayHelper::getColumn($product->tag, 'tid'));
+                    $productTags = array_merge($this->productTags, ArrayHelper::getColumn($product->tag, 'tid'));
                 }
             }
         }
+
+        if ($productTags) {
+            $productTagCoupons = TagCoupon::find()->where(['tid' => $productTags])->all();
+
+            $productTagCoupons = ArrayHelper::map($productTagCoupons, 'id', 'tid', 'coupon_id');
+        }
+
+        return $productTagCoupons;
+    }
+
+    /** 创建订单商品 */
+    public function saveProducts($newOrder)
+    {
+        foreach ($newOrder->products as $key => $product) {
+            $orderProduct = new OrderProduct();
+            $orderProduct->order_id = $newOrder->id;
+            $orderProduct->title = $product['model']->title;
+            $orderProduct->pid = $product['model']->id;
+            $orderProduct->count = $product['count'];
+            $orderProduct->price = $product['model']->price;
+            $orderProduct->discount_price = 0.00;
+            $orderProduct->coupon_id = 0;
+
+            if (!$orderProduct->save()) {
+                throw new Exception('创建订单商品失败');
+            }
+        }
+    }
+
+    /** 随机生产sn */
+    public function createOrderSn()
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $x = date('Ymd') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
+            if (Order::find()->where(['sn' => $x])->count()) {
+                continue;
+            }
+            return $x;
+        }
+        return '';
+    }
+
+    /** 创建订单 */
+    public function create()
+    {
+        $this->ip = Yii::$app->request->userIP;
+        $this->sn = $this->createOrderSn();
+        $this->buyer_id = Yii::$app->user->identity->id;
+        $this->seller_id = $this->products[0]['model']->created_by;
+        $this->status = self::STATUS_WAIT_PAY;
+        $this->pay_amount = $this->payAmount;
+        $this->product_amount = $this->productsAmount;
+        $this->discount_amount = $this->discountAmount;
+        $this->freight = $this->freight;
+        $this->pay_type = 0;
+
+        if (!$this->save()) {
+//            print_r($this->getErrors());exit;
+            throw new Exception('创建订单失败');
+        }
+
+        return $this;
     }
 
     /** 生成摇奖号码 次方法仅支持一个订单一个宝贝的情况*/
@@ -338,11 +416,11 @@ class Order extends Base
     {
         $payType = $payType ?: $this->pay_type;
         switch ($payType) {
-            case 1 :  // 支付宝
+            case '支付宝支付' :
                 return $this->_alipay();
                 break;
 
-            case 2: // 微信
+            case '微信支付':
                 return $this->_weixinPay();
                 break;
         }
@@ -355,7 +433,7 @@ class Order extends Base
         require_once(Yii::getAlias('@app') . "/sdk/alipay/lib/alipay_core.function.php");
         require_once(Yii::getAlias('@app') . "/sdk/alipay/lib/alipay_rsa.function.php");
 
-        $productTitle = $this->product ? ArrayHelper::getValue($this->product, "0.title") : '';
+        $productTitle = $this->orderProduct ? ArrayHelper::getValue($this->orderProduct, "title") : '';
 
         $apiParams = [
             'service' => 'mobile.securitypay.pay',
@@ -387,7 +465,7 @@ class Order extends Base
     /** 获取微信支付参数 */
     public function _weixinPay()
     {
-        $productTitle = $this->product ? ArrayHelper::getValue($this->product, "0.title") : '';
+        $productTitle = $this->orderProduct ? ArrayHelper::getValue($this->orderProduct, "title") : '';
 
         if ($this->pay) {
             $signParams = [
@@ -418,7 +496,7 @@ class Order extends Base
             'body' => $productTitle,
             'out_trade_no' => $this->sn,
             'total_fee' => $this->pay_amount * 100,
-            'spbill_create_ip' => Helper::getIP(),
+            'spbill_create_ip' => Yii::$app->request->userIP,
             'notify_url' => Url::to('/weixinpayCallback.php', true),
             'trade_type' => 'APP',
         ];
@@ -461,7 +539,7 @@ class Order extends Base
             }
 
             /** 保存微信支付日志 */
-            $pay = new OrderPay();
+            $pay = new Pay();
             $pay->sn = $this->sn;
             $pay->order_id = $this->id;
             $pay->pay_type = $this->pay_type;
@@ -499,6 +577,46 @@ class Order extends Base
         throw new Exception('微信支付暂时不可用');
     }
 
+    /** 收银台接口所需数据 */
+    public function checkout()
+    {
+        $r = [
+            'sn' => $this->sn,
+            'default_pay_type' => '支付宝支付',
+            'pay_types' => $this->getPayTypes(Yii::$app->request->post('pay_ids', '["支付宝支付","微信支付"]')),
+            'amount' => [
+                [
+                    'title' => '商品合计',
+                    'price' => '+ ¥' . floatval($this->product_amount),
+                ],
+                [
+                    'title' => '运费',
+                    'price' => '+ ¥' . floatval($this->freight),
+                ],
+            ],
+        ];
+
+        if ($this->discountAmount > 0) {
+            $r['amount'][] = [
+                'title' => '红包抵扣',
+                'price' => '- ¥' . floatval($this->discount_amount),
+            ];
+        }
+
+        $r['amount'][] = [
+            'title' => '支付金额',
+            'price' => '¥' . floatval($this->pay_amount),
+        ];
+
+        return $r;
+    }
+
+    /** 获取支付结果 */
+    public function getPay()
+    {
+        return $this->hasOne(Pay::className(), ['order_id' => 'id']);
+    }
+
     /** 取买家信息 */
     public function getSeller()
     {
@@ -515,6 +633,12 @@ class Order extends Base
     public function getOrderProduct()
     {
         return $this->hasOne(OrderProduct::className(), ['order_id' => 'id']);
+    }
+
+    /** 是否已付款 */
+    public function isPaid()
+    {
+        return self::STATUS_PAYED == $this->status;
     }
 
     /** 是否为一口价订单 */

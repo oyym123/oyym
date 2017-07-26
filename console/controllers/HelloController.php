@@ -1,8 +1,6 @@
 <?php
 namespace console\controllers;
 
-use backend\helpers\MyHelper;
-use backend\helpers\PinyinHelper;
 use common\models\Advice;
 use common\models\Article;
 use common\models\BaseData;
@@ -23,6 +21,7 @@ use yii\helpers\ArrayHelper;
 use common\models\Product;
 use common\models\Comments;
 use yii\db\Query;
+use common\helpers\PinyinHelper;
 
 /**
  * User: lixinxin<lixinxinlgm@163.com>
@@ -82,6 +81,36 @@ class HelloController extends Controller
             $user->generateAuthKey();
 
             $user->save();
+        }
+    }
+
+    /**
+     * Name: actionIndex
+     * Desc: 导入城市
+     * User: lixinxin <lixinxinlgm@163.com>
+     * Date: 2017-07-24
+     * @return bool
+     */
+    public function actionImportCity()
+    {
+        $sql = require(__DIR__ . '/../files/city.php');
+
+        Yii::$app->getDb()->createCommand($sql)->execute();
+
+        echo "ok \n";
+    }
+
+    /** 省市拼音排序 */
+    public function actionSetCityFirstChar()
+    {
+        foreach (City::find()->each(10) as $item) {
+            $item->sort_by_pinyin = substr(PinyinHelper::getPinyin($item->name), 0, 30);
+            $item->save();
+            if ($item->getErrors()) {
+                print_r($item->getErrors());
+                exit;
+            }
+            echo "$item->name \n";
         }
     }
 }

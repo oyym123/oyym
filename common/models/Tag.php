@@ -141,7 +141,7 @@ class Tag extends Base
     /**
      * Name: getTagConfig
      * Desc: 取 专利论文 | 社会活动 | 科研创新 | 备考无忧 页面头图
-     * User: lixinxin <lixinxin@zgzzzs.com>
+     * User: lixinxin <ulee@fangdazhongxin.com>
      * Date: 2017-01-21
      * @param $params
      * @return mixed
