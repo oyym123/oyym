@@ -332,12 +332,17 @@ class Product extends Base
      */
     public function canUpdate($userId = 0)
     {
+
+        if ($userId && $userId != $this->created_by) {
+            return [1, '不允许修改别人的宝贝哦'];
+        }
+
         if ($this->status != self::STATUS_IN_PROGRESS) {
             return [1, '宝贝状态不允许修改哦'];
         }
 
-        if ($userId && $userId != $this->created_by) {
-            return [1, '不允许修改别人的宝贝哦'];
+        if ($this->getSuccessOrderProduct()) {
+            return [1, '宝贝已有人下单不允许修改'];
         }
         return [0, ''];
     }
@@ -443,7 +448,7 @@ class Product extends Base
     }
 
     /** 获取该宝贝中支付成功的产品订单 */
-    public function getSuccessOrderProduct($offset)
+    public function getSuccessOrderProduct($offset = 0)
     {
         $orderProduct = OrderProduct::find()->where(['order_product.pid' => $this->id])->
         join('LEFT JOIN', 'order', 'order.id = order_product.order_id')->andWhere(['>=', 'order.status', Order::STATUS_PAYED])

@@ -405,6 +405,109 @@ class ProductsController extends WebController
     }
 
     /**
+     * @SWG\Post(path="/products/update",
+     *   tags={"产品"},
+     *   summary="修改产品",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Parameter(name="id", in="query", default="1", description="修改的产品ID", required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="data",
+     *     in="formData",
+     *     default="{'freight':'运费','model':1,'title':'Iphone9','contents':'\u4e70\u5b8c\u5c31\u5403\u571f:)','images':[{'name':'\u6d4b\u8bd5\u56fe\u7247','url':'demo321'},{'name':'\u6d4b\u8bd5\u56fe\u72472','url':'demo456'}],'videos':[{'name':'\u6d4b\u8bd5\u89c6\u98911','url':'demo321'}],'address':{'lat':'0.232512','lng':'1.2335432','detail_address':'\u6cb3\u5317\u7701\u5eca\u574a\u5e02\u71d5\u90ca\u9547'},'total':10000,'a_price':8000,'type_id':2,'start_time':1499392688,'end_time':1499692688,'unit_price':1}",
+     *     description= "发布产品需要的数据，可在http://www.bejson.com/jsonviewernew/上解析",
+     *     required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionUpdate()
+    {
+        $data = Yii::$app->request->post();
+        $transaction = Yii::$app->db->beginTransaction();
+        $images = json_decode($data['images'], true);
+        $videos = json_decode($data['videos'], true);
+        $address = json_decode($data['address'], true);
+        $product = $this->findModel(Yii::$app->request->get('id'));
+        list($code, $err) = $product->canUpdate();
+        if ($code) {
+            self::showMsg($err, -1);
+        }
+        try {
+            if ($data['unit_price'] > $data['a_price'] && !empty($data['a_price'])) {
+                throw new Exception('单价不能大于一口价');
+            }
+            if (count($images) > 6) {
+                throw new Exception('最多上传6张图片');
+            }
+            if (count($videos) > 1) {
+                throw new Exception('最多上传1个视频');
+            }
+
+            $product->title = $data['title'];
+            $product->contents = $data['contents'];
+            $product->detail_address = $address['detail_address'];
+            $product->lat = $address['lat'];
+            $product->lng = $address['lng'];
+            $product->model = $data['model'];
+            $product->created_by = $this->userId;
+            $product->freight = $data['freight'];
+            $product->status = Product::STATUS_IN_PROGRESS;
+            $product->created_at = time();
+            $product->updated_at = time();
+            $product->total = $data['total'];
+            $product->unit_price = $data['unit_price'];
+            $product->a_price = $data['a_price'] ?: '';
+            $product->start_time = $data['start_time'] ?: '';
+            $product->end_time = $data['end_time'] ?: '';
+            $product->type_id = $data['type_id'];
+
+            if (!$product->save()) {
+                throw new Exception('宝贝发布失败');
+            }
+            foreach ($images as $image) {
+                $params = [
+                    'name' => $image['name'],
+                    'type' => Image::TYPE_PRODUCT,
+                    'type_id' => $product->id,
+                    'url' => $image['url'],
+                    'size_type' => Image::SIZE_MEDIUM,
+                    'status' => Base::STATUS_ENABLE,
+                ];
+                Image::setImage($params);
+            }
+
+            foreach ($videos as $video) {
+                $params = [
+                    'name' => $video['name'],
+                    'type' => Video::TYPE_PRODUCT,
+                    'type_id' => $product->id,
+                    'url' => $video['url'],
+                    'size_type' => Video::SIZE_HD,
+                    'status' => Base::STATUS_ENABLE,
+                ];
+                Video::setVideo($params);
+            }
+            $transaction->commit();
+
+            self::showMsg([
+                'product_id' => $product->id
+            ], 1);
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            self::showMsg($e->getMessage(), -1);
+        }
+    }
+
+
+    /**
      * @param $id
      * @SWG\Get(path="/products/view",
      *   tags={"产品"},
