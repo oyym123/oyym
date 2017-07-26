@@ -725,14 +725,20 @@ class Order extends Base
         return $r;
     }
 
-    /** 设置 */
-    public function setAddress($addressId)
+    /** 设置收货人地址 */
+    public function setAddress($addressId = 0)
     {
-        $address = UserAddress::findOne(['id' => $addressId]);
-        if (!$address || $address->user_id != Yii::$app->user->identity->id) {
-            throw new Exception('地址选择错误');
-        }
+        if ($this->products[0]['buy_type'] == OrderProduct::A_PRICE) {
+            if (empty($addressId)) {
+                throw new Exception('请选择收货地址');
+            }
 
-        $this->address_id = $addressId;
+            $address = UserAddress::findOne(['id' => $addressId]);
+            if (!$address || $address->user_id != Yii::$app->user->identity->id) {
+                throw new Exception('地址选择错误');
+            }
+
+            $this->address_id = $addressId;
+        }
     }
 }
