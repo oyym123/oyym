@@ -142,7 +142,7 @@ class UserAddressController extends WebController
      *     in="formData",
      *     default="333000",
      *     description="邮政编码",
-     *     required=true,
+     *     required=false,
      *     type="string",
      *   ),
      *   @SWG\Parameter(

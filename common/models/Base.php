@@ -21,6 +21,7 @@ class Base extends \yii\db\ActiveRecord
     public $limit = 10; // 分页
     public $userEntity = null; // 用户实体
     public $psize = 20;
+    public $params = [];
 
     Use BaseData;
 

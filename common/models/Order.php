@@ -86,7 +86,7 @@ class Order extends Base
     public function rules()
     {
         return [
-            [['freight'], 'default', 'value' => '0'],
+            [['freight', 'deleted_at'], 'default', 'value' => '0'],
             [['buyer_id', 'seller_id', 'sn', 'status', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
@@ -633,6 +633,12 @@ class Order extends Base
     public function getOrderProduct()
     {
         return $this->hasOne(OrderProduct::className(), ['order_id' => 'id']);
+    }
+
+    /** 是否已付款 */
+    public function isPaid()
+    {
+        return self::STATUS_PAYED == $this->status;
     }
 
     /** 是否为一口价订单 */

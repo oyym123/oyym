@@ -47,8 +47,10 @@ class UserAddress extends Base
     public function rules()
     {
         return [
-            [['user_name', 'province_id', 'city_id', 'area_id', 'street_id', 'telephone', 'postal', 'detail_address', 'created_at', 'updated_at'], 'required'],
-            [['user_id', 'province_id', 'city_id', 'area_id', 'street_id', 'default_address', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['street_id'], 'default', 'value' => 0],
+            [['postal'], 'default', 'value' => ''],
+            [['user_name', 'province_id', 'city_id', 'area_id', 'telephone', 'detail_address', 'created_at', 'updated_at'], 'required'],
+//            [['user_id', 'province_id', 'city_id', 'area_id', 'street_id', 'default_address', 'status', 'created_at', 'updated_at'], 'integer'],
             [['user_name', 'str_address', 'detail_address'], 'string', 'max' => 255],
             [['lng', 'lat'], 'string', 'max' => 25],
         ];
@@ -120,8 +122,6 @@ class UserAddress extends Base
         $model->postal = $params['postal'];
         $model->telephone = $params['telephone'];
         $model->status = $params['status'];
-        $model->created_at = time();
-        $model->updated_at = time();
         $model->str_address = $this->mergeAddress($model);
         if (!$model->save()) {
             throw new Exception('地址保存失败!');

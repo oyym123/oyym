@@ -398,7 +398,7 @@ class PayController extends WebController
      * Date: 2017-00-00
      * @SWG\Get(path="/pay/success",
      *   tags={"订单"},
-     *   summary="支付成功后回调接口-用于展示买到的摇奖编号等信息",
+     *   summary="查看支付结果",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="sn", in="query", required=true, type="integer", default="1",
      *     description="订单号"
@@ -418,6 +418,10 @@ class PayController extends WebController
     public function actionPaySuccess($sn)
     {
         $order = $this->findOrderModel(['sn' => $sn, 'user_id' => $this->userId]);
+        if ($order->isPaid() == false) {
+            self::showMsg('支付失败', -1);
+        }
+
         $codes = $order->getAwardCodes();
 
         $data = [

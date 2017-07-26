@@ -225,7 +225,7 @@ class ProductsController extends WebController
      *   tags={"我的"},
      *   summary="我参与的",
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="全部",
+     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
      *     description="宝贝状态,传的值有: 全部=0 || 进行中=20 || 待揭晓=30 || 已揭晓=40, 这儿没有 待发货,代签收"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
@@ -276,14 +276,19 @@ class ProductsController extends WebController
     public function actionBuyerProductList($status)
     {
         $productModel = new Product();
-        if (empty($status)) { // 全部
-            list($sellerAllProducts, $count) = $productModel->buyerProducts([
-                'order_status' => $status,
-                'created_by' => $this->userId,
-                'offset' => Yii::$app->request->get('offset', 0)
-            ]);
-        } elseif ($status == '') {
+        $productModel->params = [
+            'created_by' => $this->userId,
+            'offset' => Yii::$app->request->get('offset', 0)
+        ];
 
+        if (empty($status)) { // 全部
+            list($sellerAllProducts, $count) = $productModel->buyerAllProduct();
+        } elseif ($status == Product::STATUS_IN_PROGRESS) {
+            // 进行中
+            $productModel->params += [
+                'status' => Product::STATUS_IN_PROGRESS,
+            ];
+            list($sellerAllProducts, $count) = $productModel->buyerInProgress();
         }
 
         $data = [
@@ -454,9 +459,9 @@ class ProductsController extends WebController
      * )
      */
 
-    public function actionView()
+    public function actionView($id)
     {
-        $item = $this->findModel(['id' => Yii::$app->request->get('id')]);
+        $item = $this->findModel(['id' => $id]);
 //        $participants = $item->getJoinCount(); //已参加人数
         $data = [
             'id' => $item->id,

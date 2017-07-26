@@ -742,9 +742,27 @@ class Product extends Base
     }
 
     /** 卖家-进行中的宝贝 */
-    public function sellerInProgress()
+    public function sellerInProgress($params)
     {
+        $query = Product::find()->where([
+            'created_by' => $params['created_by'],
+            'deleted_at' => 0,
+//            'status' => [
+//                self::STATUS_NOT_SALE, // 未上架
+//                self::STATUS_IN_PROGRESS, // 进行中
+//                self::STATUS_WAIT_PUBLISH, // 待揭晓
+//                self::STATUS_PUBLISHED, // 已揭晓
+//                self::STATUS_CANCELED, // 已取消
+//            ]
+        ]);
 
+        if ($params['status']) {
+            $query->andWhere(['status' => $params['status']]);
+        }
+
+        $query->offset($params['offset'])->limit($this->psize);
+
+        return [$this->sellerProductListField($query->all()), $query->count()];
     }
 
     /** 卖家-待揭晓的宝贝 */
@@ -762,7 +780,7 @@ class Product extends Base
     // ---------------------------------------卖家/买家分割线-------------------------------------- //
 
     /** 买家-所有参与的宝贝 */
-    public function buyerProduct($params)
+    public function buyerAllProduct()
     {
         $query = Order::find()->where([
             'buyer_id' => Yii::$app->user->identity->id,
@@ -774,30 +792,30 @@ class Product extends Base
 //            ]
         ]);
 
-        if ($params['status'] == Order::STATUS_WAIT_PAY) {
-            // 待付款
-            $query->andWhere(['status' => $params['status']]);
-        }
+        $query->andFilterWhere(['status' => ArrayHelper::getValue($this->params, 'status')]);
 
-        if ($params['status']) {
-            $query->andWhere(['status' => $params['status']]);
-        }
-
-        $query->offset($params['offset'])->limit($this->psize);
+        $query->offset($this->params['offset'])->limit($this->psize);
 
         return [$this->sellerProductListField($query->all()), $query->count()];
-    }
-
-    /** 买家-所有参与的 */
-    public function buyerAllProduct()
-    {
-
     }
 
     /** 买家-进行中的宝贝 */
     public function buyerInProgress()
     {
+        $query = OrderProduct::find()->where([
+            'order_product.buyer_id' => Yii::$app->user->identity->id,
+            'order_product.deleted_at' => 0,
+        ]);
 
+        $query->leftJoin('product', ['product.id' => 'pid'], [
+            'product.status' => Product::STATUS_IN_PROGRESS
+        ]);
+
+        $query->leftJoin('order', ['order.id' => 'order_id']);
+
+        $query->offset($this->params['offset'])->limit($this->psize);
+
+        return [$this->sellerProductListField($query->all()), $query->count()];
     }
 
     /** 买家-待揭晓的宝贝 */

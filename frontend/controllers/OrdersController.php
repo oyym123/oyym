@@ -66,11 +66,11 @@ class OrdersController extends WebController
      * Desc:
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-11
-     * @SWG\Get(path="/orders/buyer-product-list",
+     * @SWG\Get(path="/orders/seller-product-list",
      *   tags={"我的"},
      *   summary="我卖出的",
      *   description="Author: lixinxin",
-     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="全部",
+     *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
      *     description="status的值分为: 全部=0 || 待发货=20 || 已发货=25 || 待评价=70 || 已完成=100 || 退货申请=60"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
