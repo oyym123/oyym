@@ -49,7 +49,7 @@ class UserAddress extends Base
         return [
             [['street_id'], 'default', 'value' => 0],
             [['postal'], 'default', 'value' => ''],
-            [['user_name', 'province_id', 'city_id', 'area_id', 'telephone', 'detail_address', 'created_at', 'updated_at'], 'required'],
+            [['user_name', 'province_id', 'city_id', 'area_id', 'telephone', 'detail_address'], 'required'],
 //            [['user_id', 'province_id', 'city_id', 'area_id', 'street_id', 'default_address', 'status', 'created_at', 'updated_at'], 'integer'],
             [['user_name', 'str_address', 'detail_address'], 'string', 'max' => 255],
             [['lng', 'lat'], 'string', 'max' => 25],

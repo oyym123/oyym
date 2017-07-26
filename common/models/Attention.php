@@ -19,7 +19,8 @@ use yii\base\Exception;
  */
 class Attention extends Base
 {
-    const TYPE_USER = 1; //商品
+    const TYPE_USER = 1; // 用户
+    const PRODUCT_TYPE = 2; //商品
 
     /**
      * @inheritdoc
@@ -42,7 +43,7 @@ class Attention extends Base
     public function rules()
     {
         return [
-            [['user_id', 'type_id', 'type', 'created_at', 'updated_at'], 'required'],
+            [['user_id', 'type_id', 'type'], 'required'],
             [['user_id', 'type_id', 'type', 'created_at', 'updated_at', 'status'], 'integer'],
         ];
     }
@@ -91,6 +92,16 @@ class Attention extends Base
         return $query->one();
     }
 
+    /** 取消关注所有宝贝分类 */
+    public function cancelProductType()
+    {
+        Attention::deleteAll([
+            "type" => Attention::PRODUCT_TYPE,
+            "user_id" => Yii::$app->user->id,
+            "status" => Attention::STATUS_ENABLE
+        ]);
+    }
+
     /** 关注  */
     public function create($params)
     {
@@ -99,8 +110,6 @@ class Attention extends Base
         $attention->type = ArrayHelper::getValue($params, 'type');
         $attention->type_id = ArrayHelper::getValue($params, 'type_id');
         $attention->status = self::STATUS_ENABLE;
-        $attention->created_at = time();
-        $attention->updated_at = time();
         if ($attention->save()) {
             return true;
         }

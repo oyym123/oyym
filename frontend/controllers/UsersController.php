@@ -1,18 +1,11 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\Attention;
+use common\models\Base;
 use frontend\components\WebController;
 use Yii;
-use yii\base\InvalidParamException;
-use yii\web\BadRequestHttpException;
-use yii\web\Controller;
-use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
-use common\models\LoginForm;
-use frontend\models\PasswordResetRequestForm;
-use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
-use frontend\models\ContactForm;
+use yii\base\Exception;
 
 /**
  * Users controller
@@ -65,8 +58,24 @@ class UsersController extends WebController
      */
     public function actionFollowCategoryOrCancel()
     {
-        self::showMsg('已关注');
-        self::showMsg('已取消关注');
+        $attention = new Attention();
+        $param['type'] = Attention::PRODUCT_TYPE;
+        $typeIds = json_decode(Yii::$app->request->post('type_id'), true);
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $attention->cancelProductType();
+            foreach ($typeIds as $typeId) {
+                $param['type_id'] = $typeId;
+                if (!$attention->create($param)) {
+                    throw new Exception('关注失败');
+                }
+            }
+            $transaction->commit();
+            self::showMsg('关注成功', 1);
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            self::showMsg($e->getMessage(), -1);
+        }
     }
 
     /**
@@ -151,17 +160,17 @@ class UsersController extends WebController
     {
         $var1 = Yii::$app->redis->del("mioji2");
         // echo Yii::$app->redis->decrby('jkjk',2);
-           //Yii::$app->redis->zadd('mioji2','z999f','ls','12321');
-           Yii::$app->redis->zadd('mioji2',1,'rr',2,'ttt',6,000);
+        //Yii::$app->redis->zadd('mioji2','z999f','ls','12321');
+        Yii::$app->redis->zadd('mioji2', 1, 'rr', 2, 'ttt', 6, 000);
         //
 
         //$var3 = Yii::$app->redis->lrange("vari",0,99);
-        $num=Yii::$app->redis->zcard('mioji2');
-       $var81 = Yii::$app->redis->zrange('mioji2',0,$num);
-       foreach ($var81 as $i){
-           echo $i;
+        $num = Yii::$app->redis->zcard('mioji2');
+        $var81 = Yii::$app->redis->zrange('mioji2', 0, $num);
+        foreach ($var81 as $i) {
+            echo $i;
 
-       }
+        }
 
     }
 }
