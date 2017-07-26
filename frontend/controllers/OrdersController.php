@@ -71,7 +71,7 @@ class OrdersController extends WebController
      *   summary="我卖出的",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
-     *     description="status的值分为: 全部=0 || 待发货=20 || 已发货=25 || 待评价=70 || 已完成=100 || 退货申请=60"
+     *     description="status的值分为: 全部=0 || 待发货=20 || 已发货=25 || 待评价=70 || 已完成=100 || 退款申请=60"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
      *     description="数据游标"
@@ -80,7 +80,37 @@ class OrdersController extends WebController
      *     description="用户ky-token",
      *    ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *          product_count=宝贝总数
+     *          product_list=宝贝列表
+     *              layout=布局类型[
+     *                  数量模式_卖家_待发货 || 数量模式_卖家_已发货 || 数量模式_卖家_待评价 || 数量模式_卖家_已完成 || 数量模式_卖家_退款申请
+     *                  时间模式_卖家_待发货 || 时间模式_卖家_已发货 || 时间模式_卖家_待评价 || 时间模式_卖家_已完成 || 时间模式_卖家_退款申请
+     *              ]
+     *              product_id=宝贝id
+     *              order_sn=订单号
+     *              created_at=参与时间
+     *              title=标题
+     *              img=宝贝头图
+     *              total=总需人次
+     *              residual_total=剩余人次
+     *              residual_time=结束时间
+     *              progress=进度
+     *              publish_countdown=揭晓倒计时
+     *              a_price=一口价
+     *              unit_price=单价
+     *              status=状态 [待发货 || 已发货 || 待评价 || 已完成]
+     *              actions=数组下是字典
+     *                  [
+     *                      title=评价
+     *                      url=evaluation_add
+     *                  ],
+     *                  [
+     *                      title=查看评价
+     *                      url=evaluation_list
+     *                  ],
+     *              url=链接地址[跳转到宝贝详情页=product, 跳转到订单详情页=order]
+     *              order_award_count=已参与人次"
      *   )
      * )
      */
@@ -112,7 +142,7 @@ class OrdersController extends WebController
      *   summary="我买到的",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
-     *     description="status的值分为: 全部=0 || 待发货=20 || 待签收=25 || 待评价=70 || 已完成=100 || 退货申请=60"
+     *     description="status的值分为: 全部=0 || 待发货=20 || 待签收=25 || 待评价=70 || 已完成=100 || 退款申请=60"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
      *     description="数据游标"
@@ -125,8 +155,8 @@ class OrdersController extends WebController
      *          product_count=宝贝总数
      *          product_list=宝贝列表
      *              layout=布局类型[
-     *                  数量模式_买家_待发货 || 数量模式_买家_待签收 || 数量模式_买家_待评价 || 数量模式_买家_已完成 || 数量模式_买家_退货申请
-     *                  时间模式_买家_待发货 || 时间模式_买家_待签收 || 时间模式_买家_待评价 || 时间模式_买家_已完成 || 时间模式_买家_退货申请
+     *                  数量模式_买家_待发货 || 数量模式_买家_待签收 || 数量模式_买家_待评价 || 数量模式_买家_已完成 || 数量模式_买家_退款申请
+     *                  时间模式_买家_待发货 || 时间模式_买家_待签收 || 时间模式_买家_待评价 || 时间模式_买家_已完成 || 时间模式_买家_退款申请
      *              ]
      *              product_id=宝贝id
      *              order_sn=订单号
@@ -159,7 +189,7 @@ class OrdersController extends WebController
      *                      url=edit
      *                  ]
      *              url=链接地址[跳转到宝贝详情页=product, 跳转到订单详情页=order]
-     *              order_award_count=已参与人次""
+     *              order_award_count=已参与人次"
      *   )
      * )
      */

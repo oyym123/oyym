@@ -659,7 +659,7 @@ class Order extends Base
 
     }
 
-    /** 卖家-待签收的宝贝 (买家退货)*/
+    /** 卖家-待签收的宝贝 (买家退款)*/
     public function sellerWaitReceiving()
     {
 
@@ -677,7 +677,7 @@ class Order extends Base
 
     }
 
-    /** 卖家-买家的退货申请 */
+    /** 卖家-买家的退款申请 */
     public function sellerSalesReturn()
     {
 

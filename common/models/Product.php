@@ -621,7 +621,7 @@ class Product extends Base
         $r = [];
         foreach ($products as $key => $item) {
             $r[] = [
-                'created_at' => $item->order->createdAt(),
+                'created_at' => $item->createdAt(),
                 'product_id' => $item->id,
                 'title' => $item->title,
                 'layout' => $item->sellerProductLayout(),
