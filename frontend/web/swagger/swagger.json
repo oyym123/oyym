@@ -1603,14 +1603,6 @@
                         "required": true,
                         "type": "integer",
                         "default": "1"
-                    },
-                    {
-                        "name": "id",
-                        "in": "query",
-                        "description": "",
-                        "required": true,
-                        "type": "integer",
-                        "default": "1"
                     }
                 ],
                 "responses": {
