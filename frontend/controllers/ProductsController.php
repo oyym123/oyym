@@ -403,7 +403,7 @@ class ProductsController extends WebController
      *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
      *     description="用户ky-token",
      *    ),
-     *   @SWG\Parameter(name="id", in="query", default="1", description="修改的产品ID", required=true,
+     *   @SWG\Parameter(name="id", in="formData", default="1", description="修改的产品ID", required=true,
      *     type="integer",
      *   ),
      *   @SWG\Parameter(
@@ -426,7 +426,7 @@ class ProductsController extends WebController
         $images = json_decode($data['images'], true);
         $videos = json_decode($data['videos'], true);
         $address = json_decode($data['address'], true);
-        $product = $this->findModel(Yii::$app->request->get('id'));
+        $product = $this->findModel(Yii::$app->request->post('id'));
         list($code, $err) = $product->canUpdate();
         if ($code) {
             self::showMsg($err, -1);
@@ -459,7 +459,7 @@ class ProductsController extends WebController
             $product->type_id = $data['type_id'];
 
             if (!$product->save()) {
-                throw new Exception('宝贝发布失败');
+                throw new Exception('宝贝修改失败');
             }
 
             $delete['img_type'] = Image::TYPE_PRODUCT;
