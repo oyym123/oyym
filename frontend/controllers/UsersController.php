@@ -3,7 +3,10 @@ namespace frontend\controllers;
 
 use common\models\Attention;
 use common\models\Base;
+use common\models\Image;
+use common\models\Product;
 use common\models\ProductType;
+use common\models\UserInfo;
 use frontend\components\WebController;
 use Yii;
 use yii\base\Exception;
@@ -13,6 +16,19 @@ use yii\base\Exception;
  */
 class UsersController extends WebController
 {
+
+    public function init()
+    {
+        parent::init();
+        if (empty($this->userId) && in_array(Yii::$app->requestedRoute, [
+                'users/follow-category', 'users/follow-category-or-cancel',
+                'users/upload-user-photo', 'users/setting', 'users/update-info'
+            ])
+        ) {
+            self::needLogin();
+        }
+    }
+
     /**
      * Name: actionFollowCategory
      * Desc: 关注的分类
@@ -32,21 +48,13 @@ class UsersController extends WebController
         $attention = Attention::getAttention(['type' => Attention::PRODUCT_TYPE]);
         $attentionIds = array_column($attention, 'type_id');
         $productTypes = ProductType::findAll(['level' => 1]);
-        $data = [];
+        $data['list'] = [];
         foreach ($productTypes as $item) {
-            if (in_array($item->id, $attentionIds)) {
-                $data[] = [
-                    'id' => $item->id,
-                    'title' => $item->name,
-                    'is_follow' => 1
-                ];
-            } else {
-                $data[] = [
-                    'id' => $item->id,
-                    'title' => $item->name,
-                    'is_follow' => 0
-                ];
-            }
+            $data['list'][] = [
+                'id' => $item->id,
+                'title' => $item->name,
+                'is_follow' => in_array($item->id, $attentionIds) ? 1 : 0
+            ];
         }
         self::showMsg($data);
     }
@@ -171,6 +179,107 @@ class UsersController extends WebController
             ]
         ]);
     }
+
+    /**
+     * @SWG\Get(path="/users/upload-user-photo",
+     *   tags={"设置"},
+     *   summary="上传用户头像接口",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Parameter(name="url", in="query", default="abc.jpg", description="图片地址", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="name", in="query", default="abc.jpg", description="图片地址", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionUploadUserPhoto()
+    {
+        $url = Yii::$app->request->post('url');
+        $params = [
+            'name' => $url,
+            'type' => Image::TYPE_USER_PHOTO,
+            'type_id' => $this->userId,
+            'url' => Yii::$app->request->post('url'),
+            'size_type' => Yii::$app->request->post('size', Image::SIZE_BIG),
+            'status' => Base::STATUS_ENABLE,
+            'sort' => Yii::$app->request->post('sort', 0),
+        ];
+        $delete['img_type'] = Image::TYPE_USER_PHOTO;
+        $delete['type_id'] = $this->userId;
+        $delete['img_urls'] = [$url];
+
+        Image::deleteImages($delete);  //进行伪删除操作
+        Image::setImage($params);
+        self::showMsg('图片上传成功', 1);
+    }
+
+    /**
+     * @SWG\Get(path="/users/setting",
+     *   tags={"设置"},
+     *   summary="设置主界面",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionSetting()
+    {
+        $model = UserInfo::findOne(['user_id' => $this->userId]);
+        self::showMsg([
+            'user_photo' => $model->photoUrl($model->id),
+            'zhima' => '700'
+        ]);
+    }
+
+    /**
+     * @SWG\Post(path="/users/update-info",
+     *   tags={"设置"},
+     *   summary="更新用户信息",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Parameter(name="intro", in="formData", default="1", description="用户简介，不能超过255字符", required=false,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="province", in="formData", default="1", description="省", required=false,
+     *     type="integer",
+     *   ),
+     *   @SWG\Parameter(name="city", in="formData", default="1", description="市", required=false,
+     *     type="integer",
+     *   ),
+     *   @SWG\Parameter(name="area", in="formData", default="1", description="区", required=false,
+     *     type="integer",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionUpdateInfo()
+    {
+        $model = UserInfo::findOne(['user_id' => $this->userId]);
+        $model->province = Yii::$app->request->post('province');
+        $model->city = Yii::$app->request->post('city');
+        $model->area = Yii::$app->request->post('area');
+        $model->intro = Yii::$app->request->post('intro');
+        if (!$model->save()) {
+            self::showMsg('更新信息失败', -1);
+        }
+        self::showMsg('更新信息成功', 1);
+    }
+
 
     public function actionTest()
     {

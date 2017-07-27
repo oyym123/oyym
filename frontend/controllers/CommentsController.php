@@ -27,8 +27,7 @@ class CommentsController extends WebController
     {
         parent::init();
         if (empty($this->userId) && in_array(Yii::$app->requestedRoute, [
-                'comments/create-product', 'comments/reply-product', 'comments/product-page',
-                'comments/create-product'
+                'comments/create-product', 'comments/reply-product',
             ])
         ) {
             self::needLogin();

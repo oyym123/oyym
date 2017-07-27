@@ -46,7 +46,7 @@ class Image extends Base
     public function rules()
     {
         return [
-            [['type', 'type_id', 'created_at', 'updated_at', 'user_id'], 'required'],
+            [['type', 'type_id', 'user_id'], 'required'],
             [['sort'], 'default', 'value' => 0],
             [['type', 'type_id', 'size_type', 'user_id', 'sort', 'status', 'created_at', 'updated_at'], 'integer'],
             [['name', 'url'], 'string', 'max' => 255],
@@ -111,22 +111,40 @@ class Image extends Base
         return $data;
     }
 
+
     public function qiniuUrl()
     {
         return QiniuHelper::downloadImageUrl(Yii::$app->params['qiniu_url_images'], $this->url);
+    }
+
+    /** 检验是否应该上传 */
+    public static function deleteImages($params)
+    {
+        $imgId = self::findAll(['user_id' => Yii::$app->user->id,
+            'status' => Image::STATUS_ENABLE,
+            'type' => $params['img_type'],
+            'type_id' => $params['type_id']]);
+        foreach ($imgId as $item) {
+            if (!in_array($item->url, $params['img_urls'])) {
+                $item->status = Image::STATUS_DISABLE;
+                if (!$item->save()) {
+                    throw new Exception('保存图片验证出错！');
+                }
+            }
+        }
     }
 
     /** 用于限制图片上传数量 */
     public static function imageLimit($params)
     {
         return self::find()->where(['type_id' => $params['type_id'],
-            'user_id' => Yii::$app->user->id, 'type' => $params['type']])->count();
+            'user_id' => Yii::$app->user->id, 'type' => $params['type'], 'status' => self::STATUS_ENABLE])->count();
     }
 
     /** 设置图片 */
     public static function setImage($params)
     {
-        $image = new Image();
+        $image = self::findOne(['url' => $params['url']]) ?: new Image();
         $image->name = ArrayHelper::getValue($params, 'name');
         $image->type = ArrayHelper::getValue($params, 'type');
         $image->type_id = ArrayHelper::getValue($params, 'type_id');
@@ -135,8 +153,6 @@ class Image extends Base
         $image->status = ArrayHelper::getValue($params, 'status');
         $image->sort = ArrayHelper::getValue($params, 'sort');
         $image->user_id = Yii::$app->user->id;
-        $image->created_at = time();
-        $image->updated_at = time();
         if (!$image->save()) {
             throw new Exception('图片保存失败!');
         }
@@ -151,4 +167,14 @@ class Image extends Base
             throw new Exception('删除图片失败!');
         }
     }
+
+    public static function findModel($params)
+    {
+        if (($model = Image::findOne($params))) {
+            return $model;
+        } else {
+            throw new Exception('图片不存在!');
+        }
+    }
+
 }

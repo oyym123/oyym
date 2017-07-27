@@ -115,6 +115,7 @@ class Attention extends Base
         }
     }
 
+    /** 获取关注的type_id集合 */
     public static function getAttention($params)
     {
         return Attention::find()->select('type_id')->where([
@@ -124,6 +125,13 @@ class Attention extends Base
         ])->asArray()->all();
     }
 
+    /** 获取关注的用户*/
+    public static function getAttentionUser($offset = 0)
+    {
+        return User::find()->where(['attention.type' => Attention::TYPE_USER])->
+        join('LEFT JOIN', 'attention', 'user.id = attention.type_id')->andWhere(['attention.status' => Attention::STATUS_ENABLE])
+            ->orderBy('attention.created_at desc')->offset($offset)->limit(20)->all();
+    }
 
     /** 获取关注数量 */
     public static function attentionCount($type, $type_id)

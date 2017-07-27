@@ -14,7 +14,11 @@ use yii\helpers\ArrayHelper;
  * @property integer $user_id
  * @property string $name
  * @property string $profit
+ * @property string $intro
  * @property integer $like_count
+ * @property integer $province
+ * @property integer $city
+ * @property integer $area
  * @property integer $created_at
  * @property integer $attentions
  * @property integer $updated_at
@@ -36,10 +40,10 @@ class UserInfo extends Base
     public function rules()
     {
         return [
-            [['user_id', 'name', 'created_at', 'updated_at'], 'required'],
+            [['user_id', 'name'], 'required'],
             [['user_id', 'like_count', 'created_at', 'updated_at', 'province', 'city', 'area'], 'integer'],
             [['profit'], 'number'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'intro'], 'string', 'max' => 255],
         ];
     }
 
@@ -61,6 +65,13 @@ class UserInfo extends Base
         return $image ? QiniuHelper::downloadImageUrl(Yii::$app->params['qiniu_url_images'], $image->url) : Yii::$app->params['defaultPhoto'];
     }
 
+    /** 用户头像ID */
+    public function photoId($userId)
+    {
+        $image = Image::findOne(['type' => Image::TYPE_USER_PHOTO, 'type_id' => $userId, 'status' => Base::STATUS_ENABLE]);
+        return $image ? $image->id : 0;
+    }
+
     /** 用户关注数量保存 */
     public static function attention($id, $count)
     {
@@ -70,6 +81,7 @@ class UserInfo extends Base
             throw new Exception('关注失败!');
         }
     }
+
 
     /**
      * @inheritdoc

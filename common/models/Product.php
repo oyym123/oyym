@@ -92,8 +92,8 @@ class Product extends Base
     public function rules()
     {
         return [
-            [['type_id', 'title', 'created_at', 'updated_at', 'unit_price', 'created_by'], 'required'],
-            [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at', 'progress', 'order_award_count'], 'default', 'value' => 0],
+            [['type_id', 'title', 'unit_price', 'created_by'], 'required'],
+            [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at', 'progress'], 'default', 'value' => 0],
             [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at', 'total'], 'default', 'value' => 0],
             [['type_id', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total', 'random_code'], 'integer'],
             [['price', 'original_price', 'freight', 'unit_price', 'a_price'], 'number'],
@@ -420,6 +420,13 @@ class Product extends Base
                 [
                     'title' => '一口价',
                     'url' => 'a_price',
+                ]
+            ];
+        } else if (Yii::$app->user->id == $this->created_by) {
+            return [
+                [
+                    'title' => '',
+                    'url' => '',
                 ]
             ];
         } else {

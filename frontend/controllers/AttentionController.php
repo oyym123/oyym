@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\models\Base;
 use common\models\Attention;
 use common\models\Product;
+use common\models\User;
 use yii\base\Exception;
 use frontend\components\WebController;
 use Yii;
@@ -140,4 +141,36 @@ class AttentionController extends WebController
         }
     }
 
+
+    /**
+     * @SWG\Get(path="/attention/my-attention-user",
+     *   tags={"我的"},
+     *   summary="我关注的用户",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Parameter(name="offset", in="query", default="0", description="数量游标", required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionMyAttentionUser()
+    {
+        $data['list'] = [];
+        foreach (Attention::getAttentionUser($this->offset) as $item) {
+            $data['list'][] = [
+                'img' => $item->info ? $item->info->photoUrl($item->id) : Yii::$app->params['defaultPhoto'],
+                'name' => $item->getName(),
+                'zhima' => '芝麻信用:700',
+                'intro' => "来到众筹夺宝"
+                    . $item->getJoinTime($item->created_at) . "天了,成功卖出"
+                    . ($item->info ? $item->info->sold_products : 0) . "件商品",
+            ];
+        }
+        self::showMsg($data);
+    }
 }

@@ -81,6 +81,38 @@
                 }
             }
         },
+        "/attention/my-attention-user": {
+            "get": {
+                "tags": [
+                    "\u6211\u7684"
+                ],
+                "summary": "\u6211\u5173\u6ce8\u7684\u7528\u6237",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "\u6570\u91cf\u6e38\u6807",
+                        "required": true,
+                        "type": "integer",
+                        "default": "0"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
         "/city": {
             "get": {
                 "tags": [
@@ -1068,7 +1100,7 @@
                     },
                     {
                         "name": "id",
-                        "in": "query",
+                        "in": "formData",
                         "description": "\u4fee\u6539\u7684\u4ea7\u54c1ID",
                         "required": true,
                         "type": "integer",
@@ -1509,6 +1541,126 @@
                 ],
                 "summary": "\u83b7\u53d6\u5b9d\u8d1d\u5206\u7c7b",
                 "description": "Author: lixinxin",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/users/upload-user-photo": {
+            "get": {
+                "tags": [
+                    "\u8bbe\u7f6e"
+                ],
+                "summary": "\u4e0a\u4f20\u7528\u6237\u5934\u50cf\u63a5\u53e3",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "url",
+                        "in": "query",
+                        "description": "\u56fe\u7247\u5730\u5740",
+                        "required": true,
+                        "type": "string",
+                        "default": "abc.jpg"
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "\u56fe\u7247\u5730\u5740",
+                        "required": true,
+                        "type": "string",
+                        "default": "abc.jpg"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/users/setting": {
+            "get": {
+                "tags": [
+                    "\u8bbe\u7f6e"
+                ],
+                "summary": "\u8bbe\u7f6e\u4e3b\u754c\u9762",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/users/update-info": {
+            "post": {
+                "tags": [
+                    "\u8bbe\u7f6e"
+                ],
+                "summary": "\u66f4\u65b0\u7528\u6237\u4fe1\u606f",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "intro",
+                        "in": "formData",
+                        "description": "\u7528\u6237\u7b80\u4ecb\uff0c\u4e0d\u80fd\u8d85\u8fc7255\u5b57\u7b26",
+                        "required": false,
+                        "type": "string",
+                        "default": "1"
+                    },
+                    {
+                        "name": "province",
+                        "in": "formData",
+                        "description": "\u7701",
+                        "required": false,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "city",
+                        "in": "formData",
+                        "description": "\u5e02",
+                        "required": false,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "area",
+                        "in": "formData",
+                        "description": "\u533a",
+                        "required": false,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "successful operation"
