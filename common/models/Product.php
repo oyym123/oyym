@@ -499,22 +499,7 @@ class Product extends Base
         } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
             $r = '待揭晓';
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
-            // 已揭晓
-            if ($luckOrder = $this->order) {
-                if ($luckOrder->status == Order::STATUS_WAIT_SHIP) {
-                    $r = '待发货';
-                } elseif ($luckOrder->status == Order::STATUS_SHIPPED) {
-                    $r = '已发货';
-                } elseif ($luckOrder->status == Order::STATUS_CONFIRM_RECEIVING) {
-                    // 已签收 如果双方评价, 则状态为 已完成
-                    if (in_array($luckOrder->evaluation_status, [0, 1])) {
-                        $r = '待评价';
-                    }
-                } elseif ($luckOrder->status == Order::STATUS_COMPLETE) {
-                    // 双方都评价后进入该状态
-                    $r = '已完成';
-                }
-            }
+            $r = '已揭晓';
         }
 
         return $this->modelTypeText() . '_卖家_' . $r;
@@ -529,24 +514,7 @@ class Product extends Base
         } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
             $r = '待揭晓';
         } elseif ($this->status == Product::STATUS_PUBLISHED) {
-            // 已揭晓
-            if ($this->order && $this->order->buyer_id == Yii::$app->user->identity->id) {
-                if ($this->order->status == Order::STATUS_WAIT_SHIP) {
-                    $r = '待发货';
-                } elseif ($this->order->status == Order::STATUS_SHIPPED) {
-                    $r = '已发货';
-                } elseif ($this->order->status == Order::STATUS_CONFIRM_RECEIVING) {
-                    // 已签收
-                    if (in_array($this->order->evaluation_status, [0, 2])) {
-                        $r = '待评价';
-                    }
-                } elseif ($this->order->status == Order::STATUS_COMPLETE) {
-                    // 双方都评价后进入该状态
-                    $r = '已完成';
-                }
-            } else {
-                $r = '已揭晓'; // 未中奖用户
-            }
+            $r = '已揭晓';
         }
 
         return $this->modelTypeText() . '_买家_' . $r;;
@@ -624,11 +592,14 @@ class Product extends Base
                 'created_at' => $item->createdAt(),
                 'product_id' => $item->id,
                 'title' => $item->title,
+                'img' => $item->headImg(), // 宝贝头图
+                'img' => $item->headImg(),
                 'layout' => $item->sellerProductLayout(),
                 'status' => $item->getStatusText(),
                 'total' => $item->total, // 总需要多少人次
                 'order_award_count' => $item->order_award_count, // 已参与人次
                 'residual_total' => $item->getJoinCount(), // 剩余多少人次
+                'residual_time' => date('Y-m-d H:i:s', $item->end_time), // 时间模式结束时间
                 'progress' => $item->progress,
                 'publish_countdown' => $item->getPublishCountdown(),// 揭晓倒计时
                 'a_price' => $item->a_price,// 一口价
@@ -651,11 +622,13 @@ class Product extends Base
                     'created_at' => $item->order->createdAt(),
                     'product_id' => $item->product->id,
                     'title' => $item->product->title,
+                    'img' => $item->product->headImg(), // 宝贝头图
                     'layout' => $item->product->buyerProductLayout(),
                     'status' => $item->product->getStatusText(),
                     'total' => $item->product->total, // 总需要多少人次
                     'order_award_count' => $item->product->order_award_count, // 已参与人次
                     'residual_total' => $item->product->getJoinCount(), // 剩余多少人次
+                    'residual_time' => date('Y-m-d H:i:s', $item->product->end_time), // 时间模式结束时间
                     'progress' => $item->product->progress,
                     'publish_countdown' => $item->product->getPublishCountdown(),// 揭晓倒计时
                     'a_price' => $item->product->a_price,// 一口价
@@ -700,7 +673,7 @@ class Product extends Base
     public function buyerAllProduct()
     {
         $query = OrderProduct::find()->where([
-            'order_product.buyer_id' => Yii::$app->user->identity->id
+            'order_product.buyer_id' => $this->params['buyer_id']
         ]);
 
         $query->leftJoin('product', 'product.id=order_product.pid');

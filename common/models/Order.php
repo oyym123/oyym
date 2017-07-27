@@ -46,7 +46,7 @@ class Order extends Base
 //    const STATUS_CONFIRM_RECEIVING = 40; // 待签收
     const STATUS_CONFIRM_RECEIVING = 50; // 已签收
     const STATUS_RETURN_APPLY = 60; // 退款申请 (发货后, 买家不想要了)
-    const STATUS_RETURN_AGREE = 61; // 卖家同意退款申请 (发货后, 买家不想要了)
+    const STATUS_RETURN_AGREE = 61; // 同意退款 (发货后, 买家不想要了)
     const STATUS_WAIT_REFUND = 65; // 待退款 (揭晓后, 给没中奖的客户退款,卖家同意退款)
     const STATUS_REFUNDED = 68; // 已退款 (退款成功)
     const STATUS_WAIT_COMMENT = 70; // 待评价
@@ -653,116 +653,6 @@ class Order extends Base
         return $this->orderProduct->buy_type == OrderProduct::A_PRICE;
     }
 
-    /** 卖家-待发货的订单 */
-    public function sellerWaitShipping()
-    {
-
-    }
-
-    /** 卖家-待签收的宝贝 (买家退款)*/
-    public function sellerWaitReceiving()
-    {
-
-    }
-
-    /** 卖家-待评价的宝贝 */
-    public function sellerWaitAssessment()
-    {
-
-    }
-
-    /** 卖家-已完成的宝贝*/
-    public function sellerCompleted()
-    {
-
-    }
-
-    /** 卖家-买家的退款申请 */
-    public function sellerSalesReturn()
-    {
-
-    }
-
-    // ---------------------------------------卖家/买家分割线-------------------------------------- //
-
-    /** 买家参与的宝贝列表 字段 */
-    public function buyerProductListField($order)
-    {
-        $r = [];
-        foreach ($order as $key => $item) {
-            if ($item->orderProduct && $item->orderProduct->product) {
-                $r[] = [
-                    'created_at' => $item->createdAt(),
-                    'order_id' => $item->id,
-                    'title' => $item->orderProduct->product->title,
-                    'layout' => $item->orderProduct->product->buyerProductLayout(),
-                    'status' => $item->getStatusText(),
-                    'total' => $item->orderProduct->product->total, // 总需要多少人次
-                    'order_award_count' => $item->orderProduct->product->order_award_count, // 已参与人次
-                    'residual_total' => $item->orderProduct->product->getJoinCount(), // 剩余多少人次
-                    'progress' => $item->orderProduct->product->progress,
-                    'publish_countdown' => $item->orderProduct->product->getPublishCountdown(),// 揭晓倒计时
-                    'a_price' => $item->orderProduct->product->a_price,// 一口价
-                    'unit_price' => $item->orderProduct->product->unit_price,// 单价
-                    'url' => $item->orderProduct->product->buyerProductUrlRoute(), // 买家宝贝路由
-                    'actions' => $item->buyerProductActions(), // 买家宝贝动作
-                ];
-            }
-        }
-
-        return $r;
-    }
-
-    /** 买家-所有买到的宝贝 */
-    public function buyerAllProduct()
-    {
-        $query = Order::find()->where([
-            'order.buyer_id' => Yii::$app->user->identity->id,
-        ]);
-
-        $query->joinWith('orderProduct');
-
-        $query->andWhere([
-            'order.deleted_at' => 0,
-        ]);
-
-        $query->andFilterWhere(['order.status' => ArrayHelper::getValue($this->params, 'status')]);
-
-        $query->offset($this->params['offset'])->limit($this->psize);
-
-        return [$this->buyerProductListField($query->all()), $query->count()];
-    }
-
-    /** 待付款的订单 */
-    public function waitPay()
-    {
-
-    }
-
-    /** 已下架的宝贝 */
-    public function cancel()
-    {
-
-    }
-
-    /** 用户对宝贝可以进行的操作,编辑删除等 */
-    public function userActions()
-    {
-
-    }
-
-    /** 卖家-待评价的宝贝 */
-    public function buyerWaitAssessment()
-    {
-
-    }
-
-    /** 卖家-已完成的宝贝*/
-    public function buyerCompleted()
-    {
-
-    }
-
     /** 买家-我参与的/我买到的 宝贝列表跳转地址 */
     public function buyerProductActions()
     {
@@ -793,5 +683,175 @@ class Order extends Base
 
             $this->address_id = $addressId;
         }
+    }
+
+    /** 卖家-我发布的/卖出的宝贝列表 样式布局 */
+    public function sellerOrderLayout()
+    {
+        if ($this->status == Order::STATUS_WAIT_SHIP) {
+            $r = '待发货';
+        } elseif ($this->status == Order::STATUS_SHIPPED) {
+            $r = '已发货';
+        } elseif ($this->status == Order::STATUS_CONFIRM_RECEIVING) {
+            // 已签收 如果双方评价, 则状态为 已完成
+            if (in_array($this->evaluation_status, [0, 1])) {
+                $r = '待评价';
+            } else {
+                // 卖家已评价
+                $r = '已完成';
+            }
+        } elseif ($this->status == Order::STATUS_COMPLETE) {
+            // 双方都评价后进入该状态
+            $r = '已完成';
+        }
+
+        return $this->modelTypeText() . '_卖家_' . $r;
+    }
+
+    /** 买家-我参与的/买到的宝贝列表 样式布局 */
+    public function buyerOrderLayout()
+    {
+        $r = '进行中';
+        if ($this->buyer_id == Yii::$app->user->identity->id) {
+            if ($this->status == Order::STATUS_WAIT_SHIP) {
+                $r = '待发货';
+            } elseif ($this->status == Order::STATUS_SHIPPED) {
+                $r = '待签收';
+            } elseif ($this->status == Order::STATUS_CONFIRM_RECEIVING) {
+                // 已签收
+                if (in_array($this->evaluation_status, [0, 2])) {
+                    $r = '待评价';
+                } else {
+                    // 买家已评价
+                    $r = '已完成';
+                }
+            } elseif ($this->status == Order::STATUS_COMPLETE) {
+                // 双方都评价后进入该状态
+                $r = '已完成';
+            } elseif (in_array($this->status, [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED])) {
+                $r = '退款申请';
+            }
+        }
+
+        return $this->modelTypeText() . '_买家_' . $r;;
+    }
+
+    /** 返回宝贝模式 */
+    public function modelTypeText()
+    {
+        if ($this->orderProduct && $this->orderProduct->product) {
+            return ArrayHelper::getValue(Product::$modelType, $this->orderProduct->product->model, '');
+        } else {
+            return '数量模式';
+        }
+    }
+
+    /** 卖家-所有发布的的宝贝 */
+    public function sellerOrders()
+    {
+        $query = Order::find()->where([
+            'order.seller_id' => $this->params['seller_id'],
+        ]);
+
+        $query->joinWith('orderProduct');
+
+        $query->andWhere([
+            'order.deleted_at' => 0,
+        ]);
+
+        $query->andFilterWhere(['order.status' => ArrayHelper::getValue($this->params, 'status')]);
+
+        $query->offset($this->params['offset'])->limit($this->psize);
+
+        return [$this->sellerOrderListField($query->all()), $query->count()];
+    }
+
+    /** 买家-所有买到的宝贝 */
+    public function buyerOrders()
+    {
+        $query = Order::find()->where([
+            'order.buyer_id' => Yii::$app->user->identity->id,
+        ]);
+
+        $query->joinWith('orderProduct');
+
+        $query->andWhere([
+            'order.deleted_at' => 0,
+        ]);
+
+        $query->andFilterWhere(['order.status' => ArrayHelper::getValue($this->params, 'status')]);
+
+        $query->offset($this->params['offset'])->limit($this->psize);
+
+        return [$this->buyerOrderListField($query->all()), $query->count()];
+    }
+
+    /** 卖家发布的宝贝列表 字段 */
+    public function sellerOrderListField($orders)
+    {
+        $r = [];
+        foreach ($orders as $key => $item) {
+            if ($item->orderProduct && $item->orderProduct->product) {
+                $r[] = [
+                    'created_at' => $item->createdAt(),
+                    'order_sn' => $item->sn,
+                    'title' => $item->orderProduct->product->title,
+                    'img' => $item->orderProduct->product->headImg(),
+                    'layout' => $item->buyerOrderLayout(),
+                    'status' => $item->getStatusText(),
+                    'total' => $item->orderProduct->product->total, // 总需要多少人次
+                    'order_award_count' => $item->orderProduct->product->order_award_count, // 已参与人次
+                    'residual_total' => $item->orderProduct->product->getJoinCount(), // 剩余多少人次
+                    'residual_time' => date('Y-m-d H:i:s', $item->orderProduct->product->end_time), // 时间模式结束时间
+                    'progress' => $item->orderProduct->product->progress,
+                    'publish_countdown' => $item->orderProduct->product->getPublishCountdown(),// 揭晓倒计时
+                    'a_price' => $item->orderProduct->product->a_price,// 一口价
+                    'unit_price' => $item->orderProduct->product->unit_price,// 单价
+                    'url' => $item->orderProduct->product->buyerProductUrlRoute(), // 买家宝贝路由
+                    'actions' => $item->buyerProductActions(), // 买家宝贝动作
+                ];
+            }
+        }
+
+        return $r;
+    }
+
+    /** 买家参与的宝贝列表 字段 */
+    public function buyerOrderListField($order)
+    {
+        $r = [];
+        foreach ($order as $key => $item) {
+            if ($item->orderProduct && $item->orderProduct->product) {
+                $r[] = [
+                    'created_at' => $item->createdAt(),
+                    'order_sn' => $item->sn,
+                    'title' => $item->orderProduct->product->title,
+                    'img' => $item->orderProduct->product->headImg(),
+                    'layout' => $item->buyerOrderLayout(),
+                    'status' => $item->getStatusText(),
+                    'total' => $item->orderProduct->product->total, // 总需要多少人次
+                    'order_award_count' => $item->orderProduct->product->order_award_count, // 已参与人次
+                    'residual_total' => $item->orderProduct->product->getJoinCount(), // 剩余多少人次
+                    'residual_time' => date('Y-m-d H:i:s', $item->orderProduct->product->end_time), // 时间模式结束时间
+                    'progress' => $item->orderProduct->product->progress,
+                    'publish_countdown' => $item->orderProduct->product->getPublishCountdown(),// 揭晓倒计时
+                    'a_price' => $item->orderProduct->product->a_price,// 一口价
+                    'unit_price' => $item->orderProduct->product->unit_price,// 单价
+                    'url' => $item->orderProduct->product->buyerProductUrlRoute(), // 买家宝贝路由
+                    'actions' => $item->buyerProductActions(), // 买家宝贝动作
+                ];
+            }
+        }
+
+        return $r;
+    }
+
+    /** 买家订单详情页 */
+    public function buyerView(){
+
+    }
+    /** 卖家订单详情页 */
+    public function sellerView(){
+
     }
 }

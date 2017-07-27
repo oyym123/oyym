@@ -161,7 +161,10 @@ class ProductsController extends WebController
      *       response=200,description="
      *          product_count=宝贝总数
      *          product_list=宝贝列表
-     *              layout=布局类型[数量模式_卖家_未上架 || 数量模式_卖家_进行中 || 数量模式_卖家_待揭晓 || 数量模式_卖家_已揭晓 || 时间模式_卖家_未上架 || 时间模式_卖家_进行中 || 时间模式_卖家_待揭晓 || 时间模式_卖家_已揭晓]
+     *              layout=布局类型[
+     *                  数量模式_卖家_未上架 || 数量模式_卖家_进行中 || 数量模式_卖家_待揭晓 || 数量模式_卖家_已揭晓 ||
+     *                  时间模式_卖家_未上架 || 时间模式_卖家_进行中 || 时间模式_卖家_待揭晓 || 时间模式_卖家_已揭晓
+     *              ]
      *              product_id=宝贝id
      *              title=标题
      *              img=宝贝头图
@@ -201,7 +204,9 @@ class ProductsController extends WebController
         $productModel = new Product();
         list($products, $count) = $productModel->sellerProducts([
             'created_by' => Yii::$app->user->identity->id,
-            'status' => $status ?: null,
+            'status' => $status ?: [
+
+            ],
             'created_by' => $this->userId,
             'offset' => Yii::$app->request->get('offset', 0)
         ]);
@@ -237,7 +242,10 @@ class ProductsController extends WebController
      *       response=200,description="
      *          product_count=宝贝总数
      *          product_list=宝贝列表
-     *              layout=布局类型[数量模式_买家_进行中 || 数量模式_买家_待揭晓 || 数量模式_买家_已揭晓 || 时间模式_买家_进行中 || 时间模式_买家_待揭晓 || 时间模式_买家_已揭晓]
+     *              layout=布局类型[
+     *                  数量模式_买家_进行中 || 数量模式_买家_待揭晓 || 数量模式_买家_已揭晓 ||
+     *                  时间模式_买家_进行中 || 时间模式_买家_待揭晓 || 时间模式_买家_已揭晓
+     *              ]
      *              product_id=宝贝id
      *              created_at=参与时间
      *              title=标题
@@ -276,30 +284,11 @@ class ProductsController extends WebController
     {
         $productModel = new Product();
         $productModel->params = [
-            'created_by' => $this->userId,
+            'buyer_id' => $this->userId,
             'offset' => Yii::$app->request->get('offset', 0),
             'status' => $status ?: null
         ];
-/*
-        if (empty($status)) { // 全部
-            list($products, $count) = $productModel->buyerAllProduct();
-        } else {
-            $productModel->params['status'] = $status;
-            if ($status == Product::STATUS_IN_PROGRESS) {
-                // 进行中
-                list($products, $count) = $productModel->buyerInProgress();
-            } elseif ($status == Product::STATUS_WAIT_PUBLISH) {
-                // 待揭晓
-                list($products, $count) = $productModel->buyerWaitPublished();
-            } elseif ($status == Product::STATUS_PUBLISHED) {
-                // 已揭晓
-                list($products, $count) = $productModel->buyerPublished();
-            } else {
-                // 已揭晓
-                list($products, $count) = $productModel->buyerProductSearchByStatus();
-            }
-        }
-*/
+
         list($products, $count) = $productModel->buyerAllProduct();
 
         $data = [
