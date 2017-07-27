@@ -228,9 +228,6 @@ class UsersController extends WebController
      *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
      *     description="用户ky-token",
      *    ),
-     *   @SWG\Parameter(name="id", in="query", default="1", description="", required=true,
-     *     type="integer",
-     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -238,8 +235,9 @@ class UsersController extends WebController
      */
     public function actionSetting()
     {
+        $model = UserInfo::findOne(['user_id' => $this->userId]);
         self::showMsg([
-            'user_photo' => Yii::$app->user->photoUrl($this->userId),
+            'user_photo' => $model->photoUrl($model->id),
             'zhima' => '700'
         ]);
     }
