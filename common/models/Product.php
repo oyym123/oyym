@@ -363,8 +363,15 @@ class Product extends Base
     /** 商品头图 */
     public function headImg()
     {
+        $query = Image::find();
+        $query->andWhere([
+            'type' => Image::TYPE_PRODUCT,
+            'type_id' => $this->id,
+        ]);
 
+        $item = $query->orderBy('sort desc')->one();
 
+        return $item ? $item->qiniuUrl() : '';
     }
 
     /** 获取中奖者姓名 */
@@ -597,9 +604,9 @@ class Product extends Base
                 'layout' => $item->sellerProductLayout(),
                 'status' => $item->getStatusText(),
                 'total' => $item->total, // 总需要多少人次
-                'order_award_count' => (int) $item->order_award_count, // 已参与人次
+                'order_award_count' => (int)$item->order_award_count, // 已参与人次
                 'residual_total' => $item->getJoinCount(), // 剩余多少人次
-                'residual_time' => date('Y-m-d H:i:s', $item->end_time), // 时间模式结束时间
+                'residual_time' => $item->residualTime(), // 时间模式结束时间
                 'progress' => $item->progress,
                 'publish_countdown' => $item->getPublishCountdown(),// 揭晓倒计时
                 'a_price' => $item->a_price,// 一口价
@@ -626,9 +633,9 @@ class Product extends Base
                     'layout' => $item->product->buyerProductLayout(),
                     'status' => $item->product->getStatusText(),
                     'total' => $item->product->total, // 总需要多少人次
-                    'order_award_count' => (int) $item->product->order_award_count, // 已参与人次
+                    'order_award_count' => (int)$item->product->order_award_count, // 已参与人次
                     'residual_total' => $item->product->getJoinCount(), // 剩余多少人次
-                    'residual_time' => date('Y-m-d H:i:s', $item->product->end_time), // 时间模式结束时间
+                    'residual_time' => $item->product->residualTime(), // 时间模式结束时间
                     'progress' => $item->product->progress,
                     'publish_countdown' => $item->product->getPublishCountdown(),// 揭晓倒计时
                     'a_price' => $item->product->a_price,// 一口价
@@ -839,6 +846,12 @@ class Product extends Base
     public function getNewProgress($NewOrderAwardCount)
     {
         return min(100, number_format($NewOrderAwardCount / $this->total, 2, '.', '') * 100);
+    }
+
+    /** 结束时间 */
+    public function residualTime()
+    {
+        return $this->end_time ? date('Y-m-d H:i:s', $this->end_time) : '';
     }
 }
 

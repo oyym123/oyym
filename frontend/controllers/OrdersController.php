@@ -84,8 +84,7 @@ class OrdersController extends WebController
      *          product_count=宝贝总数
      *          product_list=宝贝列表
      *              layout=布局类型[
-     *                  数量模式_卖家_待发货 || 数量模式_卖家_已发货 || 数量模式_卖家_待评价 || 数量模式_卖家_已完成 || 数量模式_卖家_退款申请
-     *                  时间模式_卖家_待发货 || 时间模式_卖家_已发货 || 时间模式_卖家_待评价 || 时间模式_卖家_已完成 || 时间模式_卖家_退款申请
+     *                  一口价购买 || 众筹购买
      *              ]
      *              product_id=宝贝id
      *              order_sn=订单号
@@ -170,8 +169,7 @@ class OrdersController extends WebController
      *          product_count=宝贝总数
      *          product_list=宝贝列表
      *              layout=布局类型[
-     *                  数量模式_买家_待发货 || 数量模式_买家_待签收 || 数量模式_买家_待评价 || 数量模式_买家_已完成 || 数量模式_买家_退款申请
-     *                  时间模式_买家_待发货 || 时间模式_买家_待签收 || 时间模式_买家_待评价 || 时间模式_买家_已完成 || 时间模式_买家_退款申请
+     *                  一口价购买 || 众筹购买
      *              ]
      *              product_id=宝贝id
      *              order_sn=订单号
@@ -303,13 +301,18 @@ class OrdersController extends WebController
         foreach ($products as $product) {
             if (!empty($product['id'])) {
                 $productModel = Product::find()->where(['id' => $product['id']])->one();
-                if ($productModel && $productModel->canBuy()) {
-                    // 判断是否可以购买
-                    $r[] = [
-                        'model' => $productModel,
-                        'count' => $product['count'],
-                        'buy_type' => $product['buy_type'], // 购买方式 unit_price=众筹参与,a_price=一口价
-                    ];
+                if ($productModel) {
+                    if ($productModel->created_by == $this->userId) {
+                        self::showMsg('不允许购买自己的宝贝', -1);
+                    }
+                    if ($productModel->canBuy()) {
+                        // 判断是否可以购买
+                        $r[] = [
+                            'model' => $productModel,
+                            'count' => $product['count'],
+                            'buy_type' => $product['buy_type'], // 购买方式 unit_price=众筹参与,a_price=一口价
+                        ];
+                    }
                 }
             }
         }
@@ -755,9 +758,44 @@ class OrdersController extends WebController
      */
     public function actionSellerView($sn)
     {
-        $order = $this->findOrderModel(['sn' => $sn, 'user_id' => $this->userId]);
+        $order = $this->findOrderModel(['sn' => $sn, 'seller_id' => $this->userId]);
 
         $data = $order->sellerView();
+
+        $data = [
+            'sn' => $order->sn,
+            'status_line' => $order->sellerStatusLine(),
+            'buyer_address_info' => [
+                'username' => '李新新 18606615080',
+                'address' => '北京市 朝阳区 五道口街道 润园小区3-302',
+                'product_layout' => '布局样式: 一口价 || 参与众筹',
+                'product_list' => [
+                    [
+                        'id' => 1,
+                        'title' => '',
+                        'img' => '',
+                        'order_award_count' => '总参与人次',
+                        'amount' => '合计金额',
+                        'a_price' => '一口价',
+                    ]
+                ],
+                'luck_user' => [
+                    'user_id' => '',
+                    'username' => '',
+                    'order_sn' => '',
+                    'pay_amount' => '支付宝支付:',
+                ],
+                'share_params' => [
+                    'share_title' => '众筹夺宝',
+                    'share_contents' => '夺宝达人!',
+                    'share_link' => 'http://www.baidu.com',
+                    'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
+                ],
+                ''
+
+            ],
+
+        ];
 
         self::showMsg($data);
     }
@@ -779,9 +817,9 @@ class OrdersController extends WebController
      *   )
      * )
      */
-    public function actionBuyerView()
+    public function actionBuyerView($sn)
     {
-        $order = $this->findOrderModel(['sn' => $sn, 'user_id' => $this->userId]);
+        $order = $this->findOrderModel(['sn' => $sn, 'buyer_id' => $this->userId]);
 
         $data = $order->sellerView();
 

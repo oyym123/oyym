@@ -111,6 +111,11 @@ class Image extends Base
         return $data;
     }
 
+    public function qiniuUrl()
+    {
+        return QiniuHelper::downloadImageUrl(Yii::$app->params['qiniu_url_images'], $this->url);
+    }
+
     /** 用于限制图片上传数量 */
     public static function imageLimit($params)
     {
