@@ -71,7 +71,7 @@ class OrdersController extends WebController
      *   summary="我卖出的",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
-     *     description="status的值分为: 全部=0 || 待发货=20 || 已发货=25 || 待评价=70 || 已完成=100 || 退货申请=60"
+     *     description="status的值分为: 全部=0 || 待发货=20 || 已发货=25 || 待评价=70 || 已完成=100 || 退款申请=60"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
      *     description="数据游标"
@@ -80,23 +80,68 @@ class OrdersController extends WebController
      *     description="用户ky-token",
      *    ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *          product_count=宝贝总数
+     *          product_list=宝贝列表
+     *              layout=布局类型[
+     *                  数量模式_卖家_待发货 || 数量模式_卖家_已发货 || 数量模式_卖家_待评价 || 数量模式_卖家_已完成 || 数量模式_卖家_退款申请
+     *                  时间模式_卖家_待发货 || 时间模式_卖家_已发货 || 时间模式_卖家_待评价 || 时间模式_卖家_已完成 || 时间模式_卖家_退款申请
+     *              ]
+     *              product_id=宝贝id
+     *              order_sn=订单号
+     *              created_at=参与时间
+     *              title=标题
+     *              img=宝贝头图
+     *              total=总需人次
+     *              residual_total=剩余人次
+     *              residual_time=结束时间
+     *              progress=进度
+     *              publish_countdown=揭晓倒计时
+     *              a_price=一口价
+     *              unit_price=单价
+     *              status=状态 [待发货 || 已发货 || 待评价 || 已完成]
+     *              actions=数组下是字典
+     *                  [
+     *                      title=评价
+     *                      url=evaluation_add
+     *                  ],
+     *                  [
+     *                      title=查看评价
+     *                      url=evaluation_list
+     *                  ],
+     *              url=链接地址[跳转到宝贝详情页=product, 跳转到订单详情页=order]
+     *              order_award_count=已参与人次"
      *   )
      * )
      */
     public function actionSellerProductList($status)
     {
-        $productModel = new Product();
-        list($sellerAllProducts, $count) = $productModel->sellerProducts([
-            'created_by' => Yii::$app->user->identity->id,
-            'status' => $status,
-            'created_by' => $this->userId,
-            'offset' => Yii::$app->request->get('offset', 0)
-        ]);
+        $orderModel = new Order();
+        $orderModel->params = [
+            'seller_id' => $this->userId,
+            'offset' => Yii::$app->request->get('offset', 0),
+            'status' => $status ?: [
+                Order::STATUS_WAIT_SHIP, // 待发货
+                Order::STATUS_SHIPPED, // 已发货
+                Order::STATUS_CONFIRM_RECEIVING, // 已签收
+                Order::STATUS_RETURN_APPLY, // 退款申请
+                Order::STATUS_RETURN_AGREE, // 卖家同意退款申请
+                Order::STATUS_REFUNDED, // 已退款
+                Order::STATUS_WAIT_COMMENT, // 待评价
+                Order::STATUS_COMPLETE, // 已完成
+            ]
+        ];
+
+        if (in_array($status, [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED])) {
+            //退款申请 同意退款 已退款, 这三种状态要同时查询
+            $orderModel->params['status'] = [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED];
+        }
+
+        list($products, $count) = $orderModel->sellerOrders();
 
         $data = [
             'product_count' => $count,
-            'product_list' => $sellerAllProducts
+            'product_list' => $products
         ];
 
         self::showMsg($data);
@@ -112,7 +157,7 @@ class OrdersController extends WebController
      *   summary="我买到的",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="status", in="query", required=true, type="integer", default="0",
-     *     description="status的值分为: 全部=0 || 待发货=20 || 待签收=25 || 待评价=70 || 已完成=100 || 退货申请=60"
+     *     description="status的值分为: 全部=0 || 待发货=20 || 待签收=25 || 待评价=70 || 已完成=100 || 退款申请=60"
      *   ),
      *   @SWG\Parameter(name="offset", in="query", required=true, type="integer", default="0",
      *     description="数据游标"
@@ -121,87 +166,77 @@ class OrdersController extends WebController
      *     description="用户ky-token",
      *    ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *          product_count=宝贝总数
+     *          product_list=宝贝列表
+     *              layout=布局类型[
+     *                  数量模式_买家_待发货 || 数量模式_买家_待签收 || 数量模式_买家_待评价 || 数量模式_买家_已完成 || 数量模式_买家_退款申请
+     *                  时间模式_买家_待发货 || 时间模式_买家_待签收 || 时间模式_买家_待评价 || 时间模式_买家_已完成 || 时间模式_买家_退款申请
+     *              ]
+     *              product_id=宝贝id
+     *              order_sn=订单号
+     *              created_at=参与时间
+     *              title=标题
+     *              img=宝贝头图
+     *              total=总需人次
+     *              residual_total=剩余人次
+     *              residual_time=结束时间
+     *              progress=进度
+     *              publish_countdown=揭晓倒计时
+     *              a_price=一口价
+     *              unit_price=单价
+     *              status=状态 [下架 || 进行中 || 待揭晓 || 已揭晓]
+     *              actions=数组下是字典
+     *                  [
+     *                      title=上架
+     *                      url=up_sell
+     *                  ],
+     *                  [
+     *                      title=下架
+     *                      url=down_sell
+     *                  ],
+     *                  [
+     *                      title=编辑
+     *                      url=edit
+     *                  ],
+     *                  [
+     *                      title=删除
+     *                      url=edit
+     *                  ]
+     *              url=链接地址[跳转到宝贝详情页=product, 跳转到订单详情页=order]
+     *              order_award_count=已参与人次"
      *   )
      * )
      */
-    public function actionBuyerProductList()
+    public function actionBuyerProductList($status)
     {
-        $order = new Order();
-        $comment = new Comments();
-        $params = Yii::$app->request->get();
-        $params['skip'] = intval(Yii::$app->request->get('skip', 0));
-        $params['user_id'] = $this->userId;
+        $orderModel = new Order();
+        $orderModel->params = [
+            'buyer_id' => $this->userId,
+            'offset' => Yii::$app->request->get('offset', 0),
+            'status' => $status ?: [
+                Order::STATUS_WAIT_SHIP, // 待发货
+                Order::STATUS_SHIPPED, // 已发货
+                Order::STATUS_CONFIRM_RECEIVING, // 已签收
+                Order::STATUS_RETURN_APPLY, // 退款申请
+                Order::STATUS_RETURN_AGREE, // 卖家同意退款申请
+                Order::STATUS_REFUNDED, // 已退款
+                Order::STATUS_WAIT_COMMENT, // 待评价
+                Order::STATUS_COMPLETE, // 已完成
+            ]
+        ];
 
-        list($items, $count) = $order->apiSearch($params);
+        if (in_array($status, [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED])) {
+            //退款申请 同意退款 已退款, 这三种状态要同时查询
+            $orderModel->params['status'] = [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED];
+        }
+
+        list($products, $count) = $orderModel->buyerOrders();
 
         $data = [
-            'title' => '我的订单',
-            'total' => $count,
-            'list' => []
+            'product_count' => $count,
+            'product_list' => $products
         ];
-        $flag = 1;
-        $freightCount = 0;
-        $productCountFlag = 0;
-        foreach ($items as $item) {
-            $products = $item->product;
-            $p = [];
-            foreach ($products as $product) {
-                $params = [
-                    'product_id' => $product->pid,
-                    'type' => Comments::TYPE_VIDEO,
-                    'user_id' => $this->userId,
-                    'order_id' => $product->order_id,
-                ];
-
-                if (!$comment->commentFlag($params) && $item->isCanComment()) {
-                    $commentFlag = 0;
-                    $flag = 0;
-                } else {
-                    $commentFlag = 1;
-                    $flag = 1;
-                }
-
-                $freightCount += ($product->product ? $product->product->freight : 0);
-                $countFlag = $product->product ? (($x = $product->product->productType) ? $x->use_count : 0) : 0;
-                $productCountFlag += $countFlag;
-                $p[] = [
-                    'id' => $product->pid, // 商品id
-                    'img' => ProductImage::getOne(ProductImage::USE_FOR_LIST, $product->pid, false),
-                    'title' => $product->title,
-                    'price' => '¥' . floatval($product->price),
-                    'count' => $product->count,
-                    'count_flag' => $countFlag,
-                    'comment_flag' => $commentFlag,
-                ];
-            }
-
-            if (empty($p) && $this->isAndroid()) {
-                // 为了Android不崩
-                $p[] = [
-                    'id' => '',
-                    'img' => '',
-                    'title' => '',
-                    'price' => '',
-                    'count' => '',
-                    'count_flag' => '',
-                    'comment_flag' => '',
-                ];
-            }
-            $data['list'][] = [
-                'id' => $item->id,
-                'sn' => $item->sn,
-                'flag_comment' => $flag,//外部判断是否能进行评价
-                'can_delete' => $item->isCanDelete() ? 1 : 0,
-                'freight' => '¥' . $freightCount,
-                'product_count_flag' => $productCountFlag ? 1 : 0,
-                'status_id' => $item->status,
-                'status' => $item->getStatus(),
-                'created_at' => date('Y-m-d H:i:s', $item->created_at),
-                'pay_amount' => '¥' . floatval($item->pay_amount),
-                'products' => $p
-            ];
-        }
 
         self::showMsg($data);
     }
@@ -578,10 +613,9 @@ class OrdersController extends WebController
         self::showMsg($data);
     }
 
-    /** 订单支付成功 */
     /**
      * Name: actionPaymentSuccess
-     * Desc:
+     * Desc: 订单支付结果确认
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-00-00
      * @SWG\Get(path="/demo/demo",
@@ -619,249 +653,6 @@ class OrdersController extends WebController
         self::showMsg($data);
     }
 
-    /**
-     * Name: actionView
-     * Desc:
-     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
-     * Date: 2017-07-10
-     * @SWG\Get(path="/orders/seller-view",
-     *   tags={"订单"},
-     *   summary="卖家-我卖出的订单详情",
-     *   description="Author: lixinxin",
-     *   @SWG\Parameter(name="sn", in="query", required=true, type="string", default="201707101223",
-     *     description=""
-     *   ),
-     *   @SWG\Response(
-     *       response=200,description="successful operation"
-     *   )
-     * )
-     */
-    public function actionSellerView()
-    {
-        $comment = new Comments();
-        $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'user_id' => $this->userId]);
-        $order->user;
-
-        $products = [];
-        $flag = 1;
-        foreach ($order->product as $op) {
-            $params = [
-                'product_id' => $op->pid,
-                'type' => Comments::TYPE_VIDEO,
-                'user_id' => $this->userId,
-                'order_id' => $order->id,
-            ];
-
-            if (!$comment->commentFlag($params) && $order->isCanComment()) {
-                $commentFlag = 0;
-                $flag = 0;
-            } else {
-                $commentFlag = 1;
-            }
-
-            $countFlag = $op->product ? (($x = $op->product->productType) ? $x->use_count : '') : '';
-            $products[] = [
-                'id' => $op->getId(), // 商品id
-                'action' => $op->product ? $op->product->getTypeField() : null,
-                'title' => $op->title,
-                'img' => ProductImage::getOne(ProductImage::USE_FOR_LIST, $op->pid, false),
-                'product_attribute_info' => ($x = json_decode($op->product_attribute_info)) ? $x->name : '',
-                'price' => '¥' . $op->price,
-                'count' => $op->count,
-                'count_flag' => $countFlag,
-                'comment_flag' => $commentFlag
-            ];
-        }
-
-        if (empty($products) && $this->isAndroid()) {
-            // 为了Android不蹦
-            $products[] = [
-                'id' => '',
-                'img' => '',
-                'title' => '',
-                'price' => '',
-                'product_attribute_info' => '',
-                'count' => '',
-                'action' => '',
-                'comment_flag' => '',
-            ];
-        }
-
-        if ($order->userCoupon && $order->userCoupon->coupon) {
-            $order->amountDesc[] = [
-                'name' => $order->userCoupon->coupon->title,
-                'price' => '- ¥' . $order->userCoupon->coupon->price,
-            ];
-        }
-
-        $status = $order->getStatus();
-
-        if ($this->isAndroid() && $this->getAppVersion() <= '4.6.6') {
-            if ($order->getStatus() == '交易关闭') {
-                $status = '已取消';
-            } elseif ($order->getStatus() == '交易成功') {
-                $status = '已付款';
-            } else {
-                $status = $order->getStatus();
-            }
-        }
-
-        $data = [
-            'id' => $order->id,
-            'sn' => $order->sn,
-            'tel' => '4009191918',
-            'flag_comment' => $flag,//外部判断是否能进行评价
-            'top_icon' => $order->getTopIcon($order->status),
-            'online_qq' => '466813637',
-            'can_delete' => $order->isCanDelete() ? 1 : 0,
-            'status_id' => $order->status,
-            'status' => $status,
-            'created_at' => date('Y-m-d H:i:s', $order->created_at),
-            'title' => '订单详情',
-            'user_info' => [
-                'user_name' => substr_replace($order->user_name, '*****', 3, 4),
-            ],
-            'products' => $products,
-            'amount' => $order->amountDesc ?: ($this->isAndroid() ? [
-                [
-                    'name' => '',
-                    'price' => '',
-                ]
-            ] : null),
-//                [
-//                    'name' => '-折扣',
-//                    'price' => '¥10',
-//                ],
-            'actions' => $order->actions($this->isAndroid(), $flag),
-            'pay_type' => $order->getPayType(),
-            'product_amount' => '¥' . floatval($order->product_amount),
-            'pay_amount' => '¥' . floatval($order->pay_amount),
-        ];
-
-        self::showMsg($data);
-    }
-
-    /**
-     * Name: actionView
-     * Desc:
-     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
-     * Date: 2017-07-10
-     * @SWG\Get(path="/orders/buyer-view",
-     *   tags={"订单"},
-     *   summary="买家-我买到的订单详情",
-     *   description="Author: lixinxin",
-     *   @SWG\Parameter(name="sn", in="query", required=true, type="string", default="201707101223",
-     *     description=""
-     *   ),
-     *   @SWG\Response(
-     *       response=200,description="successful operation"
-     *   )
-     * )
-     */
-    public function actionBuyerView()
-    {
-        $comment = new Comments();
-        $order = $this->findOrderModel(['sn' => Yii::$app->request->get('sn'), 'user_id' => $this->userId]);
-        $order->user;
-
-        $products = [];
-        $flag = 1;
-        foreach ($order->product as $op) {
-            $params = [
-                'product_id' => $op->pid,
-                'type' => Comments::TYPE_VIDEO,
-                'user_id' => $this->userId,
-                'order_id' => $order->id,
-            ];
-
-            if (!$comment->commentFlag($params) && $order->isCanComment()) {
-                $commentFlag = 0;
-                $flag = 0;
-            } else {
-                $commentFlag = 1;
-            }
-
-            $countFlag = $op->product ? (($x = $op->product->productType) ? $x->use_count : '') : '';
-            $products[] = [
-                'id' => $op->getId(), // 商品id
-                'action' => $op->product ? $op->product->getTypeField() : null,
-                'title' => $op->title,
-                'img' => ProductImage::getOne(ProductImage::USE_FOR_LIST, $op->pid, false),
-                'product_attribute_info' => ($x = json_decode($op->product_attribute_info)) ? $x->name : '',
-                'price' => '¥' . $op->price,
-                'count' => $op->count,
-                'count_flag' => $countFlag,
-                'comment_flag' => $commentFlag
-            ];
-        }
-
-        if (empty($products) && $this->isAndroid()) {
-            // 为了Android不蹦
-            $products[] = [
-                'id' => '',
-                'img' => '',
-                'title' => '',
-                'price' => '',
-                'product_attribute_info' => '',
-                'count' => '',
-                'action' => '',
-                'comment_flag' => '',
-            ];
-        }
-
-        if ($order->userCoupon && $order->userCoupon->coupon) {
-            $order->amountDesc[] = [
-                'name' => $order->userCoupon->coupon->title,
-                'price' => '- ¥' . $order->userCoupon->coupon->price,
-            ];
-        }
-
-        $status = $order->getStatus();
-
-        if ($this->isAndroid() && $this->getAppVersion() <= '4.6.6') {
-            if ($order->getStatus() == '交易关闭') {
-                $status = '已取消';
-            } elseif ($order->getStatus() == '交易成功') {
-                $status = '已付款';
-            } else {
-                $status = $order->getStatus();
-            }
-        }
-
-        $data = [
-            'id' => $order->id,
-            'sn' => $order->sn,
-            'tel' => '4009191918',
-            'flag_comment' => $flag,//外部判断是否能进行评价
-            'top_icon' => $order->getTopIcon($order->status),
-            'online_qq' => '466813637',
-            'can_delete' => $order->isCanDelete() ? 1 : 0,
-            'status_id' => $order->status,
-            'status' => $status,
-            'created_at' => date('Y-m-d H:i:s', $order->created_at),
-            'title' => '订单详情',
-            'user_info' => [
-                'user_name' => substr_replace($order->user_name, '*****', 3, 4),
-            ],
-            'products' => $products,
-            'amount' => $order->amountDesc ?: ($this->isAndroid() ? [
-                [
-                    'name' => '',
-                    'price' => '',
-                ]
-            ] : null),
-//                [
-//                    'name' => '-折扣',
-//                    'price' => '¥10',
-//                ],
-            'actions' => $order->actions($this->isAndroid(), $flag),
-            'pay_type' => $order->getPayType(),
-            'product_amount' => '¥' . floatval($order->product_amount),
-            'pay_amount' => '¥' . floatval($order->pay_amount),
-        ];
-
-        self::showMsg($data);
-    }
 
     /** 取消订单 */
     public function actionCancel()
@@ -885,7 +676,7 @@ class OrdersController extends WebController
             $orderLog = new OrderLog();
             $orderLog->userEntity = $this->getApiUser();
 
-            if (!$orderLog->createLog($order, '由 ' . Order::orderStatus()[$oldStatus] . ' 改为 ' . $order->getStatus())) {
+            if (!$orderLog->createLog($order, '由 ' . Order::$status[$oldStatus] . ' 改为 ' . $order->getStatus())) {
                 throw new Exception('记录订单日志失败:' . current($orderLog->getFirstErrors()));
             }
 
@@ -919,7 +710,7 @@ class OrdersController extends WebController
             $orderLog = new OrderLog();
             $orderLog->userEntity = $this->getApiUser();
 
-            if (!$orderLog->createLog($order, '由 ' . Order::orderStatus()[$oldStatus] . ' 改为 ' . $order->getStatus())) {
+            if (!$orderLog->createLog($order, '由 ' . Order::$status[$oldStatus] . ' 改为 ' . $order->getStatus())) {
                 throw new Exception('记录订单日志失败:' . current($orderLog->getFirstErrors()));
             }
 
@@ -945,5 +736,56 @@ class OrdersController extends WebController
         }
     }
 
+    /**
+     * Name: actionView
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-10
+     * @SWG\Get(path="/orders/seller-view",
+     *   tags={"我的"},
+     *   summary="我卖出的订单详情",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="sn", in="query", required=true, type="string", default="201707101223",
+     *     description=""
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionSellerView($sn)
+    {
+        $order = $this->findOrderModel(['sn' => $sn, 'user_id' => $this->userId]);
+
+        $data = $order->sellerView();
+
+        self::showMsg($data);
+    }
+
+    /**
+     * Name: actionView
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-10
+     * @SWG\Get(path="/orders/buyer-view",
+     *   tags={"我的"},
+     *   summary="我买到的订单详情",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="sn", in="query", required=true, type="string", default="201707101223",
+     *     description=""
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionBuyerView()
+    {
+        $order = $this->findOrderModel(['sn' => $sn, 'user_id' => $this->userId]);
+
+        $data = $order->sellerView();
+
+        self::showMsg($data);
+    }
 
 }

@@ -536,7 +536,7 @@
                     {
                         "name": "status",
                         "in": "query",
-                        "description": "status\u7684\u503c\u5206\u4e3a: \u5168\u90e8=0 || \u5f85\u53d1\u8d27=20 || \u5df2\u53d1\u8d27=25 || \u5f85\u8bc4\u4ef7=70 || \u5df2\u5b8c\u6210=100 || \u9000\u8d27\u7533\u8bf7=60",
+                        "description": "status\u7684\u503c\u5206\u4e3a: \u5168\u90e8=0 || \u5f85\u53d1\u8d27=20 || \u5df2\u53d1\u8d27=25 || \u5f85\u8bc4\u4ef7=70 || \u5df2\u5b8c\u6210=100 || \u9000\u6b3e\u7533\u8bf7=60",
                         "required": true,
                         "type": "integer",
                         "default": "0"
@@ -560,7 +560,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation"
+                        "description": "\n     *          product_count=\u5b9d\u8d1d\u603b\u6570\n     *          product_list=\u5b9d\u8d1d\u5217\u8868\n     *              layout=\u5e03\u5c40\u7c7b\u578b[\n     *                  \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u5f85\u53d1\u8d27 || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u5df2\u53d1\u8d27 || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u5f85\u8bc4\u4ef7 || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u5df2\u5b8c\u6210 || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u9000\u6b3e\u7533\u8bf7\n     *                  \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u5f85\u53d1\u8d27 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u5df2\u53d1\u8d27 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u5f85\u8bc4\u4ef7 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u5df2\u5b8c\u6210 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u9000\u6b3e\u7533\u8bf7\n     *              ]\n     *              product_id=\u5b9d\u8d1did\n     *              order_sn=\u8ba2\u5355\u53f7\n     *              created_at=\u53c2\u4e0e\u65f6\u95f4\n     *              title=\u6807\u9898\n     *              img=\u5b9d\u8d1d\u5934\u56fe\n     *              total=\u603b\u9700\u4eba\u6b21\n     *              residual_total=\u5269\u4f59\u4eba\u6b21\n     *              residual_time=\u7ed3\u675f\u65f6\u95f4\n     *              progress=\u8fdb\u5ea6\n     *              publish_countdown=\u63ed\u6653\u5012\u8ba1\u65f6\n     *              a_price=\u4e00\u53e3\u4ef7\n     *              unit_price=\u5355\u4ef7\n     *              status=\u72b6\u6001 [\u5f85\u53d1\u8d27 || \u5df2\u53d1\u8d27 || \u5f85\u8bc4\u4ef7 || \u5df2\u5b8c\u6210]\n     *              actions=\u6570\u7ec4\u4e0b\u662f\u5b57\u5178\n     *                  [\n     *                      title=\u8bc4\u4ef7\n     *                      url=evaluation_add\n     *                  ],\n     *                  [\n     *                      title=\u67e5\u770b\u8bc4\u4ef7\n     *                      url=evaluation_list\n     *                  ],\n     *              url=\u94fe\u63a5\u5730\u5740[\u8df3\u8f6c\u5230\u5b9d\u8d1d\u8be6\u60c5\u9875=product, \u8df3\u8f6c\u5230\u8ba2\u5355\u8be6\u60c5\u9875=order]\n     *              order_award_count=\u5df2\u53c2\u4e0e\u4eba\u6b21"
                     }
                 }
             }
@@ -576,7 +576,7 @@
                     {
                         "name": "status",
                         "in": "query",
-                        "description": "status\u7684\u503c\u5206\u4e3a: \u5168\u90e8=0 || \u5f85\u53d1\u8d27=20 || \u5f85\u7b7e\u6536=25 || \u5f85\u8bc4\u4ef7=70 || \u5df2\u5b8c\u6210=100 || \u9000\u8d27\u7533\u8bf7=60",
+                        "description": "status\u7684\u503c\u5206\u4e3a: \u5168\u90e8=0 || \u5f85\u53d1\u8d27=20 || \u5f85\u7b7e\u6536=25 || \u5f85\u8bc4\u4ef7=70 || \u5df2\u5b8c\u6210=100 || \u9000\u6b3e\u7533\u8bf7=60",
                         "required": true,
                         "type": "integer",
                         "default": "0"
@@ -600,7 +600,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation"
+                        "description": "\n     *          product_count=\u5b9d\u8d1d\u603b\u6570\n     *          product_list=\u5b9d\u8d1d\u5217\u8868\n     *              layout=\u5e03\u5c40\u7c7b\u578b[\n     *                  \u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u5f85\u53d1\u8d27 || \u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u5f85\u7b7e\u6536 || \u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u5f85\u8bc4\u4ef7 || \u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u5df2\u5b8c\u6210 || \u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u9000\u6b3e\u7533\u8bf7\n     *                  \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u5f85\u53d1\u8d27 || \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u5f85\u7b7e\u6536 || \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u5f85\u8bc4\u4ef7 || \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u5df2\u5b8c\u6210 || \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u9000\u6b3e\u7533\u8bf7\n     *              ]\n     *              product_id=\u5b9d\u8d1did\n     *              order_sn=\u8ba2\u5355\u53f7\n     *              created_at=\u53c2\u4e0e\u65f6\u95f4\n     *              title=\u6807\u9898\n     *              img=\u5b9d\u8d1d\u5934\u56fe\n     *              total=\u603b\u9700\u4eba\u6b21\n     *              residual_total=\u5269\u4f59\u4eba\u6b21\n     *              residual_time=\u7ed3\u675f\u65f6\u95f4\n     *              progress=\u8fdb\u5ea6\n     *              publish_countdown=\u63ed\u6653\u5012\u8ba1\u65f6\n     *              a_price=\u4e00\u53e3\u4ef7\n     *              unit_price=\u5355\u4ef7\n     *              status=\u72b6\u6001 [\u4e0b\u67b6 || \u8fdb\u884c\u4e2d || \u5f85\u63ed\u6653 || \u5df2\u63ed\u6653]\n     *              actions=\u6570\u7ec4\u4e0b\u662f\u5b57\u5178\n     *                  [\n     *                      title=\u4e0a\u67b6\n     *                      url=up_sell\n     *                  ],\n     *                  [\n     *                      title=\u4e0b\u67b6\n     *                      url=down_sell\n     *                  ],\n     *                  [\n     *                      title=\u7f16\u8f91\n     *                      url=edit\n     *                  ],\n     *                  [\n     *                      title=\u5220\u9664\n     *                      url=edit\n     *                  ]\n     *              url=\u94fe\u63a5\u5730\u5740[\u8df3\u8f6c\u5230\u5b9d\u8d1d\u8be6\u60c5\u9875=product, \u8df3\u8f6c\u5230\u8ba2\u5355\u8be6\u60c5\u9875=order]\n     *              order_award_count=\u5df2\u53c2\u4e0e\u4eba\u6b21"
                     }
                 }
             }
@@ -784,9 +784,9 @@
         "/orders/seller-view": {
             "get": {
                 "tags": [
-                    "\u8ba2\u5355"
+                    "\u6211\u7684"
                 ],
-                "summary": "\u5356\u5bb6-\u6211\u5356\u51fa\u7684\u8ba2\u5355\u8be6\u60c5",
+                "summary": "\u6211\u5356\u51fa\u7684\u8ba2\u5355\u8be6\u60c5",
                 "description": "Author: lixinxin",
                 "parameters": [
                     {
@@ -808,9 +808,9 @@
         "/orders/buyer-view": {
             "get": {
                 "tags": [
-                    "\u8ba2\u5355"
+                    "\u6211\u7684"
                 ],
-                "summary": "\u4e70\u5bb6-\u6211\u4e70\u5230\u7684\u8ba2\u5355\u8be6\u60c5",
+                "summary": "\u6211\u4e70\u5230\u7684\u8ba2\u5355\u8be6\u60c5",
                 "description": "Author: lixinxin",
                 "parameters": [
                     {
@@ -973,7 +973,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "\n     *          product_count=\u5b9d\u8d1d\u603b\u6570\n     *          product_list=\u5b9d\u8d1d\u5217\u8868\n     *              layout=\u5e03\u5c40\u7c7b\u578b[\u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u672a\u4e0a\u67b6 || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u8fdb\u884c\u4e2d || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u5f85\u63ed\u6653 || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u5df2\u63ed\u6653 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u672a\u4e0a\u67b6 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u8fdb\u884c\u4e2d || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u5f85\u63ed\u6653 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u5df2\u63ed\u6653]\n     *              product_id=\u5b9d\u8d1did\n     *              order_id=\u8ba2\u5355id\n     *              title=\u6807\u9898\n     *              img=\u5b9d\u8d1d\u5934\u56fe\n     *              total=\u603b\u9700\u4eba\u6b21\n     *              residual_total=\u5269\u4f59\u4eba\u6b21\n     *              residual_time=\u7ed3\u675f\u65f6\u95f4\n     *              progress=\u8fdb\u5ea6\n     *              publish_countdown=\u63ed\u6653\u5012\u8ba1\u65f6\n     *              a_price=\u4e00\u53e3\u4ef7\n     *              unit_price=\u5355\u4ef7\n     *              status=\u72b6\u6001 [\u4e0b\u67b6 || \u8fdb\u884c\u4e2d || \u5f85\u63ed\u6653 || \u5df2\u63ed\u6653]\n     *              actions=\u6570\u7ec4\u4e0b\u662f\u5b57\u5178\n     *                  [\n     *                      title=\u4e0a\u67b6\n     *                      url=up_sell\n     *                  ],\n     *                  [\n     *                      title=\u4e0b\u67b6\n     *                      url=down_sell\n     *                  ],\n     *                  [\n     *                      title=\u7f16\u8f91\n     *                      url=edit\n     *                  ],\n     *                  [\n     *                      title=\u5220\u9664\n     *                      url=edit\n     *                  ]\n     *              url=\u94fe\u63a5\u5730\u5740[\u8df3\u8f6c\u5230\u5b9d\u8d1d\u8be6\u60c5\u9875=product, \u8df3\u8f6c\u5230\u8ba2\u5355\u8be6\u60c5\u9875=order]\n     *              order_award_count=\u5df2\u53c2\u4e0e\u4eba\u6b21"
+                        "description": "\n     *          product_count=\u5b9d\u8d1d\u603b\u6570\n     *          product_list=\u5b9d\u8d1d\u5217\u8868\n     *              layout=\u5e03\u5c40\u7c7b\u578b[\n     *                  \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u672a\u4e0a\u67b6 || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u8fdb\u884c\u4e2d || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u5f85\u63ed\u6653 || \u6570\u91cf\u6a21\u5f0f_\u5356\u5bb6_\u5df2\u63ed\u6653 ||\n     *                  \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u672a\u4e0a\u67b6 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u8fdb\u884c\u4e2d || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u5f85\u63ed\u6653 || \u65f6\u95f4\u6a21\u5f0f_\u5356\u5bb6_\u5df2\u63ed\u6653\n     *              ]\n     *              product_id=\u5b9d\u8d1did\n     *              title=\u6807\u9898\n     *              img=\u5b9d\u8d1d\u5934\u56fe\n     *              total=\u603b\u9700\u4eba\u6b21\n     *              residual_total=\u5269\u4f59\u4eba\u6b21\n     *              residual_time=\u7ed3\u675f\u65f6\u95f4\n     *              progress=\u8fdb\u5ea6\n     *              publish_countdown=\u63ed\u6653\u5012\u8ba1\u65f6\n     *              a_price=\u4e00\u53e3\u4ef7\n     *              unit_price=\u5355\u4ef7\n     *              status=\u72b6\u6001 [\u4e0b\u67b6 || \u8fdb\u884c\u4e2d || \u5f85\u63ed\u6653 || \u5df2\u63ed\u6653]\n     *              actions=\u6570\u7ec4\u4e0b\u662f\u5b57\u5178\n     *                  [\n     *                      title=\u4e0a\u67b6\n     *                      url=up_sell\n     *                  ],\n     *                  [\n     *                      title=\u4e0b\u67b6\n     *                      url=down_sell\n     *                  ],\n     *                  [\n     *                      title=\u7f16\u8f91\n     *                      url=edit\n     *                  ],\n     *                  [\n     *                      title=\u5220\u9664\n     *                      url=edit\n     *                  ]\n     *              url=\u94fe\u63a5\u5730\u5740[\u8df3\u8f6c\u5230\u5b9d\u8d1d\u8be6\u60c5\u9875=product, \u8df3\u8f6c\u5230\u8ba2\u5355\u8be6\u60c5\u9875=order]\n     *              order_award_count=\u5df2\u53c2\u4e0e\u4eba\u6b21"
                     }
                 }
             }
@@ -1013,7 +1013,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "\n     *          product_count=\u5b9d\u8d1d\u603b\u6570\n     *          product_list=\u5b9d\u8d1d\u5217\u8868\n     *              layout=\u5e03\u5c40\u7c7b\u578b[\u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u8fdb\u884c\u4e2d || \u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u5f85\u63ed\u6653 || \u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u5df2\u63ed\u6653 || \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u8fdb\u884c\u4e2d || \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u5f85\u63ed\u6653 || \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u5df2\u63ed\u6653]\n     *              product_id=\u5b9d\u8d1did\n     *              order_id=\u8ba2\u5355id\n     *              title=\u6807\u9898\n     *              img=\u5b9d\u8d1d\u5934\u56fe\n     *              total=\u603b\u9700\u4eba\u6b21\n     *              residual_total=\u5269\u4f59\u4eba\u6b21\n     *              residual_time=\u7ed3\u675f\u65f6\u95f4\n     *              progress=\u8fdb\u5ea6\n     *              publish_countdown=\u63ed\u6653\u5012\u8ba1\u65f6\n     *              a_price=\u4e00\u53e3\u4ef7\n     *              unit_price=\u5355\u4ef7\n     *              status=\u72b6\u6001 [\u4e0b\u67b6 || \u8fdb\u884c\u4e2d || \u5f85\u63ed\u6653 || \u5df2\u63ed\u6653]\n     *              actions=\u6570\u7ec4\u4e0b\u662f\u5b57\u5178\n     *                  [\n     *                      title=\u4e0a\u67b6\n     *                      url=up_sell\n     *                  ],\n     *                  [\n     *                      title=\u4e0b\u67b6\n     *                      url=down_sell\n     *                  ],\n     *                  [\n     *                      title=\u7f16\u8f91\n     *                      url=edit\n     *                  ],\n     *                  [\n     *                      title=\u5220\u9664\n     *                      url=edit\n     *                  ]\n     *              url=\u94fe\u63a5\u5730\u5740[\u8df3\u8f6c\u5230\u5b9d\u8d1d\u8be6\u60c5\u9875=product, \u8df3\u8f6c\u5230\u8ba2\u5355\u8be6\u60c5\u9875=order]\n     *              order_award_count=\u5df2\u53c2\u4e0e\u4eba\u6b21"
+                        "description": "\n     *          product_count=\u5b9d\u8d1d\u603b\u6570\n     *          product_list=\u5b9d\u8d1d\u5217\u8868\n     *              layout=\u5e03\u5c40\u7c7b\u578b[\n     *                  \u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u8fdb\u884c\u4e2d || \u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u5f85\u63ed\u6653 || \u6570\u91cf\u6a21\u5f0f_\u4e70\u5bb6_\u5df2\u63ed\u6653 ||\n     *                  \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u8fdb\u884c\u4e2d || \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u5f85\u63ed\u6653 || \u65f6\u95f4\u6a21\u5f0f_\u4e70\u5bb6_\u5df2\u63ed\u6653\n     *              ]\n     *              product_id=\u5b9d\u8d1did\n     *              created_at=\u53c2\u4e0e\u65f6\u95f4\n     *              title=\u6807\u9898\n     *              img=\u5b9d\u8d1d\u5934\u56fe\n     *              total=\u603b\u9700\u4eba\u6b21\n     *              residual_total=\u5269\u4f59\u4eba\u6b21\n     *              residual_time=\u7ed3\u675f\u65f6\u95f4\n     *              progress=\u8fdb\u5ea6\n     *              publish_countdown=\u63ed\u6653\u5012\u8ba1\u65f6\n     *              a_price=\u4e00\u53e3\u4ef7\n     *              unit_price=\u5355\u4ef7\n     *              status=\u72b6\u6001 [\u4e0b\u67b6 || \u8fdb\u884c\u4e2d || \u5f85\u63ed\u6653 || \u5df2\u63ed\u6653]\n     *              actions=\u6570\u7ec4\u4e0b\u662f\u5b57\u5178\n     *                  [\n     *                      title=\u4e0a\u67b6\n     *                      url=up_sell\n     *                  ],\n     *                  [\n     *                      title=\u4e0b\u67b6\n     *                      url=down_sell\n     *                  ],\n     *                  [\n     *                      title=\u7f16\u8f91\n     *                      url=edit\n     *                  ],\n     *                  [\n     *                      title=\u5220\u9664\n     *                      url=edit\n     *                  ]\n     *              url=\u94fe\u63a5\u5730\u5740[\u8df3\u8f6c\u5230\u5b9d\u8d1d\u8be6\u60c5\u9875=product, \u8df3\u8f6c\u5230\u8ba2\u5355\u8be6\u60c5\u9875=order]\n     *              order_award_count=\u5df2\u53c2\u4e0e\u4eba\u6b21"
                     }
                 }
             }
@@ -1046,6 +1046,46 @@
                 "responses": {
                     "200": {
                         "description": "\n     *          product_id=1"
+                    }
+                }
+            }
+        },
+        "/products/update": {
+            "post": {
+                "tags": [
+                    "\u4ea7\u54c1"
+                ],
+                "summary": "\u4fee\u6539\u4ea7\u54c1",
+                "description": "Author: OYYM",
+                "parameters": [
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "\u4fee\u6539\u7684\u4ea7\u54c1ID",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "data",
+                        "in": "formData",
+                        "description": "\u53d1\u5e03\u4ea7\u54c1\u9700\u8981\u7684\u6570\u636e\uff0c\u53ef\u5728http://www.bejson.com/jsonviewernew/\u4e0a\u89e3\u6790",
+                        "required": true,
+                        "type": "string",
+                        "default": "{'freight':'\u8fd0\u8d39','model':1,'title':'Iphone9','contents':'\\u4e70\\u5b8c\\u5c31\\u5403\\u571f:)','images':[{'name':'\\u6d4b\\u8bd5\\u56fe\\u7247','url':'demo321'},{'name':'\\u6d4b\\u8bd5\\u56fe\\u72472','url':'demo456'}],'videos':[{'name':'\\u6d4b\\u8bd5\\u89c6\\u98911','url':'demo321'}],'address':{'lat':'0.232512','lng':'1.2335432','detail_address':'\\u6cb3\\u5317\\u7701\\u5eca\\u574a\\u5e02\\u71d5\\u90ca\\u9547'},'total':10000,'a_price':8000,'type_id':2,'start_time':1499392688,'end_time':1499692688,'unit_price':1}"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
                     }
                 }
             }
@@ -1417,12 +1457,30 @@
             }
         },
         "/users/follow-category-or-cancel": {
-            "get": {
+            "post": {
                 "tags": [
                     "\u6211\u7684"
                 ],
                 "summary": "\u5173\u6ce8\u6216\u53d6\u6d88\u5173\u6ce8",
                 "description": "Author: lixinxin",
+                "parameters": [
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    {
+                        "name": "type_ids",
+                        "in": "formData",
+                        "description": "json\u6570\u7ec4\u683c\u5f0f\u7684\u5b9d\u8d1did",
+                        "required": true,
+                        "type": "string",
+                        "default": "[1,2,3,4]"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "successful operation"
