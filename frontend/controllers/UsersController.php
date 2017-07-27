@@ -16,6 +16,19 @@ use yii\base\Exception;
  */
 class UsersController extends WebController
 {
+
+    public function init()
+    {
+        parent::init();
+        if (empty($this->userId) && in_array(Yii::$app->requestedRoute, [
+                'users/follow-category', 'users/follow-category-or-cancel',
+                'users/upload-user-photo', 'users/setting', 'users/update-info'
+            ])
+        ) {
+            self::needLogin();
+        }
+    }
+
     /**
      * Name: actionFollowCategory
      * Desc: 关注的分类
@@ -168,7 +181,7 @@ class UsersController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/user/upload-user-photo",
+     * @SWG\Get(path="/users/upload-user-photo",
      *   tags={"设置"},
      *   summary="上传用户头像接口",
      *   description="Author: OYYM",
@@ -176,10 +189,10 @@ class UsersController extends WebController
      *     description="用户ky-token",
      *    ),
      *   @SWG\Parameter(name="url", in="query", default="abc.jpg", description="图片地址", required=true,
-     *     type="integer",
+     *     type="string",
      *   ),
      *   @SWG\Parameter(name="name", in="query", default="abc.jpg", description="图片地址", required=true,
-     *     type="integer",
+     *     type="string",
      *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
@@ -207,19 +220,34 @@ class UsersController extends WebController
         self::showMsg('图片上传成功', 1);
     }
 
+    /**
+     * @SWG\Get(path="/users/setting",
+     *   tags={"设置"},
+     *   summary="设置主界面",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Parameter(name="id", in="query", default="1", description="", required=true,
+     *     type="integer",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
     public function actionSetting()
     {
         self::showMsg([
             'user_photo' => Yii::$app->user->photoUrl($this->userId),
-            'photo_id' => Yii::$app->user->photoId($this->userId),
             'zhima' => '700'
         ]);
     }
 
     /**
      * @SWG\Post(path="/users/update-info",
-     *   tags={"demo"},
-     *   summary="",
+     *   tags={"设置"},
+     *   summary="更新用户信息",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
      *     description="用户ky-token",

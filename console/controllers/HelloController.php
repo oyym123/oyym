@@ -86,10 +86,14 @@ class HelloController extends Controller
 
     public function actionInitToken()
     {
+        Yii::$app->redis->hdel('token', 1);
+        Yii::$app->redis->hdel('token', 3);
+        Yii::$app->redis->hdel('token', 6);
+        Yii::$app->redis->hdel('token', 9);
         Yii::$app->redis->hset('token', 1, 1);
-        Yii::$app->redis->hset('token', 2, 3);
-        Yii::$app->redis->hset('token', 3, 6);
-        Yii::$app->redis->hset('token', 4, 9);
+        Yii::$app->redis->hset('token', 3, 2);
+        Yii::$app->redis->hset('token', 6, 3);
+        Yii::$app->redis->hset('token', 9, 4);
     }
 
     /**
