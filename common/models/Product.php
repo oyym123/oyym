@@ -93,7 +93,7 @@ class Product extends Base
     {
         return [
             [['type_id', 'title', 'created_at', 'updated_at', 'unit_price', 'created_by'], 'required'],
-            [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at', 'progress'], 'default', 'value' => 0],
+            [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at', 'progress', 'order_award_count'], 'default', 'value' => 0],
             [['sort', 'order_id', 'order_award_id', 'award_published_at', 'deleted_at', 'total'], 'default', 'value' => 0],
             [['type_id', 'watches', 'comments', 'sort', 'status', 'created_at', 'updated_at', 'total', 'random_code'], 'integer'],
             [['price', 'original_price', 'freight', 'unit_price', 'a_price'], 'number'],
@@ -597,7 +597,7 @@ class Product extends Base
                 'layout' => $item->sellerProductLayout(),
                 'status' => $item->getStatusText(),
                 'total' => $item->total, // 总需要多少人次
-                'order_award_count' => $item->order_award_count, // 已参与人次
+                'order_award_count' => (int) $item->order_award_count, // 已参与人次
                 'residual_total' => $item->getJoinCount(), // 剩余多少人次
                 'residual_time' => date('Y-m-d H:i:s', $item->end_time), // 时间模式结束时间
                 'progress' => $item->progress,
@@ -626,7 +626,7 @@ class Product extends Base
                     'layout' => $item->product->buyerProductLayout(),
                     'status' => $item->product->getStatusText(),
                     'total' => $item->product->total, // 总需要多少人次
-                    'order_award_count' => $item->product->order_award_count, // 已参与人次
+                    'order_award_count' => (int) $item->product->order_award_count, // 已参与人次
                     'residual_total' => $item->product->getJoinCount(), // 剩余多少人次
                     'residual_time' => date('Y-m-d H:i:s', $item->product->end_time), // 时间模式结束时间
                     'progress' => $item->product->progress,

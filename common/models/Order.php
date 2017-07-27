@@ -800,7 +800,7 @@ class Order extends Base
                     'layout' => $item->buyerOrderLayout(),
                     'status' => $item->getStatusText(),
                     'total' => $item->orderProduct->product->total, // 总需要多少人次
-                    'order_award_count' => $item->orderProduct->product->order_award_count, // 已参与人次
+                    'order_award_count' => (int) $item->orderProduct->product->order_award_count, // 已参与人次
                     'residual_total' => $item->orderProduct->product->getJoinCount(), // 剩余多少人次
                     'residual_time' => date('Y-m-d H:i:s', $item->orderProduct->product->end_time), // 时间模式结束时间
                     'progress' => $item->orderProduct->product->progress,
@@ -830,7 +830,7 @@ class Order extends Base
                     'layout' => $item->buyerOrderLayout(),
                     'status' => $item->getStatusText(),
                     'total' => $item->orderProduct->product->total, // 总需要多少人次
-                    'order_award_count' => $item->orderProduct->product->order_award_count, // 已参与人次
+                    'order_award_count' => (int) $item->orderProduct->product->order_award_count, // 已参与人次
                     'residual_total' => $item->orderProduct->product->getJoinCount(), // 剩余多少人次
                     'residual_time' => date('Y-m-d H:i:s', $item->orderProduct->product->end_time), // 时间模式结束时间
                     'progress' => $item->orderProduct->product->progress,
