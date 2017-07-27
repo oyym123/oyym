@@ -84,6 +84,14 @@ class HelloController extends Controller
         }
     }
 
+    public function actionInitToken()
+    {
+        Yii::$app->redis->hset('token', 1, 1);
+        Yii::$app->redis->hset('token', 2, 3);
+        Yii::$app->redis->hset('token', 3, 6);
+        Yii::$app->redis->hset('token', 4, 9);
+    }
+
     /**
      * Name: actionIndex
      * Desc: 导入城市

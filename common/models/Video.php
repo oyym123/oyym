@@ -44,7 +44,7 @@ class Video extends Base
     public function rules()
     {
         return [
-            [['type', 'type_id', 'created_at', 'updated_at', 'user_id', 'url'], 'required'],
+            [['type', 'type_id', 'user_id', 'url'], 'required'],
             [['sort'], 'default', 'value' => 0],
             [['type', 'type_id', 'size_type', 'user_id', 'sort', 'status', 'created_at', 'updated_at'], 'integer'],
             [['name', 'url'], 'string', 'max' => 255],
@@ -85,6 +85,23 @@ class Video extends Base
         return ArrayHelper::getValue(self::videoType(), $this->type);
     }
 
+    /** 检验是否应该上传 */
+    public static function deleteVideos($params)
+    {
+        $videoId = self::findAll(['user_id' => Yii::$app->user->id,
+            'status' => Video::STATUS_ENABLE,
+            'type' => $params['video_type'],
+            'type_id' => $params['type_id']]);
+        foreach ($videoId as $item) {
+            if (!in_array($item->url, $params['video_urls'])) {
+                $item->status = Video::STATUS_DISABLE;
+                if (!$item->save()) {
+                    throw new Exception('保存视频验证出错！');
+                }
+            }
+        }
+    }
+
     /** 获取所有视频 */
     public static function getVideos($params)
     {
@@ -110,7 +127,7 @@ class Video extends Base
     /** 设置视频 */
     public static function setVideo($params)
     {
-        $video = new video();
+        $video = self::findOne(['url' => $params['url']]) ?: new video();
         $video->name = ArrayHelper::getValue($params, 'name');
         $video->type = ArrayHelper::getValue($params, 'type');
         $video->type_id = ArrayHelper::getValue($params, 'type_id');
@@ -119,8 +136,6 @@ class Video extends Base
         $video->status = ArrayHelper::getValue($params, 'status');
         $video->sort = ArrayHelper::getValue($params, 'sort');
         $video->user_id = Yii::$app->user->id;
-        $video->created_at = time();
-        $video->updated_at = time();
         if (!$video->save()) {
             throw new Exception('视频保存失败!');
         }

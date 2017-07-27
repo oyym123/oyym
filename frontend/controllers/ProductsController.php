@@ -460,8 +460,6 @@ class ProductsController extends WebController
             $product->created_by = $this->userId;
             $product->freight = $data['freight'];
             $product->status = Product::STATUS_IN_PROGRESS;
-            $product->created_at = time();
-            $product->updated_at = time();
             $product->total = $data['total'];
             $product->unit_price = $data['unit_price'];
             $product->a_price = $data['a_price'] ?: '';
@@ -472,6 +470,14 @@ class ProductsController extends WebController
             if (!$product->save()) {
                 throw new Exception('宝贝发布失败');
             }
+
+            $delete['img_type'] = Image::TYPE_PRODUCT;
+            $delete['video_type'] = Video::TYPE_PRODUCT;
+            $delete['type_id'] = $product->id;
+            $delete['img_urls'] = array_column($images, 'url');
+            $delete['video_urls'] = array_column($videos, 'url');
+            Image::deleteImages($delete);  //进行伪删除操作
+            Video::deleteVideos($delete);  //进行伪删除操作
             foreach ($images as $image) {
                 $params = [
                     'name' => $image['name'],
