@@ -98,7 +98,7 @@ class OrdersController extends WebController
      *              publish_countdown=揭晓倒计时
      *              a_price=一口价
      *              unit_price=单价
-     *              status=状态 [待发货 || 已发货 || 待评价 || 已完成]
+     *              status=状态 [待发货 || 已发货 || 待评价 || 已完成 || 退款申请]
      *              actions=数组下是字典
      *                  [
      *                      title=评价
@@ -185,24 +185,16 @@ class OrdersController extends WebController
      *              buy_count=购买人次
      *              a_price=一口价
      *              unit_price=单价
-     *              status=状态 [进行中 || 待揭晓 || 已揭晓]
+     *              status=状态 [待发货 || 待签收 || 待评价 || 已完成 || 退款申请]
      *              actions=数组下是字典
      *                  [
-     *                      title=上架
-     *                      url=up_sell
+     *                      title=评价
+     *                      url=evaluation_add
      *                  ],
      *                  [
-     *                      title=下架
-     *                      url=down_sell
+     *                      title=查看评价
+     *                      url=evaluation_list
      *                  ],
-     *                  [
-     *                      title=编辑
-     *                      url=edit
-     *                  ],
-     *                  [
-     *                      title=删除
-     *                      url=edit
-     *                  ]
      *              url=链接地址[跳转到宝贝详情页=product, 跳转到订单详情页=order]
      *              order_award_count=已参与人次"
      *   )
