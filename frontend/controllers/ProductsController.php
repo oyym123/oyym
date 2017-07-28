@@ -247,6 +247,7 @@ class ProductsController extends WebController
      *                  数量模式_买家_进行中 || 数量模式_买家_待揭晓 || 数量模式_买家_已揭晓 ||
      *                  时间模式_买家_进行中 || 时间模式_买家_待揭晓 || 时间模式_买家_已揭晓
      *              ]
+     *              order_sn=订单号
      *              product_id=宝贝id
      *              created_at=参与时间
      *              title=标题

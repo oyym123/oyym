@@ -629,6 +629,7 @@ class Product extends Base
         foreach ($orderProducts as $key => $item) {
             if ($item->product && $item->order) {
                 $r[] = [
+                    'order_sn' => $item->order->sn,
                     'created_at' => $item->order->createdAt(),
                     'product_id' => $item->product->id,
                     'title' => $item->product->title,
