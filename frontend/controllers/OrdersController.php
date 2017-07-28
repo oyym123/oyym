@@ -182,6 +182,7 @@ class OrdersController extends WebController
      *              progress=进度
      *              publish_countdown=揭晓倒计时
      *              pay_amount=支付金额
+     *              buy_count=购买人次
      *              a_price=一口价
      *              unit_price=单价
      *              status=状态 [下架 || 进行中 || 待揭晓 || 已揭晓]

@@ -258,6 +258,7 @@ class ProductsController extends WebController
      *              publish_countdown=揭晓倒计时
      *              a_price=一口价
      *              unit_price=单价
+     *              buy_count=购买人次
      *              pay_amount=支付金额
      *              status=状态 [下架 || 进行中 || 待揭晓 || 已揭晓]
      *              actions=数组下是字典
