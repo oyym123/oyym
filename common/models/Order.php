@@ -86,7 +86,8 @@ class Order extends Base
     public function rules()
     {
         return [
-            [['freight', 'deleted_at', 'address_id'], 'default', 'value' => '0'],
+            [['freight', 'deleted_at', 'address_id', 'shipping_company', 'return_shipping_company'], 'default', 'value' => '0'],
+            [[''], 'default', 'value' => ''],
             [['buyer_id', 'seller_id', 'sn', 'status', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
@@ -113,6 +114,10 @@ class Order extends Base
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
             'evaluation_status' => '评价状态,卖家已评价=1,买家已评价=2,双方已评价=3',
+            'shipping_company' => '快递公司',
+            'return_shipping_company' => '退货快递公司',
+            'shipping_number' => '快递单号',
+            'return_shipping_number' => '退货快递单号',
         ];
     }
 
@@ -688,6 +693,16 @@ class Order extends Base
     /** 卖家-我发布的/卖出的宝贝列表 样式布局 */
     public function sellerOrderLayout()
     {
+        if ($this->orderProduct) {
+            if ($this->orderProduct->buy_type == OrderProduct::A_PRICE) {
+                return '一口价购买';
+            }
+        }
+
+        return '众筹购买';
+        /*
+         // 数量模式_卖家_待发货 || 数量模式_卖家_已发货 || 数量模式_卖家_待评价 || 数量模式_卖家_已完成 || 数量模式_卖家_退款申请
+         // 时间模式_卖家_待发货 || 时间模式_卖家_已发货 || 时间模式_卖家_待评价 || 时间模式_卖家_已完成 || 时间模式_卖家_退款申请
         if ($this->status == Order::STATUS_WAIT_SHIP) {
             $r = '待发货';
         } elseif ($this->status == Order::STATUS_SHIPPED) {
@@ -706,11 +721,20 @@ class Order extends Base
         }
 
         return $this->modelTypeText() . '_卖家_' . $r;
+        */
     }
 
     /** 买家-我参与的/买到的宝贝列表 样式布局 */
     public function buyerOrderLayout()
     {
+        if ($this->orderProduct) {
+            if ($this->orderProduct->buy_type == OrderProduct::A_PRICE) {
+                return '一口价购买';
+            }
+        }
+
+        return '众筹购买';
+        /*
         $r = '进行中';
         if ($this->buyer_id == Yii::$app->user->identity->id) {
             if ($this->status == Order::STATUS_WAIT_SHIP) {
@@ -733,7 +757,7 @@ class Order extends Base
             }
         }
 
-        return $this->modelTypeText() . '_买家_' . $r;;
+        return $this->modelTypeText() . '_买家_' . $r;*/
     }
 
     /** 返回宝贝模式 */
@@ -797,12 +821,12 @@ class Order extends Base
                     'order_sn' => $item->sn,
                     'title' => $item->orderProduct->product->title,
                     'img' => $item->orderProduct->product->headImg(),
-                    'layout' => $item->buyerOrderLayout(),
+                    'layout' => $item->sellerOrderLayout(),
                     'status' => $item->getStatusText(),
                     'total' => $item->orderProduct->product->total, // 总需要多少人次
-                    'order_award_count' => (int) $item->orderProduct->product->order_award_count, // 已参与人次
+                    'order_award_count' => (int)$item->orderProduct->product->order_award_count, // 已参与人次
                     'residual_total' => $item->orderProduct->product->getJoinCount(), // 剩余多少人次
-                    'residual_time' => date('Y-m-d H:i:s', $item->orderProduct->product->end_time), // 时间模式结束时间
+                    'residual_time' => $item->orderProduct->product->residualTime(), // 时间模式结束时间
                     'progress' => $item->orderProduct->product->progress,
                     'publish_countdown' => $item->orderProduct->product->getPublishCountdown(),// 揭晓倒计时
                     'a_price' => $item->orderProduct->product->a_price,// 一口价
@@ -830,9 +854,9 @@ class Order extends Base
                     'layout' => $item->buyerOrderLayout(),
                     'status' => $item->getStatusText(),
                     'total' => $item->orderProduct->product->total, // 总需要多少人次
-                    'order_award_count' => (int) $item->orderProduct->product->order_award_count, // 已参与人次
+                    'order_award_count' => (int)$item->orderProduct->product->order_award_count, // 已参与人次
                     'residual_total' => $item->orderProduct->product->getJoinCount(), // 剩余多少人次
-                    'residual_time' => date('Y-m-d H:i:s', $item->orderProduct->product->end_time), // 时间模式结束时间
+                    'residual_time' => $item->orderProduct->product->residualTime(), // 时间模式结束时间
                     'progress' => $item->orderProduct->product->progress,
                     'publish_countdown' => $item->orderProduct->product->getPublishCountdown(),// 揭晓倒计时
                     'a_price' => $item->orderProduct->product->a_price,// 一口价
@@ -847,11 +871,14 @@ class Order extends Base
     }
 
     /** 买家订单详情页 */
-    public function buyerView(){
+    public function buyerView()
+    {
 
     }
+
     /** 卖家订单详情页 */
-    public function sellerView(){
+    public function sellerView()
+    {
 
     }
 }

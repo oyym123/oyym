@@ -111,6 +111,12 @@ class Image extends Base
         return $data;
     }
 
+
+    public function qiniuUrl()
+    {
+        return QiniuHelper::downloadImageUrl(Yii::$app->params['qiniu_url_images'], $this->url);
+    }
+
     /** 检验是否应该上传 */
     public static function deleteImages($params)
     {
