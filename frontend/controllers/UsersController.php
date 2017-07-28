@@ -210,7 +210,7 @@ class UsersController extends WebController
             'name' => $url,
             'type' => Image::TYPE_USER_PHOTO,
             'type_id' => $this->userId,
-            'url' => Yii::$app->request->post('url'),
+            'url' => $url,
             'size_type' => Yii::$app->request->post('size', Image::SIZE_BIG),
             'status' => Base::STATUS_ENABLE,
             'sort' => Yii::$app->request->post('sort', 0),
@@ -219,9 +219,16 @@ class UsersController extends WebController
         $delete['type_id'] = $this->userId;
         $delete['img_urls'] = [$url];
 
-        Image::deleteImages($delete);  //进行伪删除操作
-        Image::setImage($params);
-        self::showMsg('图片上传成功', 1);
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            Image::deleteImages($delete);  //进行伪删除操作
+            Image::setImage($params);
+            $transaction->commit();
+            self::showMsg('图片上传成功', 1);
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            self::showMsg($e->getMessage(), -1);
+        }
     }
 
     /**
@@ -274,9 +281,9 @@ class UsersController extends WebController
     public function actionUpdateInfo()
     {
         $model = UserInfo::findOne(['user_id' => $this->userId]);
-        $model->province = Yii::$app->request->post('province');
-        $model->city = Yii::$app->request->post('city');
-        $model->area = Yii::$app->request->post('area');
+//        $model->province = Yii::$app->request->post('province');
+//        $model->city = Yii::$app->request->post('city');
+//        $model->area = Yii::$app->request->post('area');
         $model->intro = Yii::$app->request->post('intro');
         if (!$model->save()) {
             self::showMsg('更新信息失败', -1);

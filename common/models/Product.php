@@ -747,12 +747,13 @@ class Product extends Base
     }
 
     /** 开奖 */
-    public function openLottery()
+    public function openLottery($flag = 0)
     {
-        if (!$this->canOpenLottery()) {
-            return [-1, '不允许开奖'];
+        if ($flag == 1) { //flag==1表示用户开奖
+            if (!$this->canOpenLottery()) {
+                return [-1, '不允许开奖'];
+            }
         }
-
         $query = $this->getNumberAModel();
 
         $count = $query->count();

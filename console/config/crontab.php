@@ -18,7 +18,7 @@
 
 
 [progress]
-run_time = 1 * * * * *
+run_time = 7 1 * * * *
 cd_dir = C:\xampp\htdocs\zcdb\console\
 common = C:\xampp\htdocs\zcdb\yii product/progress 2
 log_dir = D:\log.txt
