@@ -647,6 +647,7 @@ class Product extends Base
                     'publish_countdown' => $item->product->getPublishCountdown(),// 揭晓倒计时
                     'a_price' => $item->product->a_price,// 一口价
                     'unit_price' => $item->product->unit_price,// 单价
+                    'unit_price' => $item->order->pay_amount,// 支付金额
                     'url' => $item->product->buyerProductUrlRoute(), // 买家宝贝路由
                     'actions' => $item->order->buyerProductActions(), // 买家宝贝动作
                 ];
