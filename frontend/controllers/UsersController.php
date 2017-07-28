@@ -38,6 +38,10 @@ class UsersController extends WebController
      *   tags={"我的"},
      *   summary= "关注的分类",
      *   description="Author: lixinxin",
+     *  @SWG\Parameter(
+     *     name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
      *   @SWG\Response(
      *      response=200, description="successful operation"
      *   )
@@ -283,19 +287,9 @@ class UsersController extends WebController
 
     public function actionTest()
     {
-        $var1 = Yii::$app->redis->del("mioji2");
-        // echo Yii::$app->redis->decrby('jkjk',2);
-        //Yii::$app->redis->zadd('mioji2','z999f','ls','12321');
-        Yii::$app->redis->zadd('mioji2', 1, 'rr', 2, 'ttt', 6, 000);
-        //
-
-        //$var3 = Yii::$app->redis->lrange("vari",0,99);
-        $num = Yii::$app->redis->zcard('mioji2');
-        $var81 = Yii::$app->redis->zrange('mioji2', 0, $num);
-        foreach ($var81 as $i) {
-            echo $i;
-
-        }
-
+       $t=serialize(['id' => 1]);
+       echo $t;
+        exit;
+       var_dump(unserialize('a:1:{s:2:"id";i:8;}')['id']);
     }
 }

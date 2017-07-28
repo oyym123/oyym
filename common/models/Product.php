@@ -439,6 +439,18 @@ class Product extends Base
         }
     }
 
+    public function changeProgress()
+    {
+        $products = Product::findAll(['model' => Product::MODEL_TIME, 'status' => Product::STATUS_IN_PROGRESS]);
+        foreach ($products as $product) {
+            $product->progress = $product->getProgress();
+            if (!$product->save()) {
+                return [-1, $product->id . '产品进度保存失败'];
+            }
+        }
+        return [1, '产品进度更新成功'];
+    }
+
     /** 获取参加者人数 */
     public function getJoinCount()
     {
@@ -592,7 +604,6 @@ class Product extends Base
                 'product_id' => $item->id,
                 'title' => $item->title,
                 'img' => $item->headImg(), // 宝贝头图
-                'img' => $item->headImg(),
                 'layout' => $item->sellerProductLayout(),
                 'status' => $item->getStatusText(),
                 'total' => $item->total, // 总需要多少人次

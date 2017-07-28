@@ -17,7 +17,6 @@ class CrontabController extends Controller
     /** 定时扫描crontab表，可以根据参数不同，定义不同时间间隔 */
     public function actionCrontab($type)
     {
-        echo $type;
         $crontab = new Crontab();
         $crontab->setRedis($type);
     }

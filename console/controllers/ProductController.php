@@ -7,6 +7,7 @@ use common\models\Advice;
 use common\models\Article;
 use common\models\BaseData;
 use common\models\City;
+use common\models\Crontab;
 use common\models\Download;
 use common\models\College;
 use common\models\News;
@@ -52,15 +53,17 @@ class ProductController extends Controller
     }
 
     /** 定时更新时间模式下产品进度值 */
-    public function actionProgress()
+    public function actionProgress($type)
     {
-        $products = Product::findAll(['model' => Product::MODEL_TIME, 'status' => Product::STATUS_IN_PROGRESS]);
-        foreach ($products as $product) {
-            $product->progress = $product->getProgress();
-            if (!$product->save()) {
-                echo ($product->id) . '保存出错!-------' . date('Y-m-d H:i:s') . "\r\n";
-            }
+        $crontab = new Crontab();
+        $crontab->params = '';
+        $crontab->type = $type;
+        $crontab->exec_max_count = 1000;
+        $crontab->exec_start_time = time() + 30;
+        $crontab->status = Crontab::WAIT;
+        if (!$crontab->save()) {
+            echo '保存进度失败';
         }
-        echo '产品进度更新成功!-------' . date('Y-m-d H:i:s') . "\r\n";
     }
+
 }

@@ -18,9 +18,21 @@
 
 
 [progress]
-run_time = 59 * * * * *
+run_time = 1 * * * * *
 cd_dir = C:\xampp\htdocs\zcdb\console\
-common = C:\xampp\htdocs\zcdb\yii product/progress
+common = C:\xampp\htdocs\zcdb\yii product/progress 2
+log_dir = D:\log.txt
+
+[product_progress]
+run_time = 2 * * * * *
+cd_dir = C:\xampp\htdocs\zcdb\console\
+common = ..\yii crontab/crontab 2
+log_dir = D:\log.txt
+
+[start_product_progress]
+run_time = */1 * * * * *
+cd_dir = C:\xampp\htdocs\zcdb\console\
+common = ..\yii crontab/start-crontab 2
 log_dir = D:\log.txt
 
 [product_count_down]

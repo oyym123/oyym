@@ -1481,6 +1481,16 @@
                 ],
                 "summary": "\u5173\u6ce8\u7684\u5206\u7c7b",
                 "description": "Author: lixinxin",
+                "parameters": [
+                    {
+                        "name": "ky-token",
+                        "in": "header",
+                        "description": "\u7528\u6237ky-token",
+                        "required": true,
+                        "type": "integer",
+                        "default": "1"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "successful operation"
