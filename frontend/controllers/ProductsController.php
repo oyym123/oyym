@@ -170,7 +170,7 @@ class ProductsController extends WebController
      *              img=宝贝头图
      *              total=总需人次
      *              residual_total=剩余人次
-     *              residual_time=结束时间
+     *              residual_time=剩余时间
      *              progress=进度
      *              publish_countdown=揭晓倒计时
      *              a_price=一口价
@@ -243,20 +243,23 @@ class ProductsController extends WebController
      *          product_count=宝贝总数
      *          product_list=宝贝列表
      *              layout=布局类型[
+     *                  一口价购买 ||
      *                  数量模式_买家_进行中 || 数量模式_买家_待揭晓 || 数量模式_买家_已揭晓 ||
      *                  时间模式_买家_进行中 || 时间模式_买家_待揭晓 || 时间模式_买家_已揭晓
      *              ]
+     *              order_sn=订单号
      *              product_id=宝贝id
      *              created_at=参与时间
      *              title=标题
      *              img=宝贝头图
      *              total=总需人次
      *              residual_total=剩余人次
-     *              residual_time=结束时间
+     *              residual_time=剩余时间
      *              progress=进度
      *              publish_countdown=揭晓倒计时
      *              a_price=一口价
      *              unit_price=单价
+     *              buy_count=购买人次
      *              pay_amount=支付金额
      *              status=状态 [下架 || 进行中 || 待揭晓 || 已揭晓]
      *              actions=数组下是字典

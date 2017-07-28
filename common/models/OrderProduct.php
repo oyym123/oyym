@@ -97,8 +97,27 @@ class OrderProduct extends Base
     }
 
     /** 取宝贝 */
-    public function getProduct(){
+    public function getProduct()
+    {
         return $this->hasOne(Product::className(), ['id' => 'pid']);
     }
 
+    /** 买家-我参与的/买到的宝贝列表 样式布局 */
+    public function buyerProductLayout()
+    {
+        if ($this->buy_type == self::A_PRICE) {
+            return '一口价购买';
+        }
+
+        $r = '进行中';
+        if ($this->product->status == Product::STATUS_IN_PROGRESS) {
+            $r = '进行中';
+        } elseif ($this->product->status == Product::STATUS_WAIT_PUBLISH) {
+            $r = '待揭晓';
+        } elseif ($this->product->status == Product::STATUS_PUBLISHED) {
+            $r = '已揭晓';
+        }
+
+        return $this->product->modelTypeText() . '_买家_' . $r;;
+    }
 }

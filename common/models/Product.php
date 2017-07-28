@@ -531,21 +531,6 @@ class Product extends Base
         return $this->modelTypeText() . '_卖家_' . $r;
     }
 
-    /** 买家-我参与的/买到的宝贝列表 样式布局 */
-    public function buyerProductLayout()
-    {
-        $r = '进行中';
-        if ($this->status == Product::STATUS_IN_PROGRESS) {
-            $r = '进行中';
-        } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
-            $r = '待揭晓';
-        } elseif ($this->status == Product::STATUS_PUBLISHED) {
-            $r = '已揭晓';
-        }
-
-        return $this->modelTypeText() . '_买家_' . $r;;
-    }
-
     /** 卖家-我发布的/我卖出的 宝贝列表 控制链接跳转 */
     public function sellerProductUrlRoute()
     {
@@ -624,7 +609,7 @@ class Product extends Base
                 'total' => $item->total, // 总需要多少人次
                 'order_award_count' => (int)$item->order_award_count, // 已参与人次
                 'residual_total' => $item->getJoinCount(), // 剩余多少人次
-                'residual_time' => $item->residualTime(), // 时间模式结束时间
+                'residual_time' => $item->residualTime(), // 时间模式剩余时间
                 'progress' => $item->progress,
                 'publish_countdown' => $item->getPublishCountdown(),// 揭晓倒计时
                 'a_price' => $item->a_price,// 一口价
@@ -644,21 +629,23 @@ class Product extends Base
         foreach ($orderProducts as $key => $item) {
             if ($item->product && $item->order) {
                 $r[] = [
+                    'order_sn' => $item->order->sn,
                     'created_at' => $item->order->createdAt(),
                     'product_id' => $item->product->id,
                     'title' => $item->product->title,
                     'img' => $item->product->headImg(), // 宝贝头图
-                    'layout' => $item->product->buyerProductLayout(),
+                    'layout' => $item->buyerProductLayout(),
                     'status' => $item->product->getStatusText(),
                     'total' => $item->product->total, // 总需要多少人次
                     'order_award_count' => (int)$item->product->order_award_count, // 已参与人次
                     'residual_total' => $item->product->getJoinCount(), // 剩余多少人次
-                    'residual_time' => $item->product->residualTime(), // 时间模式结束时间
+                    'residual_time' => $item->product->residualTime(), // 时间模式剩余时间
                     'progress' => $item->product->progress,
                     'publish_countdown' => $item->product->getPublishCountdown(),// 揭晓倒计时
                     'a_price' => $item->product->a_price,// 一口价
                     'unit_price' => $item->product->unit_price,// 单价
-                    'unit_price' => $item->order->pay_amount,// 支付金额
+                    'pay_amount' => $item->order->pay_amount,// 支付金额
+                    'buy_count' => $item->count,// 购买人次
                     'url' => $item->product->buyerProductUrlRoute(), // 买家宝贝路由
                     'actions' => $item->order->buyerProductActions(), // 买家宝贝动作
                 ];
@@ -870,7 +857,14 @@ class Product extends Base
     /** 结束时间 */
     public function residualTime()
     {
-        return $this->end_time ? date('Y-m-d H:i:s', $this->end_time) : '';
+        $value = $this->end_time - time();
+        if ($value > 86400) {
+            return floor(($this->end_time - time()) / 86400) . '天';
+        } elseif ($value > 0) {
+            return date('H', $this->end_time) . '点结束';
+        }
+
+        return '已结束';
     }
 }
 
