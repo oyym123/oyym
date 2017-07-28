@@ -135,7 +135,7 @@ class Attention extends Base
         return User::find()->where(['attention.type' => Attention::TYPE_USER])
             ->join('LEFT JOIN', 'attention', 'user.id = attention.type_id')
             ->andWhere(['attention.status' => Attention::STATUS_ENABLE])
-            ->andWhere(['user.id' => Yii::$app->user->id])
+            ->andWhere(['attention.user_id' => Yii::$app->user->id])
             ->orderBy('attention.created_at desc')->offset($offset)->limit(20)->all();
     }
 
