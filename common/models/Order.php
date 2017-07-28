@@ -45,8 +45,8 @@ class Order extends Base
     const STATUS_SHIPPED = 25; // 已发货
 //    const STATUS_CONFIRM_RECEIVING = 40; // 待签收
     const STATUS_CONFIRM_RECEIVING = 50; // 已签收
-    const STATUS_RETURN_APPLY = 60; // 退款申请 (发货后, 买家不想要了)
-    const STATUS_RETURN_AGREE = 61; // 同意退款 (发货后, 买家不想要了)
+    const STATUS_REFUND_APPLY = 60; // 退款申请 (发货后, 买家不想要了)
+    const STATUS_REFUND_AGREE = 61; // 同意退款 (发货后, 买家不想要了)
     const STATUS_WAIT_REFUND = 65; // 待退款 (揭晓后, 给没中奖的客户退款,卖家同意退款)
     const STATUS_REFUNDED = 68; // 已退款 (退款成功)
     const STATUS_WAIT_COMMENT = 70; // 待评价
@@ -66,8 +66,8 @@ class Order extends Base
         self::STATUS_SHIPPED => '已发货',
 //            self::STATUS_CONFIRM_RECEIVING => '待签收',
         self::STATUS_CONFIRM_RECEIVING => '已签收',
-        self::STATUS_RETURN_APPLY => '退款申请',
-        self::STATUS_RETURN_AGREE => '同意退款',
+        self::STATUS_REFUND_APPLY => '退款申请',
+        self::STATUS_REFUND_AGREE => '同意退款',
         self::STATUS_WAIT_COMMENT => '待评价',
         self::STATUS_COMPLETE => '已完成',
     ];
@@ -125,6 +125,12 @@ class Order extends Base
     public function getStatusText()
     {
         return ArrayHelper::getValue(self::$status, $this->status, '');
+    }
+
+    /** 取支付方式中文名 */
+    public function getPayTypeText()
+    {
+        return ArrayHelper::getValue(self::$payType, $this->pay_type, '');
     }
 
     /**
@@ -693,10 +699,8 @@ class Order extends Base
     /** 卖家-我发布的/卖出的宝贝列表 样式布局 */
     public function sellerOrderLayout()
     {
-        if ($this->orderProduct) {
-            if ($this->orderProduct->buy_type == OrderProduct::A_PRICE) {
-                return '一口价购买';
-            }
+        if ($this->isAPriceOrder()) {
+            return '一口价购买';
         }
 
         return '众筹购买';
@@ -727,10 +731,8 @@ class Order extends Base
     /** 买家-我参与的/买到的宝贝列表 样式布局 */
     public function buyerOrderLayout()
     {
-        if ($this->orderProduct) {
-            if ($this->orderProduct->buy_type == OrderProduct::A_PRICE) {
-                return '一口价购买';
-            }
+        if ($this->isAPriceOrder()) {
+            return '一口价购买';
         }
 
         return '众筹购买';
@@ -752,7 +754,7 @@ class Order extends Base
             } elseif ($this->status == Order::STATUS_COMPLETE) {
                 // 双方都评价后进入该状态
                 $r = '已完成';
-            } elseif (in_array($this->status, [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED])) {
+            } elseif (in_array($this->status, [Order::STATUS_REFUND_APPLY, Order::STATUS_REFUND_AGREE, Order::STATUS_REFUNDED])) {
                 $r = '退款申请';
             }
         }
@@ -870,6 +872,18 @@ class Order extends Base
         return $r;
     }
 
+    /** 退货快递公司名字 */
+    public function returnShippingCompany()
+    {
+        return ArrayHelper::getValue(Shipping::shippingCompany(), $this->return_shipping_company, '');
+    }
+
+    /** 退货快递公司名字 */
+    public function shippingCompany()
+    {
+        return ArrayHelper::getValue(Shipping::shippingCompany(), $this->shipping_company, '');
+    }
+
     /** 买家订单详情页 */
     public function buyerView()
     {
@@ -880,5 +894,57 @@ class Order extends Base
     public function sellerView()
     {
 
+    }
+
+    /** 买家是否可以发货 */
+    public function isCanShipping()
+    {
+        return $this->status == self::STATUS_WAIT_SHIP;
+    }
+
+    /** 是否等待卖家评价 */
+    public function isWaitSellerEvaluation()
+    {
+        return $this->status == self::STATUS_WAIT_SHIP;
+    }
+
+    /** 卖家订单详情页可以做的操作 */
+    public function sellerViewActions()
+    {
+        $r = [];
+        if ($this->isCanShipping()) {
+            $r[] = [
+                'title' => '发货',
+                'url' => 'shipping',
+            ];
+        }
+
+        if ($this->isWaitSellerEvaluation()) {
+            // 等待评价
+            $r[] = [
+                'title' => '评价',
+                'url' => 'evaluation',
+            ];
+        }
+
+        if ($this->sellerIsCanLookEvaluation()) {
+            // 等待评价
+            $r[] = [
+                'title' => '查看评价',
+                'url' => 'look_evaluation',
+            ];
+        }
+
+        if ($this->isNeedSellerAgreeRefund()) {
+            // 需要卖家同意买家的退款
+            $r[] = [
+                'title' => '同意退款',
+                'url' => 'agree_refund',
+            ];
+            $r[] = [
+                'title' => '拒绝退款',
+                'url' => 'reject_refund',
+            ];
+        }
     }
 }
