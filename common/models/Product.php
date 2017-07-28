@@ -519,21 +519,6 @@ class Product extends Base
         return $this->modelTypeText() . '_卖家_' . $r;
     }
 
-    /** 买家-我参与的/买到的宝贝列表 样式布局 */
-    public function buyerProductLayout()
-    {
-        $r = '进行中';
-        if ($this->status == Product::STATUS_IN_PROGRESS) {
-            $r = '进行中';
-        } elseif ($this->status == Product::STATUS_WAIT_PUBLISH) {
-            $r = '待揭晓';
-        } elseif ($this->status == Product::STATUS_PUBLISHED) {
-            $r = '已揭晓';
-        }
-
-        return $this->modelTypeText() . '_买家_' . $r;;
-    }
-
     /** 卖家-我发布的/我卖出的 宝贝列表 控制链接跳转 */
     public function sellerProductUrlRoute()
     {
@@ -637,7 +622,7 @@ class Product extends Base
                     'product_id' => $item->product->id,
                     'title' => $item->product->title,
                     'img' => $item->product->headImg(), // 宝贝头图
-                    'layout' => $item->product->buyerProductLayout(),
+                    'layout' => $item->buyerProductLayout(),
                     'status' => $item->product->getStatusText(),
                     'total' => $item->product->total, // 总需要多少人次
                     'order_award_count' => (int)$item->product->order_award_count, // 已参与人次
