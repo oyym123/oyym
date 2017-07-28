@@ -41,7 +41,7 @@ class Crontab extends Base
     {
         return [
             [['type', 'status', 'exec_count', 'exec_max_count', 'exec_start_time', 'created_at', 'updated_at'], 'integer'],
-            [['params'], 'required'],
+            [[], 'required'],
             [['params', 'log'], 'string'],
         ];
     }
@@ -52,13 +52,13 @@ class Crontab extends Base
         Yii::$app->redis->del($type . 'crontab_ids');
         $crontabs = Crontab::findAll(['type' => $type, 'status' => [self::WAIT, self::FAIL]]);
         foreach ($crontabs as $key => $crontab) {
-            if ($crontab->exec_count <= $crontab->exec_max_count) {
+            if ($crontab->exec_count < $crontab->exec_max_count) {
                 Yii::$app->redis->del($type . 'crontab' . $crontab->id);
                 Yii::$app->redis->del($type . 'crontab_ids');
                 if ($crontab->status == self::FAIL) {
                     Yii::$app->redis->setex($type . 'crontab' . $crontab->id, 3, 1);
                     Yii::$app->redis->zadd($type . 'crontab_ids', $key, $crontab->id);
-                } else {
+                } else if ($crontab->exec_start_time > time()) {
                     Yii::$app->redis->setex($type . 'crontab' . $crontab->id, $crontab->exec_start_time - time(), 1);
                     Yii::$app->redis->zadd($type . 'crontab_ids', $key, $crontab->id);
                 }
@@ -72,7 +72,10 @@ class Crontab extends Base
         $data = Yii::$app->redis->zrange($type . 'crontab_ids', 0, Yii::$app->redis->zcard($type . 'crontab_ids'));
         foreach ($data as $item) {
             if (!Yii::$app->redis->get($type . 'crontab' . $item)) {
-                $this->route($item, $type);
+                $crontab = $this->findModel($item);
+                if ($crontab->exec_count < $crontab->exec_max_count) {
+                    $this->route($item, $type);
+                }
             }
         }
     }
@@ -82,6 +85,9 @@ class Crontab extends Base
         switch ($type) {
             case 1:
                 $this->changeStatus($crontabId);
+                break;
+            case 2:
+                $this->changeProgress($crontabId);
         }
     }
 
@@ -89,8 +95,7 @@ class Crontab extends Base
     {
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $crontab = $this->findModel($id);
-            $product = Product::findOne(['id' => 1]);
+            $product = Product::findOne(['id' => $this->getParams($id)['id']]);
             list($code, $err) = $product->openLottery();
             $this->setCrontab($id, $code, $err);
             $transaction->commit();
@@ -98,6 +103,27 @@ class Crontab extends Base
             $transaction->rollBack();
             var_dump([-1, $e->getMessage()]);
         }
+    }
+
+    public function changeProgress($id)
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $product = new Product();
+            list($code, $err) = $product->changeProgress();
+            $this->setCrontab($id, $code, $err);
+            $transaction->commit();
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            var_dump([-1, $e->getMessage()]);
+        }
+    }
+
+    /** 获取params数据 */
+    public function getParams($id)
+    {
+        $crontab = self::find()->where(['id' => $id])->asArray()->one();
+        return unserialize($crontab['params']);
     }
 
 
@@ -114,8 +140,6 @@ class Crontab extends Base
             $crontab->exec_count += 1;
             $crontab->log = $err;
         }
-        $crontab->updated_at = time();
-
         if (!$crontab->save()) {
             throw new Exception('定时计划保存失败!');
         }
