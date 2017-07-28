@@ -723,7 +723,7 @@ class ProductsController extends WebController
     {
         $product = $this->findModel(['id' => $id]);
 
-        list($code, $msg) = $product->openLottery();
+        list($code, $msg) = $product->openLottery(1);
 
         self::showMsg($msg, $code);
     }
