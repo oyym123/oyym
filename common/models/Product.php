@@ -609,7 +609,7 @@ class Product extends Base
                 'total' => $item->total, // 总需要多少人次
                 'order_award_count' => (int)$item->order_award_count, // 已参与人次
                 'residual_total' => $item->getJoinCount(), // 剩余多少人次
-                'residual_time' => $item->residualTime(), // 时间模式结束时间
+                'residual_time' => $item->residualTime(), // 时间模式剩余时间
                 'progress' => $item->progress,
                 'publish_countdown' => $item->getPublishCountdown(),// 揭晓倒计时
                 'a_price' => $item->a_price,// 一口价
@@ -638,7 +638,7 @@ class Product extends Base
                     'total' => $item->product->total, // 总需要多少人次
                     'order_award_count' => (int)$item->product->order_award_count, // 已参与人次
                     'residual_total' => $item->product->getJoinCount(), // 剩余多少人次
-                    'residual_time' => $item->product->residualTime(), // 时间模式结束时间
+                    'residual_time' => $item->product->residualTime(), // 时间模式剩余时间
                     'progress' => $item->product->progress,
                     'publish_countdown' => $item->product->getPublishCountdown(),// 揭晓倒计时
                     'a_price' => $item->product->a_price,// 一口价
@@ -856,7 +856,14 @@ class Product extends Base
     /** 结束时间 */
     public function residualTime()
     {
-        return $this->end_time ? date('Y-m-d H:i:s', $this->end_time) : '';
+        $value = $this->end_time - time();
+        if ($value > 86400) {
+            return floor(($this->end_time - time()) / 86400) . '天';
+        } elseif ($value > 0) {
+            return date('H', $this->end_time) . '点结束';
+        }
+
+        return '已结束';
     }
 }
 

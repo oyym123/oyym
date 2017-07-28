@@ -170,7 +170,7 @@ class ProductsController extends WebController
      *              img=宝贝头图
      *              total=总需人次
      *              residual_total=剩余人次
-     *              residual_time=结束时间
+     *              residual_time=剩余时间
      *              progress=进度
      *              publish_countdown=揭晓倒计时
      *              a_price=一口价
@@ -253,7 +253,7 @@ class ProductsController extends WebController
      *              img=宝贝头图
      *              total=总需人次
      *              residual_total=剩余人次
-     *              residual_time=结束时间
+     *              residual_time=剩余时间
      *              progress=进度
      *              publish_countdown=揭晓倒计时
      *              a_price=一口价
