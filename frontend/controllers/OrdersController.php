@@ -123,17 +123,17 @@ class OrdersController extends WebController
                 Order::STATUS_WAIT_SHIP, // 待发货
                 Order::STATUS_SHIPPED, // 已发货
                 Order::STATUS_CONFIRM_RECEIVING, // 已签收
-                Order::STATUS_RETURN_APPLY, // 退款申请
-                Order::STATUS_RETURN_AGREE, // 卖家同意退款申请
+                Order::STATUS_REFUND_APPLY, // 退款申请
+                Order::STATUS_REFUND_AGREE, // 卖家同意退款申请
                 Order::STATUS_REFUNDED, // 已退款
                 Order::STATUS_WAIT_COMMENT, // 待评价
                 Order::STATUS_COMPLETE, // 已完成
             ]
         ];
 
-        if (in_array($status, [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED])) {
+        if (in_array($status, [Order::STATUS_REFUND_APPLY, Order::STATUS_REFUND_AGREE, Order::STATUS_REFUNDED])) {
             //退款申请 同意退款 已退款, 这三种状态要同时查询
-            $orderModel->params['status'] = [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED];
+            $orderModel->params['status'] = [Order::STATUS_REFUND_APPLY, Order::STATUS_REFUND_AGREE, Order::STATUS_REFUNDED];
         }
 
         list($products, $count) = $orderModel->sellerOrders();
@@ -216,17 +216,17 @@ class OrdersController extends WebController
                 Order::STATUS_WAIT_SHIP, // 待发货
                 Order::STATUS_SHIPPED, // 已发货
                 Order::STATUS_CONFIRM_RECEIVING, // 已签收
-                Order::STATUS_RETURN_APPLY, // 退款申请
-                Order::STATUS_RETURN_AGREE, // 卖家同意退款申请
+                Order::STATUS_REFUND_APPLY, // 退款申请
+                Order::STATUS_REFUND_AGREE, // 卖家同意退款申请
                 Order::STATUS_REFUNDED, // 已退款
                 Order::STATUS_WAIT_COMMENT, // 待评价
                 Order::STATUS_COMPLETE, // 已完成
             ]
         ];
 
-        if (in_array($status, [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED])) {
+        if (in_array($status, [Order::STATUS_REFUND_APPLY, Order::STATUS_REFUND_AGREE, Order::STATUS_REFUNDED])) {
             //退款申请 同意退款 已退款, 这三种状态要同时查询
-            $orderModel->params['status'] = [Order::STATUS_RETURN_APPLY, Order::STATUS_RETURN_AGREE, Order::STATUS_REFUNDED];
+            $orderModel->params['status'] = [Order::STATUS_REFUND_APPLY, Order::STATUS_REFUND_AGREE, Order::STATUS_REFUNDED];
         }
 
         list($products, $count) = $orderModel->buyerOrders();
@@ -760,41 +760,55 @@ class OrdersController extends WebController
     {
         $order = $this->findOrderModel(['sn' => $sn, 'seller_id' => $this->userId]);
 
-        $data = $order->sellerView();
+        $orderProduct = $order->orderProduct;
+
+        if (!$orderProduct) {
+            self::showMsg('获取订单宝贝出错', -1);
+        }
 
         $data = [
             'sn' => $order->sn,
             'status_line' => $order->sellerStatusLine(),
             'buyer_address_info' => [
-                'username' => '李新新 18606615080',
-                'address' => '北京市 朝阳区 五道口街道 润园小区3-302',
-                'product_layout' => '布局样式: 一口价 || 参与众筹',
-                'product_list' => [
-                    [
-                        'id' => 1,
-                        'title' => '',
-                        'img' => '',
-                        'order_award_count' => '总参与人次',
-                        'amount' => '合计金额',
-                        'a_price' => '一口价',
-                    ]
-                ],
-                'luck_user' => [
-                    'user_id' => '',
-                    'username' => '',
-                    'order_sn' => '',
-                    'pay_amount' => '支付宝支付:',
-                ],
-                'share_params' => [
-                    'share_title' => '众筹夺宝',
-                    'share_contents' => '夺宝达人!',
-                    'share_link' => 'http://www.baidu.com',
-                    'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
-                ],
-                ''
-
+                'user_id' => $order->buyer_id,
+                'username' => $order->buyerAddress ? $order->buyerAddress->user_name : '',
+                'telephone' => $order->buyerAddress ? $order->buyerAddress->telephone : '',
+                'address' => $order->buyerAddress ? $order->buyerAddress->str_address : '',
             ],
-
+            'product_layout' => $order->sellerOrderLayout(), // '布局样式: 一口价 || 参与众筹'
+            'product_list' => [
+                [
+                    'id' => $orderProduct->product_id,
+                    'title' => $orderProduct->product ? $orderProduct->product->title : '',
+                    'img' => $orderProduct->product ? $orderProduct->product->headImg() : '',
+                    'order_award_count' => $orderProduct->product ? (int)$orderProduct->product->order_award_count : 0,
+                    'a_price' => $orderProduct->product->a_price,
+                    'unit_price' => $orderProduct->product->unit_price,
+                ]
+            ],
+            'luck_user' => [
+                'user_id' => $order->buyer_id,
+                'username' => $order->buyer ? $order->buyer->getName() : '',
+                'order_sn' => $order->sn,
+                'pay_amount' => $order->getPayTypeText() . ': ' . $order->pay_amount,
+            ],
+            'share_params' => [
+                'share_title' => '众筹夺宝',
+                'share_contents' => '夺宝达人!',
+                'share_link' => 'http://www.baidu.com',
+                'share_img_url' => 'https://www.baidu.com/img/bd_logo1.png',
+            ],
+            'shipping_info' => [
+                'shipping_company' => $order->shippingCompany(),
+                'shipping_number' => $order->shipping_number,
+                'shipping_logs' => Shipping::shippingLogs($order->shipping_company, $order->shipping_number),
+            ],
+            'return_shipping_info' => [
+                'shipping_company' => $order->returnShippingCompany(),
+                'shipping_number' => $order->return_shipping_number,
+                'shipping_logs' => Shipping::shippingLogs($order->return_shipping_company, $order->return_shipping_number),
+            ],
+            'actions' => $order->sellerViewActions()
         ];
 
         self::showMsg($data);

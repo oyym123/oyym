@@ -405,7 +405,8 @@ class PayController extends WebController
      *   ),
      *   @SWG\Response(
      *       response=200,description="
-     *          layout=众筹夺宝 || 一口价, 用来展示不同的布局页面
+     *          order_sn=订单编号
+     *          layout=众筹购买 || 一口价购买, 用来展示不同的布局页面
      *          msg=你成功参与了1件宝贝共计2人次,活动编号如下,
      *          product_title=iphone 6s 完美越狱版
      *          award_code=数组
@@ -422,12 +423,25 @@ class PayController extends WebController
             self::showMsg('支付失败', -1);
         }
 
+        $data = [
+            'order_sn' => $order->sn,
+            'layout' => $order->buyerOrderLayout(),
+            'product_title' => $order->orderProduct ? $order->orderProduct->title : '',
+        ];
+
+        if ($order->isAPriceOrder()) {
+            // 一口价
+            $data += [
+                'msg' => '你成功购买了1件宝贝,订单编号如下',
+            ];
+
+            self::showMsg($data);
+        }
+
         $codes = $order->getAwardCodes();
 
-        $data = [
-            'layout' => $order->isAPriceOrder() ? '一口价' : '众筹夺宝',
+        $data += [
             'msg' => '你成功参与了1件宝贝共计2人次,活动编号如下',
-            'product_title' => $order->orderProduct ? $order->orderProduct->title : '',
             'codes' => $codes
         ];
         foreach ($codes as $code) {

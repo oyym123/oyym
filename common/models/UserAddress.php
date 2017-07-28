@@ -122,7 +122,7 @@ class UserAddress extends Base
         $model->postal = $params['postal'];
         $model->telephone = $params['telephone'];
         $model->status = $params['status'];
-        $model->str_address = $this->mergeAddress($model);
+        $model->str_address = $model->mergeAddress();
         if (!$model->save()) {
             throw new Exception('地址保存失败!');
         }
@@ -133,13 +133,14 @@ class UserAddress extends Base
     }
 
     /** 拼接省市县街道地址 */
-    public function mergeAddress($model)
+    public function mergeAddress()
     {
         $address = [
-            $model->province ? $model->province->name : '',
-            $model->city ? $model->city->name : '',
-            $model->area ? $model->area->name : '',
-            $model->street ? $model->street->name : ''
+            $this->province ? $this->province->name : '',
+            $this->city ? $this->city->name : '',
+            $this->area ? $this->area->name : '',
+//            $this->street ? $this->street->name : '',
+            $this->detail_address,
         ];
         return implode('', $address);
     }
