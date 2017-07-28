@@ -185,7 +185,7 @@ class OrdersController extends WebController
      *              buy_count=购买人次
      *              a_price=一口价
      *              unit_price=单价
-     *              status=状态 [下架 || 进行中 || 待揭晓 || 已揭晓]
+     *              status=状态 [进行中 || 待揭晓 || 已揭晓]
      *              actions=数组下是字典
      *                  [
      *                      title=上架

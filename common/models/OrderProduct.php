@@ -105,6 +105,10 @@ class OrderProduct extends Base
     /** 买家-我参与的/买到的宝贝列表 样式布局 */
     public function buyerProductLayout()
     {
+        if ($this->buy_type == self::A_PRICE) {
+            return '一口价购买';
+        }
+
         $r = '进行中';
         if ($this->product->status == Product::STATUS_IN_PROGRESS) {
             $r = '进行中';
@@ -112,10 +116,6 @@ class OrderProduct extends Base
             $r = '待揭晓';
         } elseif ($this->product->status == Product::STATUS_PUBLISHED) {
             $r = '已揭晓';
-        }
-
-        if ($this->buy_type == self::A_PRICE) {
-            return $this->product->modelTypeText() . '_一口价_买家_' . $r;;
         }
 
         return $this->product->modelTypeText() . '_买家_' . $r;;
