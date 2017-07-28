@@ -20,7 +20,7 @@ use yii\base\Exception;
 class Attention extends Base
 {
     const TYPE_USER = 1; // 用户
-    const PRODUCT_TYPE = 2; //商品
+    const PRODUCT_TYPE = 2; //商品类型
 
     /**
      * @inheritdoc
@@ -33,7 +33,8 @@ class Attention extends Base
     public static function getType()
     {
         return [
-            self::TYPE_USER => '宝贝商品',
+            self::TYPE_USER => '用户',
+            self::PRODUCT_TYPE => '商品类型',
         ];
     }
 
@@ -65,10 +66,13 @@ class Attention extends Base
     }
 
     /** 判断所传类型是否存在 */
-    public function checkType($key)
+    public function checkType($param)
     {
-        if (!array_key_exists($key, self::getType())) {
+        if (!array_key_exists($param['type'], self::getType())) {
             throw new Exception('该关注类型不存在!');
+        }
+        if ($param['type'] == self::TYPE_USER && $param['type_id'] == Yii::$app->user->id) {
+            throw new Exception('不可以关注自己!');
         }
     }
 
@@ -128,8 +132,10 @@ class Attention extends Base
     /** 获取关注的用户*/
     public static function getAttentionUser($offset = 0)
     {
-        return User::find()->where(['attention.type' => Attention::TYPE_USER])->
-        join('LEFT JOIN', 'attention', 'user.id = attention.type_id')->andWhere(['attention.status' => Attention::STATUS_ENABLE])
+        return User::find()->where(['attention.type' => Attention::TYPE_USER])
+            ->join('LEFT JOIN', 'attention', 'user.id = attention.type_id')
+            ->andWhere(['attention.status' => Attention::STATUS_ENABLE])
+            ->andWhere(['user.id' => Yii::$app->user->id])
             ->orderBy('attention.created_at desc')->offset($offset)->limit(20)->all();
     }
 

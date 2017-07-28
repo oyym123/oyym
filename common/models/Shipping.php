@@ -1,12 +1,13 @@
 <?php
 namespace common\models;
 
+use Yii;
+
 /**
  * 快递公司
  */
 class Shipping extends Base
 {
-
     /**
      * @inheritdoc
      */
@@ -16,16 +17,16 @@ class Shipping extends Base
         ];
     }
 
-
-
+    /** 获取快递公司 */
     public static function shippingCompany()
     {
-        return [
-            [
-                'id' => 1,
-                'title' => '',
-            ]
-        ];
+        return require(Yii::getAlias('@common') . '/MysqlFile/kuaidi.php');
+    }
+
+    /** 快递信息html接口 */
+    public function shippingInfo($params)
+    {
+        return "https://m.kuaidi100.com/index_all.html?type={$params['company']}&postid={$params['number']}";
     }
 
     /** 快递日志 */

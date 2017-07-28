@@ -287,9 +287,9 @@ class UsersController extends WebController
 
     public function actionTest()
     {
-       $t=serialize(['id' => 1]);
-       echo $t;
+        $t = serialize(['id' => 1]);
+        echo $t;
         exit;
-       var_dump(unserialize('a:1:{s:2:"id";i:8;}')['id']);
+        var_dump(unserialize('a:1:{s:2:"id";i:8;}')['id']);
     }
 }

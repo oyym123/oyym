@@ -59,7 +59,7 @@ class ProductController extends Controller
         $crontab->params = '';
         $crontab->type = $type;
         $crontab->exec_max_count = 1000;
-        $crontab->exec_start_time = time() + 30;
+        $crontab->exec_start_time = time() + 60;
         $crontab->status = Crontab::WAIT;
         if (!$crontab->save()) {
             echo '保存进度失败';

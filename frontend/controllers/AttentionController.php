@@ -61,7 +61,7 @@ class AttentionController extends WebController
         $params['type_id'] = Yii::$app->request->get('id');
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $attention->checkType($params['type']);
+            $attention->checkType($params);
             if ($model = $attention->attentionFlag($params)) {
                 $model->status = Base::STATUS_ENABLE;
                 if (!$model->save()) {

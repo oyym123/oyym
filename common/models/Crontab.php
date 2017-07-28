@@ -73,7 +73,7 @@ class Crontab extends Base
         foreach ($data as $item) {
             if (!Yii::$app->redis->get($type . 'crontab' . $item)) {
                 $crontab = $this->findModel($item);
-                if ($crontab->exec_count < $crontab->exec_max_count) {
+                if ($crontab->exec_count < $crontab->exec_max_count && in_array($crontab->status, [0, 3])) {
                     $this->route($item, $type);
                 }
             }

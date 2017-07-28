@@ -86,7 +86,7 @@ class Order extends Base
     public function rules()
     {
         return [
-            [['freight', 'deleted_at', 'address_id', 'shipping_company', 'return_shipping_company'], 'default', 'value' => '0'],
+            [['freight', 'deleted_at', 'address_id'], 'default', 'value' => '0'],
             [[''], 'default', 'value' => ''],
             [['buyer_id', 'seller_id', 'sn', 'status', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
