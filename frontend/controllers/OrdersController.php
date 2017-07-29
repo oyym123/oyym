@@ -840,8 +840,8 @@ class OrdersController extends WebController
                     'title' => $orderProduct->product ? $orderProduct->product->title : '',
                     'img' => $orderProduct->product ? $orderProduct->product->headImg() : '',
                     'order_award_count' => $orderProduct->product ? (int)$orderProduct->product->order_award_count : 0,
-                    'a_price' => $orderProduct->product->a_price,
-                    'unit_price' => $orderProduct->product->unit_price,
+                    'a_price' => '￥' . $orderProduct->product->a_price,
+                    'unit_price' => '￥' . $orderProduct->product->unit_price,
                 ]
             ],
             'luck_user' => [

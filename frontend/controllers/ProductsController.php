@@ -120,12 +120,12 @@ class ProductsController extends WebController
                 'comments' => $product->comments,
                 'like' => $product->likes,
                 'layout_type' => $layoutType ? 1 : $product->listLayoutType(),//单价排序,布局默认为1
-                'a_price' => $product->a_price ?: 0.00,
+                'a_price' => $product->a_price ? '￥' . $product->a_price : '￥' . 0.00,
                 // 布局类型
                 'zongjia' => $product->total,
                 'collection_flag' => $product->getIsCollection(),
                 'like_flag' => $product->getIsLike(),
-                'unit_price' => $product->unit_price,
+                'unit_price' => '￥' . $product->unit_price,
                 'end_time' => $product->end_time,
                 'share_params' => [
                     'share_title' => '众筹夺宝',
@@ -356,8 +356,8 @@ class ProductsController extends WebController
             $product->created_at = time();
             $product->updated_at = time();
             $product->total = $data['total'];
-            $product->unit_price = $data['unit_price'];
-            $product->a_price = $data['a_price'] ?: '';
+            $product->unit_price = '￥' . $data['unit_price'];
+            $product->a_price = '￥' . $data['a_price'] ?: '';
             $product->start_time = $data['start_time'] ?: '';
             $product->end_time = $data['end_time'] ?: '';
             $product->type_id = $data['type_id'];
@@ -456,8 +456,8 @@ class ProductsController extends WebController
             $product->freight = $data['freight'];
             $product->status = Product::STATUS_IN_PROGRESS;
             $product->total = $data['total'];
-            $product->unit_price = $data['unit_price'];
-            $product->a_price = $data['a_price'] ?: '';
+            $product->unit_price = '￥' . $data['unit_price'];
+            $product->a_price = '￥' . $data['a_price'] ?: '';
             $product->start_time = $data['start_time'] ?: '';
             $product->end_time = $data['end_time'] ?: '';
             $product->type_id = $data['type_id'];
@@ -589,9 +589,9 @@ class ProductsController extends WebController
             'like_flag' => $item->getIsLike(), // 喜欢标志
             'comments' => $item->comments, // 评论
             'layout_type' => $item->viewLayoutType(), // 布局类型
-            'unit_price' => $item->unit_price,
+            'unit_price' => '￥' . $item->unit_price,
             'freight' => $item->freight,
-            'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
+            'a_price' => '￥' . $item->a_price ?: 0.00, // 一口价,若有则为大于0 的值,没有则为 0
             'total' => $item->total, // 需要参与人次
 //            'remaining' => $item->total - $participants, // 剩余人次
             'residual_total' => $item->getJoinCount(), // 剩余多少人次
@@ -608,7 +608,7 @@ class ProductsController extends WebController
                         'value' => $item->getLuckUserName(),
                         [
                             'title' => '参与方式:',
-                            'value' => "一口价{$item->a_price}元购买"
+                            'value' => "一口价{￥$item->a_price}元购买"
                         ],
                         [
                             'title' => '购买时间:',
@@ -704,8 +704,8 @@ class ProductsController extends WebController
             'videos' => $item->getVideos(), // 视频
             'title' => $item->title, // 宝贝标题
             'contents' => $item->contents, // 宝贝介绍
-            'unit_price' => $item->unit_price, // 宝贝单价
-            'a_price' => $item->a_price, // 宝贝一口价
+            'unit_price' => '￥' . $item->unit_price, // 宝贝单价
+            'a_price' => '￥' . $item->a_price, // 宝贝一口价
             'total' => $item->total, // 需要参与人次
             'start_time' => date('Y年m月d日H时', $item->start_time), // 宝贝开始时间
             'end_time' => date('Y年m月d日H时', $item->end_time), // 宝贝结束时间
