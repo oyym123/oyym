@@ -691,9 +691,9 @@ class ProductsController extends WebController
     {
         $item = $this->findModel(['id' => $id, 'created_by' => Yii::$app->user->identity->id]);
 
-        list($code, $msg) = $item->canUpdate(Yii::$app->user->identity->id);
+        list($errCode, $msg) = $item->canUpdate(Yii::$app->user->identity->id);
 
-        if (!$code) {
+        if ($errCode) {
             self::showMsg($msg, -1);
         }
 
