@@ -659,12 +659,14 @@ class ProductsController extends WebController
      *          id=宝贝id
      *          images=相册 数组加字典 [
      *              [
+     *                  id=数据id
      *                  name=图片七牛名字
      *                  url=图片七牛地址
      *              ]
      *          ]
      *          videos=视频 数组加字典 [
      *              [
+     *                  id=数据id
      *                  name=视频七牛名字
      *                  url=视频七牛地址
      *              ]
@@ -696,30 +698,10 @@ class ProductsController extends WebController
             self::showMsg($msg, -1);
         }
 
-        $images = [];
-        if ($x = $item->getImages()) {
-            foreach ($x as $image) {
-                $images[] = [
-                    'url' => $image->qiniuUrl(),
-                    'name' => $image->name,
-                ];
-            }
-        }
-
-        $videos = [];
-        if ($x = $item->getVideos()) {
-            foreach ($x as $video) {
-                $videos[] = [
-                    'url' => $video->qiniuUrl(),
-                    'name' => $video->name,
-                ];
-            }
-        }
-
         $data = [
             'id' => $item->id, // 宝贝id
-            'images' => $images, // 相册
-            'videos' => $videos, // 视频
+            'images' => $item->getImages(), // 相册
+            'videos' => $item->getVideos(), // 视频
             'title' => $item->title, // 宝贝标题
             'contents' => $item->contents, // 宝贝介绍
             'unit_price' => $item->unit_price, // 宝贝单价
