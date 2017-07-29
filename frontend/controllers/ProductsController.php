@@ -455,8 +455,8 @@ class ProductsController extends WebController
             $product->freight = $data['freight'];
             $product->status = Product::STATUS_IN_PROGRESS;
             $product->total = $data['total'];
-            $product->unit_price = '￥' . $data['unit_price'];
-            $product->a_price = '￥' . $data['a_price'] ?: '';
+            $product->unit_price = $data['unit_price'];
+            $product->a_price = $data['a_price'] ?: '';
             $product->start_time = $data['start_time'] ?: '';
             $product->end_time = $data['end_time'] ?: '';
             $product->type_id = $data['type_id'];
