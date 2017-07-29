@@ -503,7 +503,6 @@ class OrdersController extends WebController
         try {
             $order->setAddress(Yii::$app->request->post('address_id'));
             $newOrder = $order->create();
-
             $order->saveProducts($newOrder);
             $order->saveCoupon($newOrder);
 
@@ -905,11 +904,17 @@ class OrdersController extends WebController
      * Desc:
      * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
      * Date: 2017-07-29
-     * @SWG\Get(path="/orders/seller-shipping",
+     * @SWG\Post(path="/orders/seller-shipping",
      *   tags={"我的"},
      *   summary="卖家发货",
      *   description="Author: lixinxin",
      *   @SWG\Parameter(name="sn", in="query", required=true, type="string", default="201707101223",
+     *     description=""
+     *   ),
+     *   @SWG\Parameter(name="shipping_company_code", in="query", required=true, type="string", default="快递公司代码",
+     *     description=""
+     *   ),
+     *   @SWG\Parameter(name="shipping_number", in="query", required=true, type="string", default="快递单号",
      *     description=""
      *   ),
      *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
@@ -920,11 +925,24 @@ class OrdersController extends WebController
      *   )
      * )
      */
-    public function actionSellerShipping(){
+    public function actionSellerShipping()
+    {
+        $order = $this->findOrderModel(['sn' => Yii::$app->request->post('sn'), 'seller_id' => $this->userId]);
+        if (!$order->isCanShipping()) {
+            self::showMsg('订单状态不允许发货', -1);
+        }
 
+        $order->shipping_company = Yii::$app->request->post('shipping_company_code');
+        $order->shipping_number = Yii::$app->request->post('shipping_number');
+        $order->status = Order::STATUS_SHIPPED;
+        $order->seller_shipped_at = time();
+
+        if (!$order->save()) {
+            self::showMsg('发货失败', -1);
+        }
+
+        self::showMsg('发货成功');
     }
-
-
 
 
 }

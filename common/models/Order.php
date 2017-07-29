@@ -86,8 +86,8 @@ class Order extends Base
     public function rules()
     {
         return [
-            [['freight', 'deleted_at', 'address_id'], 'default', 'value' => '0'],
-            [[''], 'default', 'value' => ''],
+            [['freight', 'deleted_at', 'address_id', 'seller_shipped_at', 'buyer_shipped_at'], 'default', 'value' => '0'],
+            [['return_shipping_company', 'shipping_company'], 'default', 'value' => ''],
             [['buyer_id', 'seller_id', 'sn', 'status', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
@@ -290,10 +290,9 @@ class Order extends Base
         $this->product_amount = $this->productsAmount;
         $this->discount_amount = $this->discountAmount;
         $this->freight = $this->freight;
+        $this->address_id = 0;
         $this->pay_type = 0;
-
         if (!$this->save()) {
-//            print_r($this->getErrors());exit;
             throw new Exception('创建订单失败');
         }
 

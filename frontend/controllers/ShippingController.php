@@ -2,9 +2,7 @@
 
 namespace frontend\controllers;
 
-use common\models\Base;
 use common\models\Shipping;
-use yii\base\Exception;
 use frontend\components\WebController;
 use Yii;
 
@@ -39,10 +37,7 @@ class ShippingController extends WebController
                 'code' => $key,
                 'title' => $val,
             ];
-
-
         }
         self::showMsg($data);
-
     }
 }
