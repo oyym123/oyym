@@ -697,8 +697,8 @@ class ProductsController extends WebController
         }
 
         $images = [];
-        if ($item->images) {
-            foreach ($item->images as $image) {
+        if ($x = $item->getImages()) {
+            foreach ($x as $image) {
                 $images[] = [
                     'url' => $image->qiniuUrl(),
                     'name' => $image->name,
@@ -707,8 +707,8 @@ class ProductsController extends WebController
         }
 
         $videos = [];
-        if ($item->videos) {
-            foreach ($item->videos as $video) {
+        if ($x = $item->getVideos()) {
+            foreach ($x as $video) {
                 $videos[] = [
                     'url' => $video->qiniuUrl(),
                     'name' => $video->name,
