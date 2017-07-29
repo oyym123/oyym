@@ -120,8 +120,7 @@ class ProductsController extends WebController
                 'comments' => $product->comments,
                 'like' => $product->likes,
                 'layout_type' => $layoutType ? 1 : $product->listLayoutType(),//单价排序,布局默认为1
-                'a_price' => $product->a_price ? '￥' . $product->a_price : '￥' . 0.00,
-                // 布局类型
+                'a_price' => $product->a_price ? $product->a_price : 0.00,
                 'zongjia' => $product->total,
                 'collection_flag' => $product->getIsCollection(),
                 'like_flag' => $product->getIsLike(),
@@ -713,7 +712,7 @@ class ProductsController extends WebController
             'detail_address' => $item->detail_address, // 定位地址
             'lat' => $item->lat, // 纬度
             'lng' => $item->lng, // 经'度
-            'freight' => $item->freight, // 运费
+            'freight' => '￥' . $item->freight, // 运费
             'type_id' => $item->type_id, // 分类id
             'type_text' => $item->typeModel ? $item->typeModel->name : '', // 分类名称
         ];

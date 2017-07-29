@@ -883,6 +883,9 @@ class OrdersController extends WebController
      *   @SWG\Parameter(name="sn", in="query", required=true, type="string", default="201707101223",
      *     description=""
      *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -896,5 +899,32 @@ class OrdersController extends WebController
 
         self::showMsg($data);
     }
+
+    /**
+     * Name: actionSellerShipping
+     * Desc:
+     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
+     * Date: 2017-07-29
+     * @SWG\Get(path="/orders/seller-shipping",
+     *   tags={"我的"},
+     *   summary="卖家发货",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(name="sn", in="query", required=true, type="string", default="201707101223",
+     *     description=""
+     *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function actionSellerShipping(){
+
+    }
+
+
+
 
 }
