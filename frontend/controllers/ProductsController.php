@@ -30,7 +30,7 @@ class ProductsController extends WebController
     {
         parent::init();
         if (empty($this->userId) && in_array(str_replace('products/', '', Yii::$app->requestedRoute), [
-                'create', 'lottery', 'seller-product-list', 'buyer-product-list'
+                'create', 'lottery', 'seller-product-list', 'buyer-product-list', 'info'
             ])
         ) {
             self::needLogin();
@@ -88,7 +88,7 @@ class ProductsController extends WebController
      *     name="user_id", in="query", required=false, default="0", type="string",
      *     description="取某个卖家的数据"
      *   ),
-     *  @SWG\Parameter(
+     *   @SWG\Parameter(
      *     name="ky-token", in="header", required=false, type="integer", default="1",
      *    ),
      *   @SWG\Response(
@@ -555,7 +555,7 @@ class ProductsController extends WebController
      *          comment_count=评论总数
      *          comment_list=评论列表数组
      *              user_count=评论人数
-     *              list
+     *              list≥
      *                  id=评论id
      *                  user_photo=评论用户头像地址
      *                  comment_line_id=评论的上级id,用于区分我评论的谁的评论
@@ -637,6 +637,93 @@ class ProductsController extends WebController
             ],
             'actions' => $item->buttonType(),
             'publish_countdown' => $item->getPublishCountdown(), // 揭晓倒计时以秒为单位
+        ];
+        self::showMsg($data);
+    }
+
+    /**
+     * @param $id
+     * @SWG\Get(path="/products/info",
+     *   tags={"产品"},
+     *   summary="修改宝贝获取宝贝信息",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(
+     *     name="id", in="query", required=true, type="integer", default="1",
+     *     description="产品ID",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="ky-token", in="header", required=false, type="integer", default="1",
+     *    ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          id=宝贝id
+     *          images=相册
+     *          videos=视频
+     *          title=宝贝标题
+     *          contents=宝贝介绍
+     *          unit_price=宝贝单价
+     *          a_price=宝贝一口价
+     *          total=需要参与人次
+     *          start_time=宝贝开始时间
+     *          end_time=宝贝结束时间
+     *          model=模式 1=数量模式 2=时间模式
+     *          detail_address=定位地址
+     *          lat=纬度
+     *          lng=经度
+     *          freight=运费
+     *          type_id=分类id
+     *          type_text=分类名称"
+     *   )
+     * )
+     */
+    public function actionInfo($id)
+    {
+        $item = $this->findModel(['id' => $id, 'created_by' => Yii::$app->user->identity->id]);
+
+        list($code, $msg) = $item->canUpdate(Yii::$app->user->identity->id);
+
+        if (!$code) {
+            self::showMsg($msg, -1);
+        }
+
+        $images = [];
+        if ($item->images) {
+            foreach ($item->images as $image) {
+                $images[] = [
+                    'url' => $image->qiniuUrl(),
+                    'name' => $image->name,
+                ];
+            }
+        }
+
+        $videos = [];
+        if ($item->videos) {
+            foreach ($item->videos as $video) {
+                $videos[] = [
+                    'url' => $video->qiniuUrl(),
+                    'name' => $video->name,
+                ];
+            }
+        }
+
+        $data = [
+            'id' => $item->id, // 宝贝id
+            'images' => $images, // 相册
+            'videos' => $videos, // 视频
+            'title' => $item->title, // 宝贝标题
+            'contents' => $item->contents, // 宝贝介绍
+            'unit_price' => $item->unit_price, // 宝贝单价
+            'a_price' => $item->a_price, // 宝贝一口价
+            'total' => $item->total, // 需要参与人次
+            'start_time' => date('Y年m月d日H时', $item->start_time), // 宝贝开始时间
+            'end_time' => date('Y年m月d日H时', $item->end_time), // 宝贝结束时间
+            'model' => $item->model, // 模式 1' => , // 数量模式 2' => , // 时间模式
+            'detail_address' => $item->detail_address, // 定位地址
+            'lat' => $item->lat, // 纬度
+            'lng' => $item->lng, // 经'度
+            'freight' => $item->freight, // 运费
+            'type_id' => $item->type_id, // 分类id
+            'type_text' => $item->typeModel ? $item->typeModel->name : '', // 分类名称
         ];
         self::showMsg($data);
     }

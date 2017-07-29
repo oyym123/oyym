@@ -15,6 +15,7 @@ use common\models\OrderLog;
 use common\models\OrderPay;
 use common\models\Product;
 use common\models\ProductImage;
+use common\models\Shipping;
 use common\models\UploadForm;
 use common\models\UserAddress;
 use frontend\components\WebController;
@@ -745,8 +746,72 @@ class OrdersController extends WebController
      *   @SWG\Parameter(name="sn", in="query", required=true, type="string", default="201707101223",
      *     description=""
      *   ),
+     *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
+     *     description="用户ky-token",
+     *    ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *          order_sn = 订单号
+     *          status_line = 订单状态线,数组下是字典格式
+     *          [
+     *              title = 已付款
+     *              layout = 1=亮色, 0=灰色
+     *          ]
+     *          buyer_address_info = 字典
+     *          [
+     *              username = 收货人姓名
+     *              telephone = 收货人电话
+     *              address = 收货人地址
+     *          ]
+     *          product_layout = 宝贝展示布局样式[ 一口价购买 || 参与众筹购买]
+     *          product_list = 宝贝信息,数组和字典[
+     *              [
+     *                  id = 宝贝id
+     *                  title = 宝贝标题
+     *                  img = 宝贝头图
+     *                  order_award_count = 已参与人次
+     *                  a_price = 一口价
+     *                  unit_price = 单价
+     *              ]
+     *          ]
+     *          luck_user = 字典 [
+     *              user_id = 用户id
+     *              username = 用户昵称
+     *              pay_amount = 支付金额
+     *          ]
+     *          share_params = 分享参数字典
+     *              share_title = 众筹夺宝
+     *              share_contents = 夺宝达人
+     *              share_link = 链接
+     *              share_img_url = 图标url
+     *          shipping_info
+     *              shipping_number = 快递单号
+     *              shipping_company = 快递公司
+     *              shipping_logs = 快递日志
+     *              [
+     *                  [
+     *                      title = 已签收
+     *                      date_time = 2017-02-01 21:12
+     *                  ]
+     *              ]
+     *          return_shipping_info
+     *              shipping_number = 快递单号
+     *              shipping_company = 快递公司
+     *              shipping_logs = 快递日志
+     *              [
+     *                  [
+     *                      title = 已签收
+     *                      date_time = 2017-02-01 21:12
+     *                  ]
+     *              ]
+     *          actions 可以操作的[
+     *              [
+     *                  title = 发货
+     *                  url = shipping
+     *              ]
+     *          ]
+     *
+     *     "
      *   )
      * )
      */
@@ -761,10 +826,9 @@ class OrdersController extends WebController
         }
 
         $data = [
-            'sn' => $order->sn,
-            'status_line' => $order->sellerStatusLine(),
+            'order_sn' => $order->sn,
+            'status_line' => $order->statusLine(),
             'buyer_address_info' => [
-                'user_id' => $order->buyer_id,
                 'username' => $order->buyerAddress ? $order->buyerAddress->user_name : '',
                 'telephone' => $order->buyerAddress ? $order->buyerAddress->telephone : '',
                 'address' => $order->buyerAddress ? $order->buyerAddress->str_address : '',
@@ -772,7 +836,7 @@ class OrdersController extends WebController
             'product_layout' => $order->sellerOrderLayout(), // '布局样式: 一口价 || 参与众筹'
             'product_list' => [
                 [
-                    'id' => $orderProduct->product_id,
+                    'id' => $orderProduct->pid,
                     'title' => $orderProduct->product ? $orderProduct->product->title : '',
                     'img' => $orderProduct->product ? $orderProduct->product->headImg() : '',
                     'order_award_count' => $orderProduct->product ? (int)$orderProduct->product->order_award_count : 0,
@@ -783,7 +847,6 @@ class OrdersController extends WebController
             'luck_user' => [
                 'user_id' => $order->buyer_id,
                 'username' => $order->buyer ? $order->buyer->getName() : '',
-                'order_sn' => $order->sn,
                 'pay_amount' => $order->getPayTypeText() . ': ' . $order->pay_amount,
             ],
             'share_params' => [

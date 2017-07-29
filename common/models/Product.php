@@ -86,6 +86,12 @@ class Product extends Base
         return ArrayHelper::getValue(self::$modelType, $this->model, '');
     }
 
+    /** 获取宝贝分类 */
+    public function getTypeModel()
+    {
+        return $this->hasOne(ProductType::className(), ['id' => 'type_id']);
+    }
+
     /**
      * @inheritdoc
      */
