@@ -1337,31 +1337,13 @@
                 }
             }
         },
-        "/orders/shipping-company": {
+        "/shipping/companies": {
             "get": {
                 "tags": [
                     "\u6211\u7684"
                 ],
                 "summary": "\u83b7\u53d6\u5feb\u9012\u516c\u53f8",
                 "description": "Author: lixinxin",
-                "parameters": [
-                    {
-                        "name": "sn",
-                        "in": "query",
-                        "description": "",
-                        "required": true,
-                        "type": "string",
-                        "default": "201707101223"
-                    },
-                    {
-                        "name": "ky-token",
-                        "in": "header",
-                        "description": "\u7528\u6237ky-token",
-                        "required": true,
-                        "type": "integer",
-                        "default": "1"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "\n     *          list = \u6570\u5b57\u52a0\u5b57\u5178[\n     *              code = shunfeng\n     *              title = \u987a\u4e30\n     *          ]\n     *     "
