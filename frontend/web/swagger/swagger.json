@@ -1598,7 +1598,7 @@
             }
         },
         "/users/upload-user-photo": {
-            "get": {
+            "post": {
                 "tags": [
                     "\u8bbe\u7f6e"
                 ],
@@ -1615,7 +1615,7 @@
                     },
                     {
                         "name": "url",
-                        "in": "query",
+                        "in": "formData",
                         "description": "\u56fe\u7247\u5730\u5740",
                         "required": true,
                         "type": "string",
@@ -1623,7 +1623,7 @@
                     },
                     {
                         "name": "name",
-                        "in": "query",
+                        "in": "formData",
                         "description": "\u56fe\u7247\u5730\u5740",
                         "required": true,
                         "type": "string",

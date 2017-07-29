@@ -185,17 +185,17 @@ class UsersController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/users/upload-user-photo",
+     * @SWG\Post(path="/users/upload-user-photo",
      *   tags={"设置"},
      *   summary="上传用户头像接口",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="ky-token", in="header", required=true, type="integer", default="1",
      *     description="用户ky-token",
      *    ),
-     *   @SWG\Parameter(name="url", in="query", default="abc.jpg", description="图片地址", required=true,
+     *   @SWG\Parameter(name="url", in="formData", default="abc.jpg", description="图片地址", required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="name", in="query", default="abc.jpg", description="图片地址", required=true,
+     *   @SWG\Parameter(name="name", in="formData", default="abc.jpg", description="图片地址", required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -249,6 +249,7 @@ class UsersController extends WebController
         $model = UserInfo::findOne(['user_id' => $this->userId]);
         self::showMsg([
             'user_photo' => $model->photoUrl($model->id),
+            'intro' => $model->intro,
             'zhima' => '700'
         ]);
     }
