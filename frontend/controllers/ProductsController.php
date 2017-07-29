@@ -370,7 +370,7 @@ class ProductsController extends WebController
                     'name' => $image['name'],
                     'type' => Image::TYPE_PRODUCT,
                     'type_id' => $product->id,
-                    'url' => $image['url'],
+                    'url' => $image['key'],
                     'size_type' => Image::SIZE_MEDIUM,
                     'status' => Base::STATUS_ENABLE,
                 ];
@@ -382,7 +382,7 @@ class ProductsController extends WebController
                     'name' => $video['name'],
                     'type' => Video::TYPE_PRODUCT,
                     'type_id' => $product->id,
-                    'url' => $video['url'],
+                    'url' => $video['key'],
                     'size_type' => Video::SIZE_HD,
                     'status' => Base::STATUS_ENABLE,
                 ];
@@ -478,7 +478,7 @@ class ProductsController extends WebController
                     'name' => $image['name'],
                     'type' => Image::TYPE_PRODUCT,
                     'type_id' => $product->id,
-                    'url' => $image['url'],
+                    'url' => $image['key'],
                     'size_type' => Image::SIZE_MEDIUM,
                     'status' => Base::STATUS_ENABLE,
                 ];
@@ -490,7 +490,7 @@ class ProductsController extends WebController
                     'name' => $video['name'],
                     'type' => Video::TYPE_PRODUCT,
                     'type_id' => $product->id,
-                    'url' => $video['url'],
+                    'url' => $video['key'],
                     'size_type' => Video::SIZE_HD,
                     'status' => Base::STATUS_ENABLE,
                 ];

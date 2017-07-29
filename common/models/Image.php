@@ -102,7 +102,6 @@ class Image extends Base
         foreach ($images as $image) {
             if ($image->url) {
                 $data[] = [
-//                    'id' => $image->id,
                     'url' => QiniuHelper::downloadImageUrl(Yii::$app->params['qiniu_url_images'], $image->url),
                     'name' => $image->name ?: '',
                     'key' => $image->url
