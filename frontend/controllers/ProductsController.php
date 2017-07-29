@@ -659,16 +659,16 @@ class ProductsController extends WebController
      *          id=宝贝id
      *          images=相册 数组加字典 [
      *              [
-     *                  id=数据id
-     *                  name=图片七牛名字
-     *                  url=图片七牛地址
+     *                  name=图片名字 例如: 宝贝图片1
+     *                  url=图片七牛地址 http://***.jpg
+     *                  key=七牛key
      *              ]
      *          ]
      *          videos=视频 数组加字典 [
      *              [
-     *                  id=数据id
      *                  name=视频七牛名字
      *                  url=视频七牛地址
+     *                  key=七牛key
      *              ]
      *          ]
      *          title=宝贝标题
