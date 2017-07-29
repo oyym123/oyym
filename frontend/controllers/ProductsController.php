@@ -657,8 +657,18 @@ class ProductsController extends WebController
      *   @SWG\Response(
      *       response=200,description="
      *          id=宝贝id
-     *          images=相册
-     *          videos=视频
+     *          images=相册 数组加字典 [
+     *              [
+     *                  name=图片七牛名字
+     *                  url=图片七牛地址
+     *              ]
+     *          ]
+     *          videos=视频 数组加字典 [
+     *              [
+     *                  name=视频七牛名字
+     *                  url=视频七牛地址
+     *              ]
+     *          ]
      *          title=宝贝标题
      *          contents=宝贝介绍
      *          unit_price=宝贝单价
