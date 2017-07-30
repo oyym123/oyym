@@ -41,7 +41,7 @@ class ChatController extends WebController
     {
         parent::init();
         if (empty(Yii::$app->user->id) && in_array(Yii::$app->requestedRoute, [
-                'chat/user-get',
+                'chat/all-user-get',
             ])
         ) {
             self::needHtmlLogin();
