@@ -58,6 +58,12 @@ class UserInfo extends Base
         return $this->hasOne(City::className(), ['id' => 'province']);
     }
 
+    public function getPublishNumber($userId, $type)
+    {
+        return Product::find()->where(['created_by' => $userId])->count();
+    }
+
+
     /** 用户头像地址 */
     public function photoUrl($userId)
     {

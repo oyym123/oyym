@@ -38,6 +38,7 @@ $resp = $c->execute($req);
 
 echo json_encode($resp);
 
+
 function check()
 {
     if (empty($_POST)) {
@@ -53,5 +54,6 @@ function check()
 
     return $md5 == $sign;
 }
+
 
 ?>

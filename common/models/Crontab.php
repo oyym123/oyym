@@ -54,7 +54,6 @@ class Crontab extends Base
         foreach ($crontabs as $key => $crontab) {
             if ($crontab->exec_count < $crontab->exec_max_count) {
                 Yii::$app->redis->del($type . 'crontab' . $crontab->id);
-                Yii::$app->redis->del($type . 'crontab_ids');
                 if ($crontab->status == self::FAIL) {
                     Yii::$app->redis->setex($type . 'crontab' . $crontab->id, 3, 1);
                     Yii::$app->redis->zadd($type . 'crontab_ids', $key, $crontab->id);

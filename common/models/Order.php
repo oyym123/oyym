@@ -87,7 +87,7 @@ class Order extends Base
     {
         return [
             [['freight', 'deleted_at', 'address_id'], 'default', 'value' => '0'],
-            [[''], 'default', 'value' => ''],
+//            [['sn'], 'default', 'value' => (string) time()],
             [['buyer_id', 'seller_id', 'sn', 'status', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],

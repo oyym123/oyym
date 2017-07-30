@@ -733,30 +733,40 @@ class Product extends Base
     }
 
     /** 是否允许开奖 */
-    public function canOpenLottery()
+    public function canOpenLottery($flag)
     {
-        if (in_array($this->status, [Product::STATUS_WAIT_PUBLISH])
-            && Yii::$app->user->identity
-            && $this->created_by > 0
-            && $this->created_by == Yii::$app->user->identity->id
-        ) {
-            // 待揭晓状态 且 是卖家
+        if ($flag == 1) {
+            if (in_array($this->status, [Product::STATUS_WAIT_PUBLISH])
+                && Yii::$app->user->identity
+                && $this->created_by > 0
+                && $this->created_by == Yii::$app->user->identity->id
+            ) {
+                // 待揭晓状态 且 是卖家
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+        if (in_array($this->status, [Product::STATUS_WAIT_PUBLISH]) && $this->created_by > 0) {
             return 1;
         }
+
         return 0;
     }
 
     /** 开奖 */
     public function openLottery($flag = 0)
     {
-        if ($flag == 1) { //flag==1表示用户开奖
-            if (!$this->canOpenLottery()) {
-                return [-1, '不允许开奖'];
-            }
+
+        if (!$this->canOpenLottery($flag)) {
+            return [-1, '不允许开奖'];
         }
+
         $query = $this->getNumberAModel();
 
         $count = $query->count();
+
         if ($count < 1) {
             return [-1, '没有人参与不能开奖'];
         }
@@ -790,13 +800,16 @@ class Product extends Base
                 throw new Exception('订单不存在');
                 Yii::error($this->getErrors(), 'order');
             } else {
+
                 $this->order->status = Order::STATUS_WAIT_SHIP; // 等待发货
+                $orderModel = Order::findOne($this->order->id);
+                $orderModel->save();
+
                 if (!$this->order->save()) {
                     throw new Exception('更新订单失败');
                     Yii::error($this->order->getErrors(), 'order');
                 }
             }
-
             $transaction->commit();
             return [0, '您成功抽中一名中奖用户'];
         } catch (Exception $e) {

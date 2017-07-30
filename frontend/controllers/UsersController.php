@@ -293,6 +293,16 @@ class UsersController extends WebController
     }
 
 
+    public function actionHome()
+    {
+        $userInfo = UserInfo::findOne(['user_id' => $this->userId]);
+        $data = [
+            'publish_number' => $userInfo->getPublishNumber($userInfo->user_id),
+        ];
+        self::showMsg($data);
+    }
+
+
     public function actionTest()
     {
         $t = serialize(['id' => 1]);
