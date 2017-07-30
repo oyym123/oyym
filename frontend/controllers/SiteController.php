@@ -151,16 +151,18 @@ class SiteController extends Controller
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->signup()) {
-                if (Yii::$app->getUser()->login($user)) {
-                    return $this->goHome();
+                if ($model->setUserInfo($user)) {
+                    if (Yii::$app->getUser()->login($user)) {
+                        return $this->goHome();
+                    }
                 }
             }
         }
-
         return $this->render('signup', [
             'model' => $model,
         ]);
     }
+
 
     /**
      * Requests password reset.

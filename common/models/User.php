@@ -231,6 +231,14 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
+    /** 获取所有用户ID */
+    public static function getAllUserId()
+    {
+        return User::find()->select('id')->where([
+            'status' => User::STATUS_ACTIVE
+        ])->asArray()->all();
+    }
+
     /** 处理用户ID，用于环信username */
     public static function hxUserName($id)
     {
@@ -241,7 +249,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return ArrayHelper::getValue(static::status(), $this->status);
     }
-    
+
     public function setToken()
     {
         $this->token = md5($this->id . $this->username . $this->password_hash . time());

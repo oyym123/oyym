@@ -33,7 +33,6 @@ class LoginController extends WebController
         $model = new LoginForm();
         if ($model->load($data) && $model->login()) {
             $userInfo = $model->user->info;
-
             $oldToken = $model->user->getToken();
 
             $model->user->setToken();

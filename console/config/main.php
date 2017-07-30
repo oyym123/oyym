@@ -28,7 +28,7 @@ return [
         ],
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=localhost;dbname=zcdb',
+            'dsn' => 'mysql:host=localhost;dbname=oyym',
             'username' => 'root',
             'password' => 'leaves_9876',
             'charset' => 'utf8',

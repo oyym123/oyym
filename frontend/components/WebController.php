@@ -71,6 +71,15 @@ class WebController extends Controller
         self::showMsg('需要登录', -100);
     }
 
+    public function needHtmlLogin()
+    {
+        Yii::$app->session->setFlash('error', '需要您先登录，才能进行操作哦O(∩_∩)O~~');
+        echo '<html>
+    <head><span style="font-size:18px;">   </span><span style="font-size:24px;"><meta http-equiv="refresh" content="0.01;URL=../index.php"> </span>  <head>
+<html>';
+        exit;
+    }
+
     /**
      * 解析并送出JSON
      * 200101

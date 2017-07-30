@@ -37,10 +37,20 @@ class ChatController extends WebController
 //        self::showMsg($chat->changeNickName());
 //    }
 
+    public function init()
+    {
+        parent::init();
+        if (empty(Yii::$app->user->id) && in_array(Yii::$app->requestedRoute, [
+                'chat/user-get',
+            ])
+        ) {
+            self::needHtmlLogin();
+        }
+    }
+
     /** 新增IM用户 */
     public function actionUserAdd()
     {
-
         $params = [
             'userid' => 'kk1',
             'password' => '123456',
@@ -52,12 +62,43 @@ class ChatController extends WebController
         self::showMsg($data);
     }
 
-    /** 获取IM用户信息 */
+    /** 获取单个IM用户信息 */
     public function actionUserGet()
     {
         $chat = new TaoBaoOpenApi();
-        $data = $chat->userGet('kk2');
-        self::showMsg($data);
+        $data = $chat->userGet(Yii::$app->user->id);
+        $this->layout = 'blank';
+        $t = json_decode($data, true);
+        return $this->render('index', [
+            'data' => $t['userinfos']['userinfos'][0],
+        ]);
+    }
+
+    /** 发送消息 */
+    public function actionSendMsg()
+    {
+        $chat = new TaoBaoOpenApi();
+        $data = $chat->userGet(Yii::$app->user->id);
+        $this->layout = 'blank';
+        $t = json_decode($data, true);
+        return $this->render('index', [
+            'data' => $t['userinfos']['userinfos'][0],
+            'touid' => Yii::$app->request->get('id')
+        ]);
+    }
+
+    /** 获所有IM用户信息(不包括本身) */
+    public function actionAllUserGet()
+    {
+        $chat = new TaoBaoOpenApi();
+        $userIds = User::getAllUserId();
+        $data = $chat->userGet(implode(',', array_column($userIds, 'id')));
+        $this->layout = 'blank';
+        $t = json_decode($data, true);
+        // $this->showMsg($t['userinfos']['userinfos']);exit;
+        return $this->render('all_user', [
+            'data' => $t['userinfos']['userinfos'],
+        ]);
     }
 
     /** 删除IM用户 */
