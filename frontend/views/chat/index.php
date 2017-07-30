@@ -18,8 +18,6 @@
                 appkey: 24564518,
                 credential: "<?php echo $data['password'] ?>",
                 touid: "<?= $touid ?>",
-                autoMsg: 'http://osak94fpd.bkt.clouddn.com/123.mp3',
-                autoMsgType: 2,
                 customData: {
                     item: { // 上传宝贝id
                         id: '宝贝id'
