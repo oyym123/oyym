@@ -408,6 +408,7 @@ class PayController extends WebController
      *          order_sn=订单编号
      *          layout=众筹购买 || 一口价购买, 用来展示不同的布局页面
      *          msg=你成功参与了1件宝贝共计2人次,活动编号如下,
+     *          count=参与人次
      *          product_title=iphone 6s 完美越狱版
      *          award_code=数组
      *              123
@@ -441,9 +442,11 @@ class PayController extends WebController
         $codes = $order->getAwardCodes();
 
         $data += [
-            'msg' => '你成功参与了1件宝贝共计2人次,活动编号如下',
-            'codes' => $codes
+            'msg' => '你成功参与了1件宝贝共计' . ($order->orderProduct ? $order->orderProduct->count : 0) . '人次,活动编号如下',
+            'codes' => $codes,
+            'count' => $order->orderProduct ? $order->orderProduct->count : 0,
         ];
+
         foreach ($codes as $code) {
             $data['codes'][] = $code;
         }

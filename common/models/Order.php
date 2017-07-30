@@ -86,8 +86,13 @@ class Order extends Base
     public function rules()
     {
         return [
+<<<<<<< HEAD
             [['freight', 'deleted_at', 'address_id'], 'default', 'value' => '0'],
 //            [['sn'], 'default', 'value' => (string) time()],
+=======
+            [['freight', 'deleted_at', 'address_id', 'seller_shipped_at', 'buyer_shipped_at'], 'default', 'value' => '0'],
+            [['return_shipping_company', 'shipping_company'], 'default', 'value' => ''],
+>>>>>>> ddc220e1b3a4ae535c2d4728d32bdb676cfb4484
             [['buyer_id', 'seller_id', 'sn', 'status', 'ip'], 'required'],
             [['buyer_id', 'seller_id', 'evaluation_status', 'pay_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['pay_amount', 'product_amount', 'discount_amount'], 'number'],
@@ -290,10 +295,9 @@ class Order extends Base
         $this->product_amount = $this->productsAmount;
         $this->discount_amount = $this->discountAmount;
         $this->freight = $this->freight;
+        $this->address_id = 0;
         $this->pay_type = 0;
-
         if (!$this->save()) {
-//            print_r($this->getErrors());exit;
             throw new Exception('创建订单失败');
         }
 
@@ -646,6 +650,12 @@ class Order extends Base
         return $this->hasOne(User::className(), ['id' => 'buyer_id']);
     }
 
+    /** 获取买家收货地址 */
+    public function getBuyerAddress()
+    {
+        return $this->hasOne(UserAddress::className(), ['id' => 'address_id']);
+    }
+
     /** 取订单商品一条 */
     public function getOrderProduct()
     {
@@ -910,6 +920,24 @@ class Order extends Base
         return $this->status == self::STATUS_WAIT_SHIP;
     }
 
+    /** 卖家是否可以查看评价 */
+    public function sellerIsCanLookEvaluation()
+    {
+        return in_array($this->evaluation_status, [self::EVALUATION_STATUS_1, self::EVALUATION_STATUS_3]) ? 1 : 0;
+    }
+
+    /** 买家是否可以查看评价 */
+    public function buyerIsCanLookEvaluation()
+    {
+        return in_array($this->evaluation_status, [self::EVALUATION_STATUS_2, self::EVALUATION_STATUS_3]) ? 1 : 0;
+    }
+
+    /** 是否需要卖家同意买家的退款申请 */
+    public function isNeedSellerAgreeRefund()
+    {
+        return $this->status == self::STATUS_REFUND_APPLY ? 1 : 0;
+    }
+
     /** 卖家订单详情页可以做的操作 */
     public function sellerViewActions()
     {
@@ -919,25 +947,19 @@ class Order extends Base
                 'title' => '发货',
                 'url' => 'shipping',
             ];
-        }
-
-        if ($this->isWaitSellerEvaluation()) {
+        } elseif ($this->isWaitSellerEvaluation()) {
             // 等待评价
             $r[] = [
                 'title' => '评价',
                 'url' => 'evaluation',
             ];
-        }
-
-        if ($this->sellerIsCanLookEvaluation()) {
+        } elseif ($this->sellerIsCanLookEvaluation()) {
             // 等待评价
             $r[] = [
                 'title' => '查看评价',
                 'url' => 'look_evaluation',
             ];
-        }
-
-        if ($this->isNeedSellerAgreeRefund()) {
+        } elseif ($this->isNeedSellerAgreeRefund()) {
             // 需要卖家同意买家的退款
             $r[] = [
                 'title' => '同意退款',
@@ -948,5 +970,84 @@ class Order extends Base
                 'url' => 'reject_refund',
             ];
         }
+
+        return $r;
     }
+
+    /** 买家订单详情页可以做的操作 */
+    public function buyerViewActions()
+    {
+        $r = [];
+
+        if ($this->isWaitSellerEvaluation()) {
+            // 等待评价
+            $r[] = [
+                'title' => '评价',
+                'url' => 'evaluation',
+            ];
+        } elseif ($this->sellerIsCanLookEvaluation()) {
+            // 等待评价
+            $r[] = [
+                'title' => '查看评价',
+                'url' => 'look_evaluation',
+            ];
+        } elseif ($this->isNeedSellerAgreeRefund()) {
+            // 需要卖家同意买家的退款
+            $r[] = [
+                'title' => '确认收货',
+                'url' => 'agree_refund',
+            ];
+            $r[] = [
+                'title' => '申请退款',
+                'url' => 'reject_refund',
+            ];
+        }
+    }
+
+    /** 状态线 */
+    public function statusLine()
+    {
+        $r = [
+            [
+                'title' => '已付款',
+                'layout' => 1,
+            ]
+        ];
+
+        if (!$this->isAPriceOrder()) {
+            // 众筹订单
+            $r[] = [
+                'title' => '已揭晓',
+                'layout' => $this->status >= self::STATUS_WAIT_SHIP ? 1 : 0,
+            ];
+        }
+
+        $r[] = [
+            'title' => '已发货',
+            'layout' => $this->status >= self::STATUS_SHIPPED ? 1 : 0,
+        ];
+
+        $r[] = [
+            'title' => '已签收',
+            'layout' => $this->status >= self::STATUS_CONFIRM_RECEIVING ? 1 : 0,
+        ];
+
+        if ($this->buyer_id == Yii::$app->user->identity->id) {
+            // 判断买家是否已评价
+            $r[] = [
+                'title' => '已评价',
+                'layout' => in_array($this->evaluation_status, [self::EVALUATION_STATUS_2, self::EVALUATION_STATUS_3]) ? 1 : 0,
+            ];
+        } else {
+            // 判断卖家是否已评价
+            $r[] = [
+                'title' => '已评价',
+                'layout' => in_array($this->evaluation_status, [self::EVALUATION_STATUS_1, self::EVALUATION_STATUS_3]) ? 1 : 0,
+            ];
+        }
+
+        return $r;
+    }
+
+
 }

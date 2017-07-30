@@ -30,7 +30,7 @@ class ProductsController extends WebController
     {
         parent::init();
         if (empty($this->userId) && in_array(str_replace('products/', '', Yii::$app->requestedRoute), [
-                'create', 'lottery', 'seller-product-list', 'buyer-product-list'
+                'create', 'lottery', 'seller-product-list', 'buyer-product-list', 'info'
             ])
         ) {
             self::needLogin();
@@ -88,7 +88,7 @@ class ProductsController extends WebController
      *     name="user_id", in="query", required=false, default="0", type="string",
      *     description="取某个卖家的数据"
      *   ),
-     *  @SWG\Parameter(
+     *   @SWG\Parameter(
      *     name="ky-token", in="header", required=false, type="integer", default="1",
      *    ),
      *   @SWG\Response(
@@ -120,12 +120,11 @@ class ProductsController extends WebController
                 'comments' => $product->comments,
                 'like' => $product->likes,
                 'layout_type' => $layoutType ? 1 : $product->listLayoutType(),//单价排序,布局默认为1
-                'a_price' => $product->a_price ?: 0.00,
-                // 布局类型
+                'a_price' => $product->a_price ? $product->a_price : 0.00,
                 'zongjia' => $product->total,
                 'collection_flag' => $product->getIsCollection(),
                 'like_flag' => $product->getIsLike(),
-                'unit_price' => $product->unit_price,
+                'unit_price' => '￥' . $product->unit_price,
                 'end_time' => $product->end_time,
                 'share_params' => [
                     'share_title' => '众筹夺宝',
@@ -370,7 +369,7 @@ class ProductsController extends WebController
                     'name' => $image['name'],
                     'type' => Image::TYPE_PRODUCT,
                     'type_id' => $product->id,
-                    'url' => $image['url'],
+                    'url' => $image['key'],
                     'size_type' => Image::SIZE_MEDIUM,
                     'status' => Base::STATUS_ENABLE,
                 ];
@@ -382,7 +381,7 @@ class ProductsController extends WebController
                     'name' => $video['name'],
                     'type' => Video::TYPE_PRODUCT,
                     'type_id' => $product->id,
-                    'url' => $video['url'],
+                    'url' => $video['key'],
                     'size_type' => Video::SIZE_HD,
                     'status' => Base::STATUS_ENABLE,
                 ];
@@ -478,7 +477,7 @@ class ProductsController extends WebController
                     'name' => $image['name'],
                     'type' => Image::TYPE_PRODUCT,
                     'type_id' => $product->id,
-                    'url' => $image['url'],
+                    'url' => $image['key'],
                     'size_type' => Image::SIZE_MEDIUM,
                     'status' => Base::STATUS_ENABLE,
                 ];
@@ -490,7 +489,7 @@ class ProductsController extends WebController
                     'name' => $video['name'],
                     'type' => Video::TYPE_PRODUCT,
                     'type_id' => $product->id,
-                    'url' => $video['url'],
+                    'url' => $video['key'],
                     'size_type' => Video::SIZE_HD,
                     'status' => Base::STATUS_ENABLE,
                 ];
@@ -555,7 +554,7 @@ class ProductsController extends WebController
      *          comment_count=评论总数
      *          comment_list=评论列表数组
      *              user_count=评论人数
-     *              list
+     *              list≥
      *                  id=评论id
      *                  user_photo=评论用户头像地址
      *                  comment_line_id=评论的上级id,用于区分我评论的谁的评论
@@ -589,9 +588,9 @@ class ProductsController extends WebController
             'like_flag' => $item->getIsLike(), // 喜欢标志
             'comments' => $item->comments, // 评论
             'layout_type' => $item->viewLayoutType(), // 布局类型
-            'unit_price' => $item->unit_price,
+            'unit_price' => '￥' . $item->unit_price,
             'freight' => $item->freight,
-            'a_price' => $item->a_price ?: 0, // 一口价,若有则为大于0 的值,没有则为 0
+            'a_price' => '￥' . $item->a_price ?: 0.00, // 一口价,若有则为大于0 的值,没有则为 0
             'total' => $item->total, // 需要参与人次
 //            'remaining' => $item->total - $participants, // 剩余人次
             'residual_total' => $item->getJoinCount(), // 剩余多少人次
@@ -608,7 +607,7 @@ class ProductsController extends WebController
                         'value' => $item->getLuckUserName(),
                         [
                             'title' => '参与方式:',
-                            'value' => "一口价{$item->a_price}元购买"
+                            'value' => "一口价{￥$item->a_price}元购买"
                         ],
                         [
                             'title' => '购买时间:',
@@ -637,6 +636,85 @@ class ProductsController extends WebController
             ],
             'actions' => $item->buttonType(),
             'publish_countdown' => $item->getPublishCountdown(), // 揭晓倒计时以秒为单位
+        ];
+        self::showMsg($data);
+    }
+
+    /**
+     * @param $id
+     * @SWG\Get(path="/products/info",
+     *   tags={"产品"},
+     *   summary="修改宝贝获取宝贝信息",
+     *   description="Author: lixinxin",
+     *   @SWG\Parameter(
+     *     name="id", in="query", required=true, type="integer", default="1",
+     *     description="产品ID",
+     *   ),
+     *   @SWG\Parameter(
+     *     name="ky-token", in="header", required=false, type="integer", default="1",
+     *    ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          id=宝贝id
+     *          images=相册 数组加字典 [
+     *              [
+     *                  name=图片名字 例如: 宝贝图片1
+     *                  url=图片七牛地址 http://***.jpg
+     *                  key=七牛key
+     *              ]
+     *          ]
+     *          videos=视频 数组加字典 [
+     *              [
+     *                  name=视频七牛名字
+     *                  url=视频七牛地址
+     *                  key=七牛key
+     *              ]
+     *          ]
+     *          title=宝贝标题
+     *          contents=宝贝介绍
+     *          unit_price=宝贝单价
+     *          a_price=宝贝一口价
+     *          total=需要参与人次
+     *          start_time=宝贝开始时间
+     *          end_time=宝贝结束时间
+     *          model=模式 1=数量模式 2=时间模式
+     *          detail_address=定位地址
+     *          lat=纬度
+     *          lng=经度
+     *          freight=运费
+     *          type_id=分类id
+     *          type_text=分类名称"
+     *   )
+     * )
+     */
+    public function actionInfo($id)
+    {
+        $item = $this->findModel(['id' => $id, 'created_by' => Yii::$app->user->identity->id]);
+
+        list($errCode, $msg) = $item->canUpdate(Yii::$app->user->identity->id);
+
+        if ($errCode) {
+            self::showMsg($msg, -1);
+        }
+
+        $data = [
+            'id' => $item->id, // 宝贝id
+            'images' => $item->getImages(), // 相册
+            'videos' => $item->getVideos(), // 视频
+            'title' => $item->title, // 宝贝标题
+            'contents' => $item->contents, // 宝贝介绍
+            'unit_price' => '￥' . $item->unit_price, // 宝贝单价
+            'a_price' => '￥' . $item->a_price, // 宝贝一口价
+            'total' => $item->total, // 需要参与人次
+            'start_time' => date('Y年m月d日H时', $item->start_time), // 宝贝开始时间
+            'end_time' => date('Y年m月d日H时', $item->end_time), // 宝贝结束时间
+            'model' => $item->model, // 模式 1' => , // 数量模式 2' => , // 时间模式
+            'detail_address' => $item->detail_address, // 定位地址
+            'lat' => $item->lat, // 纬度
+            'lng' => $item->lng, // 经'度
+            'freight' => '￥' . $item->freight, // 运费
+            'type_id' => $item->type_id, // 分类id
+            'type_text' => $item->typeModel ? $item->typeModel->name : '', // 分类名称
         ];
         self::showMsg($data);
     }
