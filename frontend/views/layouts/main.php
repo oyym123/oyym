@@ -37,6 +37,7 @@ AppAsset::register($this);
     ]);
     $menuItems = [
         ['label' => 'Chat', 'url' => ['/chat/all-user-get'], 'target' => '_blank'],
+        ['label' => 'Video', 'url' => ['/videos/'], 'target' => '_blank'],
         ['label' => 'Home', 'url' => ['/site/index']],
         ['label' => 'About', 'url' => ['/site/about']],
         ['label' => 'Contact', 'url' => ['/site/contact']],
