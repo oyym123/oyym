@@ -57,7 +57,7 @@ class TaoBaoOpenApi extends Base
         $custmsg = new \CustMsg;
         $custmsg->from_user = "3";
         $custmsg->to_appkey = "0";
-        $custmsg->to_users = "[\"1\",\"2\",'3','4','5']";
+        $custmsg->to_users = "[1,2,3,4,5]";
         $custmsg->summary = "客户端最近消息里面显示的消息摘要";
         $custmsg->data = "123456788";
         $custmsg->aps = "{\"alert\":\"ios apns push\"}";

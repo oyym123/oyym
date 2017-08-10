@@ -29,11 +29,23 @@
                 msgColor: '#fff'
             }
         );
+        var sdk = new WSDK();
+        var obj = {
+            text: 'wsdk'
+        };
+        sdk.Event.on('CHAT.MSG_RECEIVED', function(data){
+            console.log(data);
+            console.log(data.data.uid.substr(8));
+            console.log(data.data.touid.substr(8));
+            var userids=data.data.touid.substr(8);
+            console.log(userids.length);
+            console.log(data.data.msgs[0].msg.customize);
+            // console.log(this.text); // wsdk
+        }, obj);
+
+
     }
 
-    sdk.Event.on('CHAT.MSG_RECEIVED', function(data){
-        console.log("custom data ",data);
-    });
 
 </script>
 </html>
