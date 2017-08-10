@@ -30,5 +30,10 @@
             }
         );
     }
+
+    sdk.Event.on('CHAT.MSG_RECEIVED', function(data){
+        console.log("custom data ",data);
+    });
+
 </script>
 </html>

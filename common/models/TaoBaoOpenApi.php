@@ -53,17 +53,16 @@ class TaoBaoOpenApi extends Base
 
     public function CustmsgPush($params)
     {
-
         $req = new \OpenimCustmsgPushRequest;
         $custmsg = new \CustMsg;
-        $custmsg->from_user = "user_sender";
+        $custmsg->from_user = "3";
         $custmsg->to_appkey = "0";
-        $custmsg->to_users = "[\"kk2\"]";
+        $custmsg->to_users = "[\"1\",\"2\",'3','4','5']";
         $custmsg->summary = "客户端最近消息里面显示的消息摘要";
-        $custmsg->data = "push payload";
+        $custmsg->data = "123456788";
         $custmsg->aps = "{\"alert\":\"ios apns push\"}";
         $custmsg->apns_param = "apns推送的附带数据";
-        $custmsg->invisible = "0";
+        $custmsg->invisible = "1";
         $custmsg->from_nick = "sender_nick";
         $custmsg->from_taobao = "0";
         $req->setCustmsg(json_encode($custmsg));

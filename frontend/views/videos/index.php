@@ -86,14 +86,14 @@
                         <h5>New RoyalSlider</h5>
                         <span>by Dmitry Semenov</span>
                     </div>
-                </a><a class="rsImg" data-rsVideo="https://vimeo.com/45830194" href="/images/video-player/319715493_640.jpg">
+                </a><a class="rsImg" data-rsVideo="http://od83l5fvw.bkt.clouddn.com/DXodcDCPWl_RUHRv7KseqBeMwqc=/llS_h-tV72eA-o9iLz8hmVKE43kw" href="/images/video-player/319715493_640.jpg">
                     <div class="rsTmb">
                         <h5>Stanley Piano</h5>
                         <span>by Digital Kitchen</span>
                     </div>
                 </a>
                 <div class="rsContent">
-                    <a class="rsImg" data-rsVideo="https://vimeo.com/31240369" href=/images/video-player/210393954_640.jpg">
+                    <a class="rsImg" data-rsVideo="http://od83l5fvw.bkt.clouddn.com/DXodcDCPWl_RUHRv7KseqBeMwqc=/llS_h-tV72eA-o9iLz8hmVKE43kw" href=/images/video-player/210393954_640.jpg">
                         <div class="rsTmb">
                             <h5>I Believe I Can Fly</h5>
                             <span>by sebastien montaz-rosset</span>
@@ -101,27 +101,27 @@
                     </a>
                     <h3 class="rsABlock sampleBlock">Animated block, to show you that you can put anything you want inside each slide.</h3>
                 </div>
-                <a class="rsImg" data-rsVideo="https://vimeo.com/44878206" href="/images/video-player/311891198_640.jpg">
+                <a class="rsImg" data-rsVideo="http://od83l5fvw.bkt.clouddn.com/DXodcDCPWl_RUHRv7KseqBeMwqc=/llS_h-tV72eA-o9iLz8hmVKE43kw" href="/images/video-player/311891198_640.jpg">
                     <div class="rsTmb">
                         <h5>Dubstep Dispute</h5>
                         <span>by Fluxel Media</span>
                     </div>
-                </a><a class="rsImg" data-rsVideo="https://vimeo.com/45778774" href="/images/video-player/318502540_640.jpg">
+                </a><a class="rsImg" data-rsVideo="http://od83l5fvw.bkt.clouddn.com/DXodcDCPWl_RUHRv7KseqBeMwqc=/llS_h-tV72eA-o9iLz8hmVKE43kw" href="/images/video-player/318502540_640.jpg">
                     <div class="rsTmb">
                         <h5>The Epic & The Beasts</h5>
                         <span>by Sebastian Linda</span>
                     </div>
-                </a><a class="rsImg" data-rsVideo="https://vimeo.com/41132461" href="/images/video-player/284709146_640.jpg">
+                </a><a class="rsImg" data-rsVideo="http://od83l5fvw.bkt.clouddn.com/DXodcDCPWl_RUHRv7KseqBeMwqc=/llS_h-tV72eA-o9iLz8hmVKE43kw" href="/images/video-player/284709146_640.jpg">
                     <div class="rsTmb">
                         <h5>Barcode Band</h5>
                         <span>by Kang woon Jin</span>
                     </div>
-                </a><a class="rsImg" data-rsVideo="https://vimeo.com/44388232" href="/images/video-player/308375094_640.jpg">
+                </a><a class="rsImg" data-rsVideo="http://od83l5fvw.bkt.clouddn.com/DXodcDCPWl_RUHRv7KseqBeMwqc=/llS_h-tV72eA-o9iLz8hmVKE43kw" href="/images/video-player/308375094_640.jpg">
                     <div class="rsTmb">
                         <h5>Samm Hodges Reel</h5>
                         <span>by Animal</span>
                     </div>
-                </a><a class="rsImg" data-rsVideo="http://www.youtube.com/watch?v=VDspPKDMBMo" href="images/02.jpg">
+                </a><a class="rsImg" data-rsVideo="http://od83l5fvw.bkt.clouddn.com/DXodcDCPWl_RUHRv7KseqBeMwqc=/llS_h-tV72eA-o9iLz8hmVKE43kw" href="images/02.jpg">
                     <div class="rsTmb">
                         <h5>The Foundry Showreel</h5>
                         <span>by The Foundry</span>
