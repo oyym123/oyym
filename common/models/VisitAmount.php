@@ -11,6 +11,7 @@ use frontend\components\WebController;
  * @property integer $id
  * @property string $user_ip
  * @property string $user_ip_address
+ * @property string $interface
  * @property integer $phone_type
  * @property integer $visit_times
  * @property integer $created_at
@@ -48,9 +49,10 @@ class VisitAmount extends Base
     /** 访问统计 */
     public static function createVisit()
     {
-        $model = self::findOne(['user_ip' => Yii::$app->request->userIP]) ?: new VisitAmount();
+        $model = self::findOne(['user_ip' => Yii::$app->request->userIP, 'interface' => Yii::$app->requestedRoute]) ?: new VisitAmount();
         $model->user_ip = Yii::$app->request->userIP;
         $model->user_ip_address = self::getUserAddress();
+        $model->interface = Yii::$app->requestedRoute;
         $model->visit_times = $model->visit_times ? $model->visit_times + 1 : 1;
         $model->phone_type = WebController::getAppTypeByUa();
         if (!$model->save()) {
