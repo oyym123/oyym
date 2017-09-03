@@ -44,7 +44,7 @@ class ChatController extends WebController
                 'chat/all-user-get',
             ])
         ) {
-            self::needHtmlLogin();
+            self::setHint('需要您先登录，才能进行操作哦O(∩_∩)O~~');
         }
     }
 

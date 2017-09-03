@@ -72,8 +72,11 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $this->layout = 'blank';
         return $this->render('index');
     }
+
+
 
     /**
      * Logs in a user.

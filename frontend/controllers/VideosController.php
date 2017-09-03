@@ -167,8 +167,6 @@ class VideosController extends WebController
         self::showMsg(Video::getVideos($params), 1);
     }
 
-
-    /** 获取单个IM用户信息 */
     public function actionIndex()
     {
         $this->layout = 'blank';
@@ -176,4 +174,21 @@ class VideosController extends WebController
             'data' => '',
         ]);
     }
+
+    public function actionSearchView()
+    {
+        $this->layout = 'blank';
+        return $this->render('search', [
+            'data' => '',
+        ]);
+    }
+
+    public function actionSearch()
+    {
+        $this->layout = 'blank';
+        return $this->render('index', [
+            'data' => '',
+        ]);
+    }
+
 }

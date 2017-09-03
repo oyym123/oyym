@@ -28,9 +28,15 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'status')->textInput() ?>
 
-    <?= $form->field($model, 'created_at')->textInput() ?>
+    <span style="display: none;">
+    <?= $form->field($model, 'name')->textarea(['rows' => 6, 'id' => 'name']) ?>
+    </span>
+    <script src="/js/ueditor/ueditor.config.js"></script>
+    <script src="/js/ueditor/ueditor.all.min.js"></script>
+    <script src="/js/ueditor/lang/zh-cn/zh-cn.js"></script>
 
-    <?= $form->field($model, 'updated_at')->textInput() ?>
+    <label class="control-label" for="intro">内容介绍</label>
+    <script id="editor" type="text/plain" style="width:1024px;height:500px;"></script>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
@@ -39,3 +45,24 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
+<script type="text/javascript">
+
+    //实例化编辑器
+    //建议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
+    var ue = UE.getEditor('editor', {
+        autoHeight: true
+    });
+
+    ue.ready(function () {
+        //设置编辑器的内容
+        ue.setContent('<?= $model->name ?>');
+        //获取html内容，返回: <p>hello</p>
+//        var html = ue.getContent();
+        //获取纯文本内容，返回: hello
+//        var txt = ue.getContentTxt();
+    });
+
+    function setContents() {
+        $("#contents").val(ue.getContent());
+    }
+</script>
