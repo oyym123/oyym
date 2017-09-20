@@ -1,11 +1,14 @@
 <?php
 namespace backend\controllers;
 
+use common\models\User;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
+use common\models\UserInfo;
+use common\models\UserSearch;
 
 /**
  * Site controller
@@ -60,9 +63,13 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $data = [
-            ''
-        ];
+        $data = [];
+        $users = User::find()->where(['status' => User::STATUS_ACTIVE])->limit(10)->all();
+        foreach ($users as $user) {
+            $data[] = [
+                'userName' => $user->name,
+            ];
+        }
         $this->layout = 'blank';
         return $this->render('index', [
             'data' => $data

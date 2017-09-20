@@ -12,7 +12,7 @@ use common\models\Image;
 use frontend\components\WebController;
 use Yii;
 
-class ImagesController extends WebController
+class ImageController extends WebController
 {
     public function init()
     {
@@ -165,5 +165,13 @@ class ImagesController extends WebController
             'psize' => $this->psize
         ];
         self::showMsg(Image::getImages($params), 1);
+    }
+
+    public function actionIndex()
+    {
+        $this->layout = 'blank';
+        return $this->render('index', [
+            'data' => '',
+        ]);
     }
 }

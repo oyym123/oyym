@@ -170,8 +170,15 @@ class VideosController extends WebController
     public function actionIndex()
     {
         $this->layout = 'blank';
+        if (Yii::$app->request->get('key_words')) {
+            return $this->render('index', [
+                'data' => '',
+                'hotSearchWords' => ['猩球崛起', '蜘蛛侠', '战狼', '金刚狼3']
+            ]);
+        }
         return $this->render('index', [
             'data' => '',
+            'hotSearchWords' => ['猩球崛起', '蜘蛛侠', '战狼', '金刚狼3']
         ]);
     }
 
@@ -183,11 +190,21 @@ class VideosController extends WebController
         ]);
     }
 
+    public function actionView()
+    {
+        $this->layout = 'blank';
+        return $this->render('view', [
+            'data' => '',
+        ]);
+    }
+
     public function actionSearch()
     {
+
         $this->layout = 'blank';
         return $this->render('index', [
             'data' => '',
+            'hotSearchWords' => ['猩球崛起', '蜘蛛侠', '战狼', '金刚狼3']
         ]);
     }
 

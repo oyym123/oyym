@@ -312,7 +312,7 @@
                 <span>All Options</span>
             </h4>
         </div>
-        <div>
+        <div onclick="image();">
             <span class="sb-icon icon-picture"></span>
             <h4>
                 <span>User Images</span>
@@ -363,9 +363,12 @@
         document.getElementById("Login").style.visibility = "visible";
 
     }
+    function image() {
+        location.href = "image/";
+    }
 
     function video() {
-        location.href = "videos/search-view";
+        location.href = "videos/index";
     }
 
     function music() {
