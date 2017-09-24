@@ -173,11 +173,13 @@ class VideosController extends WebController
         if (Yii::$app->request->get('key_words')) {
             return $this->render('index', [
                 'data' => '',
+                'keyWords' => Yii::$app->request->get('key_words'),
                 'hotSearchWords' => ['猩球崛起', '蜘蛛侠', '战狼', '金刚狼3']
             ]);
         }
         return $this->render('index', [
             'data' => '',
+            'keyWords' => '',
             'hotSearchWords' => ['猩球崛起', '蜘蛛侠', '战狼', '金刚狼3']
         ]);
     }

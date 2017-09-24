@@ -55,8 +55,8 @@
         <br/>
 
         <p class="page-description text-center"><?php
-            if (isset($_GET['key_words'])) {
-                echo '以下为 <b>' . $_GET['key_words'] . '</b> 的搜索结果,共计<b>100</b>条记录';
+            if ($keyWords) {
+                echo '以下为 <b>' . $keyWords . '</b> 的搜索结果,共计<b>100</b>条记录';
             } ?> </p>
 
         <div class="tz-gallery">

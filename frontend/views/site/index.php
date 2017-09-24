@@ -288,7 +288,7 @@
                 <span>User Modes</span>
             </h4>
         </div>
-        <div>
+        <div onclick="search();">
             <span class="sb-icon icon-eye"></span>
             <h4>
                 <span>Browse All</span>
@@ -363,6 +363,11 @@
         document.getElementById("Login").style.visibility = "visible";
 
     }
+
+    function search() {
+        location.href = "search";
+    }
+
     function image() {
         location.href = "image/";
     }
