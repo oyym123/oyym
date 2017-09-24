@@ -24,8 +24,10 @@ class SearchController extends WebController
             $xmldata .= fgets($fp, 4096);
         }
         fclose($fp);
-        $x = new Xml();
-        return json_decode($x->xml2json($url), true);
+        $xml_object = NULL;
+        $xml_object = simplexml_load_file($url);
+        $xml_json = json_encode($xml_object);
+        return json_decode($xml_json, true);
     }
 
     public function actionIndex()
