@@ -16,7 +16,7 @@ class SearchController extends WebController
     /** 抓取http://www.btwhat.net的数据 */
     public function searchInfo($keyWords)
     {
-        $url = 'http://www.btwhat.net/rss/' . $keyWords . 'xml';
+        $url = 'http://www.btwhat.net/rss/' . $keyWords . '.xml';
         header('Content-Type:text/html;charset= UTF-8');
         $xmldata = "";
         $fp = fopen($url, "r");
