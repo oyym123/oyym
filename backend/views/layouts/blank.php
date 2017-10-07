@@ -115,7 +115,7 @@ $this->title = '管理后台';
 <!-- Button to open/hide shortcuts -->
 <a href="#" id="open-shortcuts"><span class="icon-thumbs"></span></a>
 
-<?php echo $content;?>
+<?php echo $content; ?>
 
 <!-- Side tabs shortcuts -->
 <ul id="shortcuts" role="complementary" class="children-tooltip tooltip-right">
@@ -142,16 +142,16 @@ $this->title = '管理后台';
         <div id="profile">
             <img src="/images/bootstrap/user.png" width="64" height="64" alt="User name" class="user-icon">
             Hello
-            <span class="name">欧阳 <b>裕民</b></span>
+            <span class="name"><?= Yii::$app->user->identity->name ?></span>
         </div>
 
         <!-- By default, this section is made for 4 icons, see the doc to learn how to change this, in "basic markup explained" -->
         <ul id="access" class="children-tooltip">
-            <li><a href="inbox.html" title="Messages"><span class="icon-inbox"></span><span class="count">2</span></a>
+            <li><a href="inbox.html" title="Messages"><span class="icon-chat"></span><span class="count">2</span></a>
             </li>
             <li><a href="calendars.html" title="Calendar"><span class="icon-calendar"></span></a></li>
             <li><a href="login.html" title="Profile"><span class="icon-user"></span></a></li>
-            <li class="disabled"><span class="icon-gear"></span></li>
+            <li><a href="login.html"<span class="icon-movie"></span></a></li>
         </ul>
 
         <section class="navigable">
@@ -209,15 +209,34 @@ $this->title = '管理后台';
             </ul>
         </section>
 
+        <script language="javascript" type="text/javascript">
+            function showLeftTime() {
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = now.getUTCMonth();
+                var day = now.getDate();
+                var hours = now.getHours();
+                var minutes = now.getMinutes();
+                var seconds = now.getSeconds();
+                document.all.show.innerHTML = "" + year + "年" + (month + 1) + "月" + day + "日 " + hours + ":" + minutes + ":" + seconds + "";
+//一秒刷新一次显示时间
+                setTimeout(showLeftTime, 1000);
+            }
+        </script>
+
+
         <ul class="unstyled-list">
             <li class="title-menu">Today's event</li>
             <li>
                 <ul class="calendar-menu">
                     <li>
                         <a href="#" title="See event">
-                            <time datetime="2011-02-24"><b>24</b> Feb</time>
-                            <small class="green">10:30</small>
-                            Event's description
+                            <time datetime="2017-09-26"><b><?= date('d') ?></b> <?= date('D') ?></time>
+                            <label class="green">
+                                <body onload="showLeftTime()">
+                                <label id="show">当前时间</label>
+                                </body>
+                            </label>
                         </a>
                     </li>
                 </ul>
@@ -574,14 +593,14 @@ $this->title = '管理后台';
                 clearTimeout(timeout);
             }
         });
-    };
+    }
+    ;
 
 </script>
 
 <!-- Charts library -->
 <!-- Load the AJAX API -->
 <script>
-
 
 
 </script>

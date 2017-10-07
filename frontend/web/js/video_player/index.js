@@ -7,7 +7,7 @@ window.onload = function () {
 
     //初始化
     var video = $('#video1').videoCt({
-        title: '窗前明月光',              //标题
+        title: '蜡笔小新外传 带家之狼(2017)屁屁剑法',              //标题
         volume: 0.5,                //音量
         barrage: true,              //弹幕开关
         comment: true,              //弹幕
@@ -17,9 +17,9 @@ window.onload = function () {
         autoplay: true,            //自动播放
         clarity: {
             type: ['360P', '480P', '720p'],            //清晰度
-            src: ['http://jq22.qiniudn.com/jq22.mp4',
-                'http://jq22.qiniudn.com/jq22.mp4',
-                'http://osak94fpd.bkt.clouddn.com/demo321?e=1504261176&token=PUJTfsyDqEfwagmIqw5kWhmuq0tSn-MNaFiZeXPs:qb_bZZE63DULJ2Xgsf03lruwFvE=']      //链接地址
+            src: ['http://oex0i784m.bkt.clouddn.com/%E7%AC%AC01%E8%AF%9D%20%E5%B1%81%E5%B1%81%E5%89%91%E6%B3%95_%E6%A0%87%E6%B8%85.mp4',
+                'http://oex0i784m.bkt.clouddn.com/%E7%AC%AC01%E8%AF%9D%20%E5%B1%81%E5%B1%81%E5%89%91%E6%B3%95_%E9%AB%98%E6%B8%85.mp4',
+                'http://oex0i784m.bkt.clouddn.com/%E7%AC%AC01%E8%AF%9D%20%E5%B1%81%E5%B1%81%E5%89%91%E6%B3%95_%E8%B6%85%E6%B8%85.mp4']      //链接地址
         },
         commentFile: 'comment.json'           //导入弹幕json数据
     });
