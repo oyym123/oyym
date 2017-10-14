@@ -96,7 +96,8 @@
                         <option value="http://api.91exp.com/svip/?url=" selected="">③号vip引擎系统【搜狐SOhu】</option>
                         <option value="http://api.662820.com/xnflv/index.php?url=" selected="">②号vip引擎系统【PPTV解析】
                         </option>
-                        <option value="http://vip.jlsprh.com/index.php?url=" selected="">①号通用vip引擎系统【稳定通用】</option>
+<!--                        <option value="http://vip.jlsprh.com/index.php?url=" selected="">①号通用vip引擎系统【稳定通用】</option>-->
+                       <option value="http://api.loc.lol/?url=" selected="">①号通用vip引擎系统【稳定通用】</option>
                     </select>
                 </div>
             </div>
