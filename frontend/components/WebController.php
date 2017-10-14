@@ -3,6 +3,7 @@ namespace frontend\components;
 
 use app\helpers\Helper;
 use common\models\User;
+use common\models\VisitAmount;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -31,6 +32,7 @@ class WebController extends Controller
             Yii::$app->user->identity = $this->getApiUser();
         }
 
+        VisitAmount::createVisit();
         if (isset($_REQUEST['env_dev'])) {
             \common\helpers\Helper::writeLog($_GET);
             \common\helpers\Helper::writeLog($_POST);
