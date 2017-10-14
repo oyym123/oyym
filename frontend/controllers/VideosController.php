@@ -210,4 +210,11 @@ class VideosController extends WebController
         ]);
     }
 
+
+    public function actionWatch()
+    {
+        $this->layout = 'blank';
+        return $this->render('watch', [
+        ]);
+    }
 }

@@ -306,7 +306,7 @@
                 <span>Productivity</span>
             </h4>
         </div>
-        <div>
+        <div onclick="watch();">
             <span class="sb-icon icon-globe"></span>
             <h4>
                 <span>All Options</span>
@@ -370,6 +370,10 @@
 
     function image() {
         location.href = "image/";
+    }
+
+    function watch() {
+        location.href = "videos/watch";
     }
 
     function video() {
