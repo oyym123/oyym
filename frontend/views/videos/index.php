@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>视频列表</title>
-    <link rel="stylesheet" type="text/css" href="http://www.jq22.com/jquery/bootstrap-3.3.4.css">
+    <link rel="stylesheet" type="text/css" href="https://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
     <link rel="stylesheet" href="/css/video_list/baguetteBox.min.css">
     <link rel="stylesheet" href="/css/video_list/thumbnail-gallery.css">
     <link rel="stylesheet" type="text/css" href="/css/search/search-form.css">
