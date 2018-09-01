@@ -33,8 +33,14 @@
                 <div class="grid grid--effect-<?= $active[rand(1, 9)] ?>">
                     <?php
                     foreach ($item as $t) {
+                        $guid = isset($t['guid']) ? $t['guid'] : '';
+                        if ($guid) {
+                            $url = 'search/url?url=' . str_replace('http://www.btbook.us/wiki/', '', $guid);
+                        } else {
+                            $url = '#';
+                        }
                         ?>
-                        <a href="<?= "search/url?url=" . str_replace('http://www.btbook.us/wiki/', '', $t['guid']) ?>"
+                        <a href="<?= $url ?>"
                            target="_blank" class="grid__item grid__item--c<?= rand(1, 3) ?>">
                             <div class="stack">
                                 <div class="stack__deco"></div>
