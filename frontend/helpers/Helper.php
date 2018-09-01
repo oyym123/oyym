@@ -153,4 +153,67 @@ class Helper extends BaseArrayHelper
         }
         return $ip;
     }
+
+    public static function breakString($str, $num)
+    {
+        preg_match_all("/./u", $str, $arr);//将所有字符转成单个数组
+
+        //print_r($arr);
+
+        $strstr = '';
+        $width = 0;
+        $arr = $arr[0];
+        foreach ($arr as $key => $string) {
+            $strlen = strlen($string);//计算当前字符的长度，一个字母的长度为1，一个汉字的长度为3
+            //echo $strlen;
+
+            if ($strlen == 3) {
+
+                $width += 1;
+
+            } else {
+
+                $width += 0.5;
+
+            }
+
+            $strstr .= $string;
+
+            //计算当前字符的下一个
+            if (array_key_exists($key + 1, $arr)) {
+                $_strlen = strlen($arr[$key + 1]);
+                if ($_strlen == 3) {
+                    $_width = 1;
+                } else {
+                    $_width = 0.5;
+                }
+                if ($width + $_width > $num) {
+                    $width = 0;
+                    $strstr .= "\n";
+                }
+            }
+
+        }
+        return $strstr;
+    }
+
+
+    public static function getInfo($url = '')
+    {
+
+        //初始化
+        $curlobj = curl_init();
+        //设置访问的url
+        curl_setopt($curlobj, CURLOPT_URL, $url);
+        //执行后不直接打印出
+        curl_setopt($curlobj, CURLOPT_RETURNTRANSFER, true);
+        //  curl_setopt($curlobj, CURLOPT_HEADER, 0);
+        //设置https 支持
+        // date_default_timezone_get('PRC');   //使用cookies时，必须先设置时区
+        curl_setopt($curlobj, CURLOPT_SSL_VERIFYPEER, 0);  //终止从服务端验证
+        curl_setopt($curlobj, CURLOPT_FOLLOWLOCATION, 1);
+        $output = curl_exec($curlobj);  //执行获取内容
+        curl_close($curlobj);          //关闭curl
+        return $output;
+    }
 }
