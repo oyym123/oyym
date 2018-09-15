@@ -21,7 +21,7 @@ $this->title = '管理后台';
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>Developr</title>
+    <title>欧阳裕民博客</title>
     <meta name="description" content="">
     <meta name="author" content="">
 

@@ -3,7 +3,7 @@
 <html xmlns="/www.w3.org/1999/xhtml">
 <head id="Head1">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>云上的日子</title>
+    <title>欧阳裕民博客</title>
     <meta name="Keywords" content="想念云上的日子"/>
     <meta name="Description" content="FM音乐电台"/>
     <meta name="Copyright" content="ouyym.com"/>

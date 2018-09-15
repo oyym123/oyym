@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>视频列表</title>
+    <title>欧阳裕民博客</title>
     <link rel="stylesheet" type="text/css" href="https://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
     <link rel="stylesheet" href="/css/video_list/baguetteBox.min.css">
     <link rel="stylesheet" href="/css/video_list/thumbnail-gallery.css">

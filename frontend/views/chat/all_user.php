@@ -13,7 +13,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Grid Loading Animations | </title>
+    <title>欧阳裕民博客</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,500,700" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/sponsor/pater.css"/>
     <link rel="stylesheet" type="text/css" href="/css/all-user/normalize.css">

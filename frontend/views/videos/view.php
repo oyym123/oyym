@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>video</title>
+    <title>欧阳裕民博客</title>
     <link rel="stylesheet" href="/css/video_player/videoCT.css">
     <link rel="stylesheet" href="/css/video_player/index.css">
 
@@ -24,7 +24,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>无标题文档</title>
+    <title>欧阳裕民博客</title>
 </head>
 <style>
     body {

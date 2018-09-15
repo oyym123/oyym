@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Pisual Mouse</title>
+    <title>欧阳裕民博客</title>
     <link rel="stylesheet" type="text/css" href="/css/index/demo.css">
     <link rel="stylesheet" type="text/css" href="/css/index/style3.css">
     <link rel="stylesheet" type="text/css" href="/css/index/ui.css">
